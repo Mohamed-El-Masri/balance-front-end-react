@@ -1,0 +1,54 @@
+.property-details-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Loading container */
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 60vh;
+  gap: 20px;
+}
+
+.loadingContainer p {
+  font-size: 1.2rem;
+  color: var(--color-text-secondary);
+}
+
+/* Property sections layout */
+.property-details-page__sections {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 30px;
+  margin: 40px 0;
+}
+
+.property-details-page__main {
+  grid-column: 1;
+}
+
+.property-details-page__sidebar {
+  grid-column: 2;
+}
+
+/* RTL Support */
+[dir="rtl"] .property-details-page {
+  direction: rtl;
+  text-align: right;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .property-details-page__sections {
+    grid-template-columns: 1fr;
+  }
+  
+  .property-details-page__main,
+  .property-details-page__sidebar {
+    grid-column: 1;
+  }
+}
