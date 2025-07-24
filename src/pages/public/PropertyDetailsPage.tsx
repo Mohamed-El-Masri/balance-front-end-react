@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import LoadingSpinner from '../../components/ui/common/LoadingSpinner';
-import Toast from '../../components/ui/Toast';
-import PropertyBreadcrumb from '../../components/ui/property-details/PropertyBreadcrumb';
+import Toast from '../../components/ui/common/Toast';
+import PageBreadcrumb from '../../components/ui/shared/PageBreadcrumb';
 import PropertyGallery from '../../components/ui/property-details/PropertyGallery';
 import PropertyInfo from '../../components/ui/property-details/PropertyInfo';
 import PropertyDescription from '../../components/ui/property-details/PropertyDescription';
@@ -23,6 +23,10 @@ const mockPropertyData = {
   locationAr: 'الرياض، حي الملك فهد',
   address: 'King Fahd Road, Building 123, Floor 5',
   addressAr: 'طريق الملك فهد، مبنى 123، الطابق 5',
+  // Project information for breadcrumb
+  projectName: 'Balance Residential Complex',
+  projectNameAr: 'مجمع بالانس السكني',
+  projectSlug: 'balance-residential-complex',
   images: [
     'https://images.adsttc.com/media/images/5eee/50f9/b357/658c/7f00/0125/large_jpg/00FI_V_COMPOUND_Cover.jpg?1592676562',
     'https://www.shutterstock.com/image-photo/cityscape-residential-area-modern-apartment-600nw-1723278520.jpg',
@@ -243,14 +247,17 @@ const PropertyDetailsPage: React.FC = () => {
       />
 
       {/* Breadcrumb with Hero Background */}
-      <PropertyBreadcrumb 
-        propertyName={propertyData.name}
-        propertyNameAr={propertyData.nameAr}
+      <PageBreadcrumb 
+        title={propertyData.name}
+        titleAr={propertyData.nameAr}
         location={propertyData.location}
         locationAr={propertyData.locationAr}
         backgroundImage={propertyData.images[0]}
         propertyType={propertyData.type}
         propertyTypeAr={propertyData.typeAr}
+        projectName={propertyData.projectName}
+        projectNameAr={propertyData.projectNameAr}
+        projectSlug={propertyData.projectSlug}
       />
 
       {/* Property Gallery */}

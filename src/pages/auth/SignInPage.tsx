@@ -280,7 +280,7 @@ const SignInPage: React.FC = () => {
         {/* Background Image Section */}
         <div className={styles.signin__image_section}>
           <div className={styles.signin__image_content}>
-            <img src="/public/assets/signin/4963.jpg" alt="Balance Real Estate" />
+            <img src="https://res.cloudinary.com/dk2cdwufj/image/upload/v1753350813/4963_txeqoe.jpg" alt="Balance Real Estate" />
             <div className={styles.signin__image_overlay}>
               <h2>{isArabic ? 'اكتشف عقارك المثالي' : 'Discover Your Perfect Property'}</h2>
               <p>{isArabic ? 'مع بالانس العقارية، ابحث عن منزل أحلامك' : 'With Balance Real Estate, find your dream home'}</p>

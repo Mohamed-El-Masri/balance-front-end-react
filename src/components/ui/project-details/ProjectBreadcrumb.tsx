@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Home, ChevronRight, MapPin } from 'lucide-react';
 import styles from '../../../styles/components/project-details/ProjectBreadcrumb.module.css';
 import { useLanguage } from '../../../contexts/useLanguage';
@@ -21,6 +21,8 @@ const ProjectBreadcrumb: React.FC<ProjectBreadcrumbProps> = ({
 }) => {
   const { currentLanguage } = useLanguage();
   const isArabic = currentLanguage.code === 'ar';
+  const routeLocation = useLocation();
+  const isProjectsPage = routeLocation.pathname === '/projects';
 
   const content = {
     en: {
@@ -52,13 +54,21 @@ const ProjectBreadcrumb: React.FC<ProjectBreadcrumbProps> = ({
             {t.home}
           </Link>
           <ChevronRight size={16} className={styles.breadcrumb__separator} />
-          <Link to="/projects" className={styles.breadcrumb__link}>
-            {t.projects}
-          </Link>
-          <ChevronRight size={16} className={styles.breadcrumb__separator} />
-          <span className={styles.breadcrumb__current}>
-            {t.projectDetails}
-          </span>
+          {isProjectsPage ? (
+            <span className={styles.breadcrumb__current}>
+              {t.projects}
+            </span>
+          ) : (
+            <>
+              <Link to="/projects" className={styles.breadcrumb__link}>
+                {t.projects}
+              </Link>
+              <ChevronRight size={16} className={styles.breadcrumb__separator} />
+              <span className={styles.breadcrumb__current}>
+                {t.projectDetails}
+              </span>
+            </>
+          )}
         </nav>
 
         {/* Project Info */}

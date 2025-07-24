@@ -490,7 +490,7 @@ const SignUpPage: React.FC = () => {
         {/* Background Image Section */}
         <div className={styles.signup__image_section}>
           <div className={styles.signup__image_content}>
-            <img src="/public/assets/signup/signupimage.jpg" alt="Balance Real Estate" />
+            <img src="https://res.cloudinary.com/dk2cdwufj/image/upload/v1753359141/signupimage_1_snu6qx.jpg" alt="Balance Real Estate" />
             <div className={styles.signup__image_overlay}>
               <h2>{isArabic ? 'ابدأ رحلتك العقارية معنا' : 'Start Your Real Estate Journey'}</h2>
               <p>{isArabic ? 'انضم إلى آلاف العملاء الراضين عن خدماتنا' : 'Join thousands of satisfied customers'}</p>

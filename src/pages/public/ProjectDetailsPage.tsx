@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import LoadingSpinner from '../../components/ui/common/LoadingSpinner';
 import Toast from '../../components/ui/common/Toast';
-import ProjectBreadcrumb from '../../components/ui/project-details/ProjectBreadcrumb';
+import PageBreadcrumb from '../../components/ui/shared/PageBreadcrumb';
 import ProjectGallery from '../../components/ui/project-details/ProjectGallery';
 import ProjectInfo from '../../components/ui/project-details/ProjectInfo';
 import ProjectDescription from '../../components/ui/project-details/ProjectDescription';
@@ -264,9 +264,9 @@ const ProjectDetailsPage: React.FC = () => {
       />
 
       {/* Breadcrumb with Hero Background */}
-      <ProjectBreadcrumb 
-        projectName={projectData.name}
-        projectNameAr={projectData.nameAr}
+      <PageBreadcrumb 
+        title={projectData.name}
+        titleAr={projectData.nameAr}
         location={projectData.location}
         locationAr={projectData.locationAr}
         backgroundImage={projectData.images[0]}

@@ -1,13 +1,13 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
-  Breadcrumb, 
   ProjectFilter, 
   ProjectCard, 
   Pagination,
   type ActiveFilters,
   type Project 
 } from '../../components/ui/projects';
+import PageBreadcrumb from '../../components/ui/shared/PageBreadcrumb';
 import styles from '../../styles/pages/ProjectsPage.module.css';
 import { useLanguage } from '../../contexts/useLanguage';
 
@@ -32,20 +32,14 @@ const ProjectsPage: React.FC = () => {
       pageDescription: 'Discover our exceptional real estate developments across Saudi Arabia',
       sectionTitle: 'Featured Projects',
       sectionDescription: 'Explore our diverse portfolio of residential and commercial developments designed to meet your lifestyle and investment needs.',
-      breadcrumbItems: [
-        { label: 'Home', href: '/' },
-        { label: 'Projects' }
-      ]
+      location: 'Saudi Arabia'
     },
     ar: {
       pageTitle: 'مشاريعنا',
       pageDescription: 'اكتشف مشاريعنا العقارية الاستثنائية في جميع أنحاء المملكة العربية السعودية',
       sectionTitle: 'المشاريع المميزة',
       sectionDescription: 'استكشف محفظتنا المتنوعة من التطويرات السكنية والتجارية المصممة لتلبية احتياجات نمط حياتك الاستثمارية.',
-      breadcrumbItems: [
-        { label: 'الرئيسية', href: '/' },
-        { label: 'المشاريع' }
-      ]
+      location: 'المملكة العربية السعودية'
     }
   };
 
@@ -320,10 +314,11 @@ const ProjectsPage: React.FC = () => {
   return (
     <>
       {/* Breadcrumb */}
-      <Breadcrumb
-        items={t.breadcrumbItems}
+      <PageBreadcrumb
         title={t.pageTitle}
-        description={t.pageDescription}
+        titleAr={t.pageTitle}
+        location={t.location}
+        locationAr={t.location}
         backgroundImage="https://images.adsttc.com/media/images/5eee/50f9/b357/658c/7f00/0125/large_jpg/00FI_V_COMPOUND_Cover.jpg?1592676562"
       />
 

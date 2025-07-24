@@ -15,6 +15,9 @@ export interface Property {
     lat: number
     lng: number
   }
+  projectName?: string
+  projectNameAr?: string
+  projectSlug?: string
   createdAt: string
   updatedAt: string
 }

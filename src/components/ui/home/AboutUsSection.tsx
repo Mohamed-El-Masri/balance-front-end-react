@@ -87,7 +87,7 @@ const AboutUsSection: React.FC = () => {
 
   const handleLearnMore = () => {
     // التنقل إلى صفحة About Us
-    window.location.href = '/about-us';
+    window.location.href = '/about';
   };
 
   return (
