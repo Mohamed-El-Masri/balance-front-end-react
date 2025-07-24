@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Mail, Phone, MapPin, Clock, Send, User, MessageSquare } from 'lucide-react';
 import { useLanguage } from '../../contexts/useLanguage';
+import PageBreadcrumb from '../../components/ui/shared/PageBreadcrumb';
 import Toast from '../../components/ui/Toast';
 import styles from '../../styles/components/public/Contact.module.css';
 
@@ -214,16 +215,14 @@ const ContactPage: React.FC = () => {
 
   return (
     <div className={styles.contact} dir={isArabic ? 'rtl' : 'ltr'}>
-      <div className={styles.contact__container}>
-        {/* Hero Section */}
-        <div className={styles.contact__hero}>
-          <div className={styles.contact__hero_content}>
-            <h1 className={styles.contact__title}>{t.pageTitle}</h1>
-            <p className={styles.contact__subtitle}>{t.pageSubtitle}</p>
-          </div>
-        </div>
+      {/* Page Breadcrumb */}
+      <PageBreadcrumb 
+        title={t.pageTitle}
+        titleAr={t.pageTitle}
+        backgroundImage="https://res.cloudinary.com/dk2cdwufj/image/upload/v1753362166/Image-6_u4opka.jpg"
+      />
 
-        {/* Main Content */}
+      <div className={styles.contact__container}>
         <div className={styles.contact__content}>
           <div className={styles.contact__grid}>
             {/* Contact Information */}

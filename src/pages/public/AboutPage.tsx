@@ -1,6 +1,7 @@
 import React from 'react';
-import { Target, Eye, Award, Users, Building, TrendingUp, Heart, Shield } from 'lucide-react';
+import { Target, Eye, Award, Users, Building, Heart, Shield, MapPin } from 'lucide-react';
 import { useLanguage } from '../../contexts/useLanguage';
+import PageBreadcrumb from '../../components/ui/shared/PageBreadcrumb';
 import styles from '../../styles/components/public/About.module.css';
 
 const AboutPage: React.FC = () => {
@@ -49,24 +50,24 @@ const AboutPage: React.FC = () => {
           description: 'Strategic locations in prime areas across major Saudi cities'
         },
         {
-          title: 'Quality Construction',
-          description: 'Using the finest materials and latest construction techniques'
+          title: 'Innovative Design',
+          description: 'Modern architectural solutions that blend functionality with aesthetics'
         },
         {
-          title: 'Modern Amenities',
-          description: 'State-of-the-art facilities and services for modern living'
+          title: 'Sustainable Development',
+          description: 'Eco-friendly construction practices aligned with Saudi Vision 2030'
         },
         {
-          title: 'Investment Value',
-          description: 'Properties designed to appreciate in value over time'
+          title: 'Investment Security',
+          description: 'Proven track record of delivering high-value, appreciating properties'
         },
         {
           title: 'Customer Service',
-          description: '24/7 support and after-sales service for all our clients'
+          description: 'Dedicated support team ensuring exceptional client experience'
         },
         {
-          title: 'Sustainability',
-          description: 'Eco-friendly developments that respect the environment'
+          title: 'Quality Assurance',
+          description: 'Rigorous quality control processes and premium material selection'
         }
       ],
       timeline: {
@@ -90,32 +91,32 @@ const AboutPage: React.FC = () => {
           {
             year: '2019',
             title: 'Innovation Award',
-            description: 'Received the Saudi Real Estate Innovation Award'
+            description: 'Received Saudi Real Estate Innovation Award'
           },
           {
             year: '2022',
             title: 'Sustainability Focus',
-            description: 'Launched our green building initiative aligned with Vision 2030'
+            description: 'Launched green building initiative aligned with Vision 2030'
           },
           {
             year: '2024',
             title: 'Digital Transformation',
-            description: 'Implemented cutting-edge technology across all operations'
+            description: 'Implemented cutting-edge PropTech solutions'
           }
         ]
       }
     },
     ar: {
-      pageTitle: 'عن شركة بالنس للتطوير العقاري',
+      pageTitle: 'حول بالنس العقارية',
       pageSubtitle: 'نبني الأحلام، ننشئ المجتمعات، ونشكل مستقبل العقارات في المملكة العربية السعودية',
       ourStory: 'قصتنا',
-      storyContent: 'تأسست شركة بالنس للتطوير العقاري عام 2010، وكانت في المقدمة في تحول القطاع العقاري السعودي. بدأنا برؤية بسيطة: إنشاء مساحات معيشة وعمل استثنائية تعزز حياة الناس مع المساهمة في رؤية المملكة 2030. على مر السنين، نمونا من شركة عائلية صغيرة إلى واحدة من أكثر الأسماء الموثوقة في تطوير العقارات السعودية.',
+      storyContent: 'تأسست بالنس العقارية في عام 2010، وكانت في طليعة التحول العقاري في المملكة العربية السعودية. بدأنا برؤية بسيطة: إنشاء مساحات معيشة وعمل استثنائية تعزز حياة الناس مع المساهمة في رؤية المملكة 2030. على مر السنين، نمونا من شركة عائلية صغيرة لنصبح واحدة من أكثر الأسماء الموثوقة في تطوير العقارات السعودية.',
       ourMission: 'رسالتنا',
       missionContent: 'تطوير مشاريع عقارية مبتكرة ومستدامة وعالية الجودة تلبي الاحتياجات المتطورة للمجتمع السعودي الحديث مع الحفاظ على تراثنا الثقافي والمساهمة في النمو الاقتصادي.',
       ourVision: 'رؤيتنا',
-      visionContent: 'أن نكون الشركة الرائدة في التطوير العقاري في المملكة العربية السعودية، معترف بها لالتزامنا بالتميز والابتكار ورضا العملاء، مع لعب دور محوري في تشكيل مستقبل التطوير العمراني في المملكة.',
+      visionContent: 'أن نكون المطور العقاري الرائد في المملكة العربية السعودية، معترف بالتزامنا بالتميز والابتكار ورضا العملاء، مع لعب دور محوري في تشكيل مستقبل التطوير العمراني في المملكة.',
       ourValues: 'قيمنا',
-      whyChooseUs: 'لماذا تختار بالنس للتطوير العقاري؟',
+      whyChooseUs: 'لماذا تختار بالنس العقارية؟',
       stats: {
         projectsCompleted: 'مشروع مكتمل',
         yearsExperience: 'سنة من الخبرة',
@@ -137,33 +138,33 @@ const AboutPage: React.FC = () => {
         },
         {
           title: 'التركيز على العميل',
-          description: 'عملاؤنا في قلب كل ما نفعله، ونحن ملتزمون بتجاوز توقعاتهم.'
+          description: 'عملاؤنا في قلب كل ما نقوم به، ونحن ملتزمون بتجاوز توقعاتهم.'
         }
       ],
       features: [
         {
           title: 'مواقع مميزة',
-          description: 'مواقع استراتيجية في أرقى المناطق عبر المدن السعودية الرئيسية'
+          description: 'مواقع استراتيجية في المناطق الرئيسية عبر المدن السعودية الكبرى'
         },
         {
-          title: 'جودة البناء',
-          description: 'استخدام أجود المواد وأحدث تقنيات البناء'
+          title: 'تصميم مبتكر',
+          description: 'حلول معمارية حديثة تمزج بين الوظائف والجماليات'
         },
         {
-          title: 'وسائل راحة حديثة',
-          description: 'مرافق وخدمات متطورة للعيش العصري'
+          title: 'التطوير المستدام',
+          description: 'ممارسات بناء صديقة للبيئة متماشية مع رؤية السعودية 2030'
         },
         {
-          title: 'قيمة استثمارية',
-          description: 'عقارات مصممة لتزداد قيمتها مع مرور الوقت'
+          title: 'أمان الاستثمار',
+          description: 'سجل حافل في تقديم عقارات عالية القيمة ومتزايدة التقدير'
         },
         {
           title: 'خدمة العملاء',
-          description: 'دعم على مدار الساعة وخدمة ما بعد البيع لجميع عملائنا'
+          description: 'فريق دعم مخصص يضمن تجربة عملاء استثنائية'
         },
         {
-          title: 'الاستدامة',
-          description: 'مشاريع صديقة للبيئة تحترم البيئة'
+          title: 'ضمان الجودة',
+          description: 'عمليات مراقبة جودة صارمة واختيار مواد فاخرة'
         }
       ],
       timeline: {
@@ -172,7 +173,7 @@ const AboutPage: React.FC = () => {
           {
             year: '2010',
             title: 'تأسيس الشركة',
-            description: 'تأسست بالنس للتطوير العقاري برؤية لتحويل العقارات السعودية'
+            description: 'تأسست بالنس العقارية برؤية لتحويل العقارات السعودية'
           },
           {
             year: '2013',
@@ -197,7 +198,7 @@ const AboutPage: React.FC = () => {
           {
             year: '2024',
             title: 'التحول الرقمي',
-            description: 'طبقنا تقنيات متطورة عبر جميع العمليات'
+            description: 'طبقنا حلول تقنية عقارية متطورة'
           }
         ]
       }
@@ -205,55 +206,64 @@ const AboutPage: React.FC = () => {
   };
 
   const t = isArabic ? content.ar : content.en;
-
-  const statsData = [
-    { icon: Building, value: '150+', label: t.stats.projectsCompleted },
-    { icon: Award, value: '14+', label: t.stats.yearsExperience },
-    { icon: Users, value: '5000+', label: t.stats.happyClients },
-    { icon: TrendingUp, value: '12+', label: t.stats.citiesCovered }
-  ];
-
   const valueIcons = [Target, Eye, Shield, Heart];
 
   return (
     <div className={styles.about} dir={isArabic ? 'rtl' : 'ltr'}>
-      {/* Hero Section */}
-      <section className={styles.about__hero}>
-        <div className={styles.about__hero_content}>
-          <h1 className={styles.about__title}>{t.pageTitle}</h1>
-          <p className={styles.about__subtitle}>{t.pageSubtitle}</p>
-        </div>
-        <div className={styles.about__hero_image}>
-          <img 
-            src="/images/about-hero.jpg" 
-            alt="Balance Real Estate" 
-            onError={(e) => {
-              (e.target as HTMLImageElement).src = '/images/placeholder-hero.jpg';
-            }}
-          />
+      {/* Page Breadcrumb */}
+      <PageBreadcrumb 
+        title={t.pageTitle}
+        titleAr={t.pageTitle}
+        backgroundImage="https://res.cloudinary.com/dk2cdwufj/image/upload/v1753360975/Image-7_zzi2sl.jpg"
+      />
+
+      {/* Stats Section */}
+      <section className={styles.about__stats}>
+        <div className={styles.about__stats_container}>
+          <div className={styles.about__stats_grid}>
+            <div className={styles.about__stat_card}>
+              <div className={styles.about__stat_icon}>
+                <Building size={32} />
+              </div>
+              <div className={styles.about__stat_content}>
+                <div className={styles.about__stat_value}>150+</div>
+                <div className={styles.about__stat_label}>{t.stats.projectsCompleted}</div>
+              </div>
+            </div>
+            <div className={styles.about__stat_card}>
+              <div className={styles.about__stat_icon}>
+                <Award size={32} />
+              </div>
+              <div className={styles.about__stat_content}>
+                <div className={styles.about__stat_value}>15+</div>
+                <div className={styles.about__stat_label}>{t.stats.yearsExperience}</div>
+              </div>
+            </div>
+            <div className={styles.about__stat_card}>
+              <div className={styles.about__stat_icon}>
+                <Users size={32} />
+              </div>
+              <div className={styles.about__stat_content}>
+                <div className={styles.about__stat_value}>5000+</div>
+                <div className={styles.about__stat_label}>{t.stats.happyClients}</div>
+              </div>
+            </div>
+            <div className={styles.about__stat_card}>
+              <div className={styles.about__stat_icon}>
+                <MapPin size={32} />
+              </div>
+              <div className={styles.about__stat_content}>
+                <div className={styles.about__stat_value}>12+</div>
+                <div className={styles.about__stat_label}>{t.stats.citiesCovered}</div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
-      <div className={styles.about__container}>
-        {/* Stats Section */}
-        <section className={styles.about__stats}>
-          <div className={styles.about__stats_grid}>
-            {statsData.map((stat, index) => (
-              <div key={index} className={styles.about__stat_card}>
-                <div className={styles.about__stat_icon}>
-                  <stat.icon size={32} />
-                </div>
-                <div className={styles.about__stat_content}>
-                  <span className={styles.about__stat_value}>{stat.value}</span>
-                  <span className={styles.about__stat_label}>{stat.label}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Story Section */}
-        <section className={styles.about__section}>
+      {/* Story Section */}
+      <section className={styles.about__section}>
+        <div className={styles.about__section_container}>
           <div className={styles.about__section_grid}>
             <div className={styles.about__section_content}>
               <h2 className={styles.about__section_title}>{t.ourStory}</h2>
@@ -261,18 +271,20 @@ const AboutPage: React.FC = () => {
             </div>
             <div className={styles.about__section_image}>
               <img 
-                src="/images/about-story.jpg" 
+                src="https://res.cloudinary.com/dk2cdwufj/image/upload/v1753360976/rikaz-basyouni-SSdOb-uU0iM-unsplash_oaerxi.jpg" 
                 alt="Our Story"
                 onError={(e) => {
-                  (e.target as HTMLImageElement).src = '/images/placeholder-story.jpg';
+                  (e.target as HTMLImageElement).src = 'https://res.cloudinary.com/dk2cdwufj/image/upload/v1753360976/rikaz-basyouni-SSdOb-uU0iM-unsplash_oaerxi.jpg';
                 }}
               />
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* Mission & Vision */}
-        <section className={styles.about__mission_vision}>
+      {/* Mission & Vision */}
+      <section className={styles.about__mission_vision}>
+        <div className={styles.about__mv_container}>
           <div className={styles.about__mv_grid}>
             <div className={styles.about__mv_card}>
               <div className={styles.about__mv_icon}>
@@ -289,10 +301,12 @@ const AboutPage: React.FC = () => {
               <p className={styles.about__mv_text}>{t.visionContent}</p>
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* Values Section */}
-        <section className={styles.about__values}>
+      {/* Values Section */}
+      <section className={styles.about__values}>
+        <div className={styles.about__section_container}>
           <h2 className={styles.about__section_title}>{t.ourValues}</h2>
           <div className={styles.about__values_grid}>
             {t.values.map((value, index) => {
@@ -308,10 +322,12 @@ const AboutPage: React.FC = () => {
               );
             })}
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* Why Choose Us */}
-        <section className={styles.about__features}>
+      {/* Why Choose Us */}
+      <section className={styles.about__features}>
+        <div className={styles.about__section_container}>
           <h2 className={styles.about__section_title}>{t.whyChooseUs}</h2>
           <div className={styles.about__features_grid}>
             {t.features.map((feature, index) => (
@@ -321,10 +337,12 @@ const AboutPage: React.FC = () => {
               </div>
             ))}
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* Timeline */}
-        <section className={styles.about__timeline}>
+      {/* Timeline */}
+      <section className={styles.about__timeline}>
+        <div className={styles.about__section_container}>
           <h2 className={styles.about__section_title}>{t.timeline.title}</h2>
           <div className={styles.about__timeline_container}>
             {t.timeline.events.map((event, index) => (
@@ -339,10 +357,12 @@ const AboutPage: React.FC = () => {
               </div>
             ))}
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* CTA Section */}
-        <section className={styles.about__cta}>
+      {/* CTA Section */}
+      <section className={styles.about__cta}>
+        <div className={styles.about__cta_container}>
           <div className={styles.about__cta_content}>
             <h2 className={styles.about__cta_title}>
               {isArabic ? 'هل أنت مستعد للانضمام إلى عائلة بالنس؟' : 'Ready to Join the Balance Family?'}
@@ -362,8 +382,8 @@ const AboutPage: React.FC = () => {
               </a>
             </div>
           </div>
-        </section>
-      </div>
+        </div>
+      </section>
     </div>
   );
 };

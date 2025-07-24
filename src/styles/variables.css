@@ -13,7 +13,11 @@
   --balance-blue-800: #A79E9C; /* رمادي فاتح مائل للوردي */
   
   --balance-accent: #B58863; /* لون نحاسي/برونزي */
-  
+  --balance-accent-light: #FBBF24; /* لون أصفر نحاسي فاتح */
+  --balance-accent-dark: #F59E0B; /* لون أصفر نحاسي داكن */
+  --balance-accent-hover: #FBBF24; /* لون أصفر نحاسي عند التمرير */
+
+
   --balance-black: #161616; /* أسود داكن جداً (charcoal black) */
   --balance-white: #FFFFFF;
 

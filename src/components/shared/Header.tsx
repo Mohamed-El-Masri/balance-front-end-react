@@ -83,7 +83,7 @@ const Header: React.FC = () => {
         <div className={styles.header__nav}>
           {/* Logo */}
           <Link to="/" className={styles.header__logo}>
-            <img src="https://res.cloudinary.com/dk2cdwufj/image/upload/v1753351651/Balance_-_Icon_Yellow_1_1_yvu7al.png" alt="Balance Real Estate" className={styles.header__logoImg} />
+            <img src="https://res.cloudinary.com/dk2cdwufj/image/upload/v1753363614/Balance_-_logo_ekzzzs.png" alt="Balance Real Estate" className={styles.header__logoImg} />
             <div className={styles.header__logoText}>
               <span className={styles.header__logoName}>
                 {currentLanguage.code === 'ar' ? 'بالنس' : 'Balance'}
@@ -130,7 +130,17 @@ const Header: React.FC = () => {
               className={styles["header__lang-btn"]}
               aria-label="Change Language"
             >
-              🇸🇦 {currentLanguage.code === 'ar' ? 'EN' : 'AR'}
+              {currentLanguage.code === 'ar' ? (
+                <>
+                  <img src="https://cdn-icons-png.flaticon.com/128/206/206626.png" alt="English" style={{width: '20px', height: '20px'}} />
+                  EN
+                </>
+              ) : (
+                <>
+                  <img src="https://cdn-icons-png.flaticon.com/128/14821/14821650.png" alt="العربية" style={{width: '20px', height: '20px'}} />
+                  ع
+                </>
+              )}
               <ChevronDown size={14} />
             </button>
             
@@ -193,7 +203,7 @@ const Header: React.FC = () => {
           <div className={styles["header__mobile-menu"]}>
             <div className={styles["header__mobile-header"]}>
               <Link to="/" className={styles.header__logo} onClick={() => setIsMenuOpen(false)}>
-                <img src="https://res.cloudinary.com/dk2cdwufj/image/upload/v1753351651/Balance_-_Icon_Yellow_1_1_yvu7al.png" alt="Balance Real Estate" className={styles.header__logoImg} />
+                <img src="https://res.cloudinary.com/dk2cdwufj/image/upload/v1753363614/Balance_-_logo_ekzzzs.png" alt="Balance Real Estate" className={styles.header__logoImg} />
                 <div className={styles.header__logoText}>
                   <span className={styles.header__logoName}>
                     {currentLanguage.code === 'ar' ? 'بالنس' : 'Balance'}
@@ -250,7 +260,17 @@ const Header: React.FC = () => {
                   }}
                   className={styles["header__lang-btn"]}
                 >
-                  {currentLanguage.code === 'ar' ? 'EN' : 'AR'}
+                  {currentLanguage.code === 'ar' ? (
+                    <>
+                      <img src="https://cdn-icons-png.flaticon.com/128/206/206626.png" alt="English" style={{width: '18px', height: '18px'}} />
+                      EN
+                    </>
+                  ) : (
+                    <>
+                      <img src="https://cdn-icons-png.flaticon.com/128/14821/14821650.png" alt="العربية" style={{width: '18px', height: '18px'}} />
+                      ع
+                    </>
+                  )}
                   <ChevronDown size={16} />
                 </button>
                 
