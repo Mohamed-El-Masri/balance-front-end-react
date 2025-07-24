@@ -19,7 +19,7 @@ const FeaturedProjects: React.FC = () => {
       status: isArabic ? 'قيد الإنشاء' : 'Under Construction',
       completion: isArabic ? '2025' : '2025',
       units: 120,
-      image: '/images/Home/projects-section.png'
+      image: 'https://images.adsttc.com/media/images/5eee/50f9/b357/658c/7f00/0125/large_jpg/00FI_V_COMPOUND_Cover.jpg?1592676562'
     },
     {
       id: 2,
@@ -29,7 +29,7 @@ const FeaturedProjects: React.FC = () => {
       status: isArabic ? 'مكتمل' : 'Completed',
       completion: isArabic ? '2024' : '2024',
       units: 80,
-      image: '/images/Home/About-section.png'
+      image: 'https://www.shutterstock.com/image-photo/cityscape-residential-area-modern-apartment-600nw-1723278520.jpg'
     },
     {
       id: 3,
@@ -39,7 +39,7 @@ const FeaturedProjects: React.FC = () => {
       status: isArabic ? 'قيد التخطيط' : 'Planning Phase',
       completion: isArabic ? '2026' : '2026',
       units: 200,
-      image: '/images/Home/hero-slider-section.png'
+      image: 'https://normarch.com/wp-content/uploads/2018/05/thumb_X-ARCHITECTURE-aaaaa-La-Vista-Compound-north-coast-QU-N.RGB_color.0000.jpg.jpg.jpg'
     },
     {
       id: 4,
@@ -49,7 +49,7 @@ const FeaturedProjects: React.FC = () => {
       status: isArabic ? 'قيد الإنشاء' : 'Under Construction',
       completion: isArabic ? '2025' : '2025',
       units: 150,
-      image: '/images/Home/projects-section.png'
+      image: 'https://www.omranarch.com/storage/projects/2014/1442-muhaidib-family-compound/2.jpg'
     },
     {
       id: 5,
@@ -59,7 +59,7 @@ const FeaturedProjects: React.FC = () => {
       status: isArabic ? 'متاح للبيع' : 'Available for Sale',
       completion: isArabic ? '2024' : '2024',
       units: 60,
-      image: '/images/Home/About-section.png'
+      image: 'https://ideal-architects.com/data/77/2116/15721673489652.jpg'
     },
     {
       id: 6,
@@ -69,7 +69,7 @@ const FeaturedProjects: React.FC = () => {
       status: isArabic ? 'قيد الإنشاء' : 'Under Construction',
       completion: isArabic ? '2026' : '2026',
       units: 90,
-      image: '/images/Home/hero-slider-section.png'
+      image: 'https://ideal-architects.com/data/77/2116/15721674722493.JPG'
     }
   ];
 

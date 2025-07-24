@@ -147,7 +147,7 @@ const AboutUsSection: React.FC = () => {
           <div className={styles.about__image}>
             <div className={styles.about__image_container}>
               <img 
-                src="/public/assets/Home-aboutus.png" 
+                src="https://res.cloudinary.com/dk2cdwufj/image/upload/v1753350813/Home-aboutus_hvy5su.png" 
                 alt={t.title}
                 className={styles.about__image_main}
               />

@@ -9,21 +9,21 @@ const slides = {
       title: 'Choose Your Perfect Home',
       description: 'We help you find the perfect home easily.',
       browse: 'Browse properties',
-      image: '/public/assets/slider-images/slide01.png',
+      image: 'https://res.cloudinary.com/dk2cdwufj/image/upload/v1753350813/slide01_ntinrh.png',
       alt: 'Luxury Property'
     },
     {
       title: 'Luxury Properties in Saudi Arabia',
       description: 'Discover exceptional real estate opportunities with premium amenities.',
       browse: 'View Collection',
-      image: '/public/assets/slider-images/slide02.png',
+      image: 'https://res.cloudinary.com/dk2cdwufj/image/upload/v1753350814/slide02_e6wb9r.png',
       alt: 'Premium Real Estate'
     },
     {
       title: 'Smart Real Estate Investment',
       description: 'Build your wealth with strategic property investments.',
       browse: 'Start Investing',
-      image: '/public/assets/slider-images/slide03.png',
+      image: 'https://res.cloudinary.com/dk2cdwufj/image/upload/v1753350814/slide03_d1g24p.png',
       alt: 'Investment Properties'
     }
   ],
@@ -32,21 +32,21 @@ const slides = {
       title: 'اختر منزلك المثالي',
       description: 'نساعدك في العثور على المنزل المثالي بسهولة.',
       browse: 'تصفح العقارات',
-      image: '/public/assets/slider-images/slide01.png',
+      image: 'https://res.cloudinary.com/dk2cdwufj/image/upload/v1753350813/slide01_ntinrh.png',
       alt: 'منزل فاخر'
     },
     {
       title: 'عقارات فاخرة في المملكة العربية السعودية',
       description: 'اكتشف فرص عقارية استثنائية مع وسائل راحة متميزة.',
       browse: 'عرض المجموعة',
-      image: '/public/assets/slider-images/slide02.png',
+      image: 'https://res.cloudinary.com/dk2cdwufj/image/upload/v1753350814/slide02_e6wb9r.png',
       alt: 'عقارات مميزة'
     },
     {
       title: 'استثمار عقاري ذكي',
       description: 'ابن ثروتك من خلال استثمارات عقارية استراتيجية.',
       browse: 'ابدأ الاستثمار',
-      image: '/public/assets/slider-images/slide03.png',
+      image: 'https://res.cloudinary.com/dk2cdwufj/image/upload/v1753350814/slide03_d1g24p.png',
       alt: 'عقارات استثمارية'
     }
   ]

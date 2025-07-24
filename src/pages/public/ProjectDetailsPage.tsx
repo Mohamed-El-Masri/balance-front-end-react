@@ -33,11 +33,11 @@ const mockProjectData = {
   location: 'Riyadh, King Fahd District',
   locationAr: 'الرياض، حي الملك فهد',
   images: [
-    '/images/projects/project1-1.jpg',
-    '/images/projects/project1-2.jpg',
-    '/images/projects/project1-3.jpg',
-    '/images/projects/project1-4.jpg',
-    '/images/projects/project1-5.jpg'
+    'https://images.adsttc.com/media/images/5eee/50f9/b357/658c/7f00/0125/large_jpg/00FI_V_COMPOUND_Cover.jpg?1592676562',
+    'https://www.shutterstock.com/image-photo/cityscape-residential-area-modern-apartment-600nw-1723278520.jpg',
+    'https://normarch.com/wp-content/uploads/2018/05/thumb_X-ARCHITECTURE-aaaaa-La-Vista-Compound-north-coast-QU-N.RGB_color.0000.jpg.jpg.jpg',
+    'https://www.omranarch.com/storage/projects/2014/1442-muhaidib-family-compound/2.jpg',
+    'https://ideal-architects.com/data/77/2116/15721673489652.jpg'
   ],
   category: 'Residential',
   categoryAr: 'سكني',
@@ -91,7 +91,7 @@ const mockProjectData = {
       buildingAr: 'المبنى أ',
       features: ['Balcony', 'City View', 'Parking'],
       featuresAr: ['شرفة', 'إطلالة على المدينة', 'موقف سيارة'],
-      images: ['/images/properties/prop1-1.jpg', '/images/properties/prop1-2.jpg'],
+      images: ['https://ideal-architects.com/data/77/2116/15721674722493.JPG', 'https://images.squarespace-cdn.com/content/v1/616c31383a6fd661d13b21df/1640311031879-NGK4HWKU8VUVF3P0ICOF/Cam_003.jpg'],
       status: 'available' as const,
       isFavorited: false
     },
@@ -110,7 +110,7 @@ const mockProjectData = {
       buildingAr: 'المبنى ب',
       features: ['Garden View', 'Storage Room', 'Maid Room'],
       featuresAr: ['إطلالة على الحديقة', 'غرفة تخزين', 'غرفة خادمة'],
-      images: ['/images/properties/prop2-1.jpg', '/images/properties/prop2-2.jpg'],
+      images: ['https://newcapital-developments.com/wp-content/uploads/2023/12/apartments-For-Sale-in-Oia-New-Capital-Compound.jpg', 'https://mgd.com.eg/wp-content/uploads/2024/12/Dream-Heaven-Mini-Compound-arabic-1_Page_03.webp'],
       status: 'reserved' as const,
       isFavorited: true
     },
@@ -129,7 +129,7 @@ const mockProjectData = {
       buildingAr: 'المبنى ج',
       features: ['Roof Terrace', 'Private Elevator', 'Jacuzzi'],
       featuresAr: ['تراس علوي', 'مصعد خاص', 'جاكوزي'],
-      images: ['/images/properties/prop3-1.jpg', '/images/properties/prop3-2.jpg'],
+      images: ['https://mgd.com.eg/wp-content/uploads/2024/05/WhatsApp-Image-2024-11-05-at-14.53.16.webp', 'https://newcairo-developments.com/wp-content/uploads/2024/03/Prices-and-spaces-of-At-East-El-Mostakbal-Compound.jpg'],
       status: 'sold' as const,
       isFavorited: false
     }

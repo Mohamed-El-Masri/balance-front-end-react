@@ -15,7 +15,7 @@ const FeaturedProperties: React.FC = () => {
       bedrooms: 5,
       bathrooms: 4,
       area: 450,
-      image: '/api/placeholder/400/300',
+      image: 'https://images.adsttc.com/media/images/5eee/50f9/b357/658c/7f00/0125/large_jpg/00FI_V_COMPOUND_Cover.jpg?1592676562',
       features: ['Swimming Pool', 'Garden', 'Garage', 'Modern Kitchen'],
       rating: 4.9
     },
@@ -29,7 +29,7 @@ const FeaturedProperties: React.FC = () => {
       bedrooms: 3,
       bathrooms: 2,
       area: 180,
-      image: '/api/placeholder/400/300',
+      image: 'https://www.shutterstock.com/image-photo/cityscape-residential-area-modern-apartment-600nw-1723278520.jpg',
       features: ['Sea View', 'Balcony', 'Parking', 'Gym Access'],
       rating: 4.7
     },
@@ -43,7 +43,7 @@ const FeaturedProperties: React.FC = () => {
       bedrooms: 0,
       bathrooms: 8,
       area: 800,
-      image: '/api/placeholder/400/300',
+      image: 'https://normarch.com/wp-content/uploads/2018/05/thumb_X-ARCHITECTURE-aaaaa-La-Vista-Compound-north-coast-QU-N.RGB_color.0000.jpg.jpg.jpg',
       features: ['Prime Location', 'Elevator', 'Security', 'Parking'],
       rating: 4.8
     },
@@ -57,7 +57,7 @@ const FeaturedProperties: React.FC = () => {
       bedrooms: 8,
       bathrooms: 6,
       area: 650,
-      image: '/api/placeholder/400/300',
+      image: 'https://www.omranarch.com/storage/projects/2014/1442-muhaidib-family-compound/2.jpg',
       features: ['Multiple Units', 'Private Garden', 'Guest House', 'Security'],
       rating: 4.9
     }
@@ -97,7 +97,7 @@ const FeaturedProperties: React.FC = () => {
               {/* Image */}
               <div className={styles["featured__card-image"]}>
                 <img 
-                  src="/images/Home/projects-section.png" 
+                  src={property.image} 
                   alt={property.title} 
                 />
                 

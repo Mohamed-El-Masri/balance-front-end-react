@@ -24,12 +24,12 @@ const mockPropertyData = {
   address: 'King Fahd Road, Building 123, Floor 5',
   addressAr: 'طريق الملك فهد، مبنى 123، الطابق 5',
   images: [
-    '/images/properties/property1-1.jpg',
-    '/images/properties/property1-2.jpg',
-    '/images/properties/property1-3.jpg',
-    '/images/properties/property1-4.jpg',
-    '/images/properties/property1-5.jpg',
-    '/images/properties/property1-6.jpg'
+    'https://images.adsttc.com/media/images/5eee/50f9/b357/658c/7f00/0125/large_jpg/00FI_V_COMPOUND_Cover.jpg?1592676562',
+    'https://www.shutterstock.com/image-photo/cityscape-residential-area-modern-apartment-600nw-1723278520.jpg',
+    'https://normarch.com/wp-content/uploads/2018/05/thumb_X-ARCHITECTURE-aaaaa-La-Vista-Compound-north-coast-QU-N.RGB_color.0000.jpg.jpg.jpg',
+    'https://www.omranarch.com/storage/projects/2014/1442-muhaidib-family-compound/2.jpg',
+    'https://ideal-architects.com/data/77/2116/15721673489652.jpg',
+    'https://ideal-architects.com/data/77/2116/15721674722493.JPG'
   ],
   price: 850000,
   area: 180,

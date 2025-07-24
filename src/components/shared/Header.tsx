@@ -83,7 +83,7 @@ const Header: React.FC = () => {
         <div className={styles.header__nav}>
           {/* Logo */}
           <Link to="/" className={styles.header__logo}>
-            <img src="/images/logo-balance.svg" alt="Balance Real Estate" className={styles.header__logoImg} />
+            <img src="https://res.cloudinary.com/dk2cdwufj/image/upload/v1753351651/Balance_-_Icon_Yellow_1_1_yvu7al.png" alt="Balance Real Estate" className={styles.header__logoImg} />
             <div className={styles.header__logoText}>
               <span className={styles.header__logoName}>
                 {currentLanguage.code === 'ar' ? 'بالنس' : 'Balance'}
@@ -193,7 +193,7 @@ const Header: React.FC = () => {
           <div className={styles["header__mobile-menu"]}>
             <div className={styles["header__mobile-header"]}>
               <Link to="/" className={styles.header__logo} onClick={() => setIsMenuOpen(false)}>
-                <img src="/images/logo-balance.svg" alt="Balance Real Estate" className={styles.header__logoImg} />
+                <img src="https://res.cloudinary.com/dk2cdwufj/image/upload/v1753351651/Balance_-_Icon_Yellow_1_1_yvu7al.png" alt="Balance Real Estate" className={styles.header__logoImg} />
                 <div className={styles.header__logoText}>
                   <span className={styles.header__logoName}>
                     {currentLanguage.code === 'ar' ? 'بالنس' : 'Balance'}
