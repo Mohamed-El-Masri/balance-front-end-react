@@ -9,21 +9,21 @@ const slides = {
       title: 'Choose Your Perfect Home',
       description: 'We help you find the perfect home easily.',
       browse: 'Browse properties',
-      image: '/src/assets/slider-images/slide01.png',
+      image: '/public/assets/slider-images/slide01.png',
       alt: 'Luxury Property'
     },
     {
       title: 'Luxury Properties in Saudi Arabia',
       description: 'Discover exceptional real estate opportunities with premium amenities.',
       browse: 'View Collection',
-      image: '/src/assets/slider-images/slide02.png',
+      image: '/public/assets/slider-images/slide02.png',
       alt: 'Premium Real Estate'
     },
     {
       title: 'Smart Real Estate Investment',
       description: 'Build your wealth with strategic property investments.',
       browse: 'Start Investing',
-      image: '/src/assets/slider-images/slide03.png',
+      image: '/public/assets/slider-images/slide03.png',
       alt: 'Investment Properties'
     }
   ],
@@ -32,21 +32,21 @@ const slides = {
       title: 'اختر منزلك المثالي',
       description: 'نساعدك في العثور على المنزل المثالي بسهولة.',
       browse: 'تصفح العقارات',
-      image: '/src/assets/slider-images/slide01.png',
+      image: '/public/assets/slider-images/slide01.png',
       alt: 'منزل فاخر'
     },
     {
       title: 'عقارات فاخرة في المملكة العربية السعودية',
       description: 'اكتشف فرص عقارية استثنائية مع وسائل راحة متميزة.',
       browse: 'عرض المجموعة',
-      image: '/src/assets/slider-images/slide02.png',
+      image: '/public/assets/slider-images/slide02.png',
       alt: 'عقارات مميزة'
     },
     {
       title: 'استثمار عقاري ذكي',
       description: 'ابن ثروتك من خلال استثمارات عقارية استراتيجية.',
       browse: 'ابدأ الاستثمار',
-      image: '/src/assets/slider-images/slide03.png',
+      image: '/public/assets/slider-images/slide03.png',
       alt: 'عقارات استثمارية'
     }
   ]

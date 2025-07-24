@@ -20,7 +20,7 @@ const Breadcrumb: React.FC<BreadcrumbProps> = ({
   items, 
   title, 
   description, 
-  backgroundImage = '/src/assets/breadcrumb-bg.jpg' 
+  backgroundImage = '/public/assets/breadcrumb-bg.jpg' 
 }) => {
   const { currentLanguage } = useLanguage();
   const isArabic = currentLanguage.code === 'ar';
