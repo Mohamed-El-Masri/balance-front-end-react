@@ -386,7 +386,6 @@
 
 .properties__list .properties__card_content {
   flex: 1;
-  padding: var(--balance-spacing-md) 0;
 }
 
 .properties__card {
