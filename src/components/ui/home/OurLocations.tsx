@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import styles from '../../../styles/components/home/OurLocations.module.css';
 import { useLanguage } from '../../../contexts/useLanguage';
 
+// Global flag to track if Google Maps script has been loaded
+let googleMapsScriptLoaded = false;
+
 // بيانات المواقع مع إحداثيات جغرافية حقيقية
 const projectLocations = [
   {
@@ -187,10 +190,14 @@ const OurLocations: React.FC = () => {
   // تحميل Google Maps API
   useEffect(() => {
     const loadGoogleMaps = () => {
-      if (window.google && window.google.maps) {
+      // Check if Google Maps is already loaded or script is already being loaded
+      if ((window.google && window.google.maps) || googleMapsScriptLoaded) {
         setMapLoaded(true);
         return;
       }
+
+      // Mark that we're loading the script to prevent multiple loads
+      googleMapsScriptLoaded = true;
 
       const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || 'AIzaSyBb7zIoQBrl3GWQ2E4DyJ677ZVDtkQu_sQ';
       const script = document.createElement('script');
@@ -198,9 +205,12 @@ const OurLocations: React.FC = () => {
       script.async = true;
       script.defer = true;
       
-      window.initMap = () => {
-        setMapLoaded(true);
-      };
+      // Only define initMap if it doesn't already exist
+      if (!window.initMap) {
+        window.initMap = () => {
+          setMapLoaded(true);
+        };
+      }
 
       document.head.appendChild(script);
     };
