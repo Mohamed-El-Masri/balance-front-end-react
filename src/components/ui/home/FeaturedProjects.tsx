@@ -1,13 +1,20 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MapPin, Building, Calendar } from 'lucide-react';
+import { MapPin, Building, Calendar, Heart } from 'lucide-react';
 import styles from '../../../styles/components/home/FeaturedProjects.module.css';
 import { useLanguage } from '../../../contexts/useLanguage';
+import Toast from '../common/Toast';
 
 const FeaturedProjects: React.FC = () => {
   const { currentLanguage } = useLanguage();
   const isArabic = currentLanguage.code === 'ar';
   const navigate = useNavigate();
+  const [favoriteProjects, setFavoriteProjects] = React.useState<Set<number>>(new Set());
+  const [toast, setToast] = React.useState<{
+    show: boolean;
+    message: string;
+    type: 'success' | 'error' | 'info';
+  }>({ show: false, message: '', type: 'success' });
 
   // بيانات المشاريع - 6 مشاريع ثابتة
   const projects = [
@@ -80,7 +87,9 @@ const FeaturedProjects: React.FC = () => {
       description: 'Explore our exceptional development projects that set new standards in luxury and innovation.',
       units: 'Units',
       viewDetails: 'View Details',
-      exploreProjects: 'Explore Our Projects'
+      exploreProjects: 'Explore Our Projects',
+      favoriteAdded: 'Project added to favorites!',
+      favoriteRemoved: 'Project removed from favorites!'
     },
     ar: {
       subtitle: 'أعمالنا',
@@ -88,7 +97,9 @@ const FeaturedProjects: React.FC = () => {
       description: 'اكتشف مشاريعنا التطويرية الاستثنائية التي تضع معايير جديدة في الفخامة والابتكار.',
       units: 'وحدة',
       viewDetails: 'عرض التفاصيل',
-      exploreProjects: 'استكشف مشاريعنا'
+      exploreProjects: 'استكشف مشاريعنا',
+      favoriteAdded: 'تم إضافة المشروع للمفضلة!',
+      favoriteRemoved: 'تم إزالة المشروع من المفضلة!'
     }
   };
 
@@ -102,8 +113,40 @@ const FeaturedProjects: React.FC = () => {
     navigate('/projects');
   };
 
+  const handleFavoriteToggle = (projectId: number, event: React.MouseEvent) => {
+    event.stopPropagation();
+    const newFavorites = new Set(favoriteProjects);
+    const isCurrentlyFavorited = favoriteProjects.has(projectId);
+    
+    if (isCurrentlyFavorited) {
+      newFavorites.delete(projectId);
+    } else {
+      newFavorites.add(projectId);
+    }
+    
+    setFavoriteProjects(newFavorites);
+    
+    // Show toast notification
+    setToast({
+      show: true,
+      message: isCurrentlyFavorited ? t.favoriteRemoved : t.favoriteAdded,
+      type: 'success'
+    });
+  };
+
+  const closeToast = () => {
+    setToast(prev => ({ ...prev, show: false }));
+  };
   return (
     <section className={styles.featured} dir={isArabic ? 'rtl' : 'ltr'}>
+      {/* Toast Notification */}
+      <Toast 
+        message={toast.message}
+        type={toast.type}
+        isVisible={toast.show}
+        onClose={closeToast}
+      />
+      
       <div className={styles.featured__container}>
         {/* Section Header */}
         <div className={styles.featured__header}>
@@ -138,6 +181,18 @@ const FeaturedProjects: React.FC = () => {
                 <div className={styles["featured__card-status"]}>
                   {project.status}
                 </div>
+                
+                {/* Favorite Button */}
+                <button 
+                  className={`${styles["featured__card-favorite"]} ${favoriteProjects.has(project.id) ? styles["featured__card-favorite_active"] : ''}`}
+                  onClick={(e) => handleFavoriteToggle(project.id, e)}
+                  title={favoriteProjects.has(project.id) ? t.favoriteRemoved : t.favoriteAdded}
+                >
+                  <Heart 
+                    size={20} 
+                    fill={favoriteProjects.has(project.id) ? '#FBBF24' : 'none'} 
+                  />
+                </button>
               </div>
 
               {/* Content */}

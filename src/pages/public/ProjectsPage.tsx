@@ -8,6 +8,7 @@ import {
   type Project 
 } from '../../components/ui/projects';
 import PageBreadcrumb from '../../components/ui/shared/PageBreadcrumb';
+import Toast from '../../components/ui/common/Toast';
 import styles from '../../styles/pages/ProjectsPage.module.css';
 import { useLanguage } from '../../contexts/useLanguage';
 
@@ -23,6 +24,12 @@ const ProjectsPage: React.FC = () => {
     city: '',
     area: ''
   });
+  const [favoriteProjects, setFavoriteProjects] = useState<Set<number>>(new Set());
+  const [toast, setToast] = useState<{
+    show: boolean;
+    message: string;
+    type: 'success' | 'error' | 'info';
+  }>({ show: false, message: '', type: 'success' });
   
   const itemsPerPage = 6;
 
@@ -32,14 +39,18 @@ const ProjectsPage: React.FC = () => {
       pageDescription: 'Discover our exceptional real estate developments across Saudi Arabia',
       sectionTitle: 'Featured Projects',
       sectionDescription: 'Explore our diverse portfolio of residential and commercial developments designed to meet your lifestyle and investment needs.',
-      location: 'Saudi Arabia'
+      location: 'Saudi Arabia',
+      favoriteAdded: 'Project added to favorites!',
+      favoriteRemoved: 'Project removed from favorites!'
     },
     ar: {
       pageTitle: 'مشاريعنا',
       pageDescription: 'اكتشف مشاريعنا العقارية الاستثنائية في جميع أنحاء المملكة العربية السعودية',
       sectionTitle: 'المشاريع المميزة',
       sectionDescription: 'استكشف محفظتنا المتنوعة من التطويرات السكنية والتجارية المصممة لتلبية احتياجات نمط حياتك الاستثمارية.',
-      location: 'المملكة العربية السعودية'
+      location: 'المملكة العربية السعودية',
+      favoriteAdded: 'تم إضافة المشروع للمفضلة!',
+      favoriteRemoved: 'تم إزالة المشروع من المفضلة!'
     }
   };
 
@@ -311,8 +322,39 @@ const ProjectsPage: React.FC = () => {
     navigate(`/projects/${slug}`);
   };
 
+  const handleFavoriteToggle = (projectId: number) => {
+    const newFavorites = new Set(favoriteProjects);
+    const isCurrentlyFavorited = favoriteProjects.has(projectId);
+    
+    if (isCurrentlyFavorited) {
+      newFavorites.delete(projectId);
+    } else {
+      newFavorites.add(projectId);
+    }
+    
+    setFavoriteProjects(newFavorites);
+    
+    // Show toast notification
+    setToast({
+      show: true,
+      message: isCurrentlyFavorited ? t.favoriteRemoved : t.favoriteAdded,
+      type: 'success'
+    });
+  };
+
+  const closeToast = () => {
+    setToast(prev => ({ ...prev, show: false }));
+  };
   return (
     <>
+      {/* Toast Notification */}
+      <Toast 
+        message={toast.message}
+        type={toast.type}
+        isVisible={toast.show}
+        onClose={closeToast}
+      />
+      
       {/* Breadcrumb */}
       <PageBreadcrumb
         title={t.pageTitle}
@@ -353,6 +395,8 @@ const ProjectsPage: React.FC = () => {
                   key={project.id}
                   project={project}
                   onViewDetails={handleViewDetails}
+                  onFavoriteToggle={handleFavoriteToggle}
+                  isFavorited={favoriteProjects.has(project.id)}
                 />
               ))}
             </div>

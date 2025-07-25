@@ -46,7 +46,8 @@ const PropertyDescription: React.FC<PropertyDescriptionProps> = ({
   const showReadMore = currentDescription.length > 300;
 
   return (
-    <div className={styles.description} dir={isArabic ? 'rtl' : 'ltr'}>
+    <div className={styles.description} dir={isArabic ? 'rtl' : 'ltr'} 
+    >
       <h2 className={styles.description__title}>{t.title}</h2>
       
       <div className={styles.description__content}>

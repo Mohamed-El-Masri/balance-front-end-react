@@ -95,6 +95,8 @@ const ProfilePage: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState<UserData>(userData);
   const [activeTab, setActiveTab] = useState<'profile' | 'favorites' | 'interests' | 'password'>('profile');
+  const [favoritesFilter, setFavoritesFilter] = useState<'all' | 'projects' | 'properties'>('all');
+  const [interestsFilter, setInterestsFilter] = useState<'all' | 'projects' | 'properties'>('all');
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState<{
     show: boolean;
@@ -131,13 +133,13 @@ const ProfilePage: React.FC = () => {
   const [interests] = useState<Property[]>([
     {
       id: '3',
-      title: 'Commercial Office Space',
-      titleAr: 'مساحة مكتبية تجارية',
+      title: 'Balance Residence Project',
+      titleAr: 'مشروع بالانس ريزيدنس',
       price: 1200000,
       location: 'King Fahd Road, Riyadh',
       locationAr: 'طريق الملك فهد، الرياض',
-      image: '/images/properties/office-1.jpg',
-      type: 'office',
+      image: '/images/properties/project-1.jpg',
+      type: 'villa',
       area: 200
     }
   ]);
@@ -148,6 +150,9 @@ const ProfilePage: React.FC = () => {
       favorites: 'Favorites',
       interests: 'Interests', 
       changePassword: 'Change Password',
+      all: 'All',
+      projects: 'Projects',
+      properties: 'Properties',
       editProfile: 'Edit Profile',
       saveChanges: 'Save Changes',
       cancel: 'Cancel',
@@ -193,6 +198,9 @@ const ProfilePage: React.FC = () => {
       favorites: 'المفضلة',
       interests: 'الاهتمامات',
       changePassword: 'تغيير كلمة المرور',
+      all: 'الكل',
+      projects: 'المشاريع',
+      properties: 'العقارات',
       editProfile: 'تعديل الملف الشخصي',
       saveChanges: 'حفظ التغييرات',
       cancel: 'إلغاء',
@@ -277,6 +285,12 @@ const ProfilePage: React.FC = () => {
       : `${price.toLocaleString('en-US')} ${t.currency}`;
   };
 
+  const getFilteredItems = (items: Property[], filter: string) => {
+    if (filter === 'all') return items;
+    if (filter === 'projects') return items.filter(item => item.type === 'villa');
+    if (filter === 'properties') return items.filter(item => item.type !== 'villa');
+    return items;
+  };
   const renderPropertyCard = (property: Property) => (
     <div key={property.id} className={styles.profile__property_card}>
       <div className={styles.profile__property_image}>
@@ -411,9 +425,32 @@ const ProfilePage: React.FC = () => {
           {activeTab === 'favorites' && (
             <div className={styles.profile__tab_content}>
               <h2 className={styles.profile__section_title}>{t.myFavorites}</h2>
-              {favorites.length > 0 ? (
+              
+              {/* Filter Tabs */}
+              <div className={styles.profile__filter_tabs}>
+                <button
+                  className={`${styles.profile__filter_tab} ${favoritesFilter === 'all' ? styles.active : ''}`}
+                  onClick={() => setFavoritesFilter('all')}
+                >
+                  {t.all}
+                </button>
+                <button
+                  className={`${styles.profile__filter_tab} ${favoritesFilter === 'projects' ? styles.active : ''}`}
+                  onClick={() => setFavoritesFilter('projects')}
+                >
+                  {t.projects}
+                </button>
+                <button
+                  className={`${styles.profile__filter_tab} ${favoritesFilter === 'properties' ? styles.active : ''}`}
+                  onClick={() => setFavoritesFilter('properties')}
+                >
+                  {t.properties}
+                </button>
+              </div>
+              
+              {getFilteredItems(favorites, favoritesFilter).length > 0 ? (
                 <div className={styles.profile__properties_grid}>
-                  {favorites.map(renderPropertyCard)}
+                  {getFilteredItems(favorites, favoritesFilter).map(renderPropertyCard)}
                 </div>
               ) : (
                 <div className={styles.profile__empty_state}>
@@ -427,9 +464,32 @@ const ProfilePage: React.FC = () => {
           {activeTab === 'interests' && (
             <div className={styles.profile__tab_content}>
               <h2 className={styles.profile__section_title}>{t.myInterests}</h2>
-              {interests.length > 0 ? (
+              
+              {/* Filter Tabs */}
+              <div className={styles.profile__filter_tabs}>
+                <button
+                  className={`${styles.profile__filter_tab} ${interestsFilter === 'all' ? styles.active : ''}`}
+                  onClick={() => setInterestsFilter('all')}
+                >
+                  {t.all}
+                </button>
+                <button
+                  className={`${styles.profile__filter_tab} ${interestsFilter === 'projects' ? styles.active : ''}`}
+                  onClick={() => setInterestsFilter('projects')}
+                >
+                  {t.projects}
+                </button>
+                <button
+                  className={`${styles.profile__filter_tab} ${interestsFilter === 'properties' ? styles.active : ''}`}
+                  onClick={() => setInterestsFilter('properties')}
+                >
+                  {t.properties}
+                </button>
+              </div>
+              
+              {getFilteredItems(interests, interestsFilter).length > 0 ? (
                 <div className={styles.profile__properties_grid}>
-                  {interests.map(renderPropertyCard)}
+                  {getFilteredItems(interests, interestsFilter).map(renderPropertyCard)}
                 </div>
               ) : (
                 <div className={styles.profile__empty_state}>

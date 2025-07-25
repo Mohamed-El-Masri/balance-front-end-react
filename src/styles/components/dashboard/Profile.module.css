@@ -9,7 +9,6 @@
 .profile__container {
   max-width: var(--container-width);
   margin: 0 auto;
-  padding: 0 var(--container-padding);
   background: var(--balance-white);
   border-radius: var(--balance-border-radius-xl);
   overflow: hidden;
@@ -269,7 +268,7 @@
 
 /* Form Styles */
 .profile__form {
-  max-width: 700px;
+ 
   background: linear-gradient(135deg, var(--balance-gray-50) 0%, var(--balance-white) 100%);
   padding: var(--balance-spacing-xl);
   border-radius: var(--balance-border-radius-xl);
@@ -344,7 +343,7 @@
 
 /* Password Form */
 .profile__password_form {
-  max-width: 500px;
+
   background: linear-gradient(135deg, var(--balance-gray-50) 0%, var(--balance-white) 100%);
   padding: var(--balance-spacing-xl);
   border-radius: var(--balance-border-radius-xl);
@@ -733,4 +732,69 @@
 .profile__cancel_btn:hover::before,
 .profile__update_password_btn:hover:not(:disabled)::before {
   left: 100%;
+}
+
+/* Filter Tabs */
+.profile__filter_tabs {
+  display: flex;
+  gap: var(--balance-spacing-xs);
+  margin-bottom: var(--balance-spacing-xl);
+  background: var(--balance-gray-100);
+  padding: var(--balance-spacing-xs);
+  border-radius: var(--balance-border-radius-lg);
+  width: fit-content;
+}
+
+.profile__filter_tab {
+  padding: var(--balance-spacing-sm) var(--balance-spacing-lg);
+  background: transparent;
+  border: none;
+  border-radius: var(--balance-border-radius-md);
+  font-weight: 600;
+  font-size: var(--balance-font-size-sm);
+  color: var(--balance-gray-600);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.profile__filter_tab:hover {
+  background: rgba(181, 136, 99, 0.1);
+  color: var(--balance-brown-950);
+}
+
+.profile__filter_tab.active {
+  background: linear-gradient(135deg, var(--balance-accent) 0%, var(--balance-brown-600) 100%);
+  color: var(--balance-white);
+  box-shadow: 0 2px 8px rgba(181, 136, 99, 0.3);
+}
+
+/* RTL Support for Filter Tabs */
+[dir="rtl"] .profile__filter_tabs {
+  flex-direction: row-reverse;
+}
+
+/* Responsive Design for Filter Tabs */
+@media (max-width: 768px) {
+  .profile__filter_tabs {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .profile__filter_tab {
+    flex: 1;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .profile__filter_tabs {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .profile__filter_tab {
+    width: 100%;
+    padding: var(--balance-spacing-md);
+  }
 }

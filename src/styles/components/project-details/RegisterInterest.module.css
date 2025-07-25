@@ -343,9 +343,7 @@
   grid-template-columns: 1fr 2fr;
 }
 
-[dir="rtl"] .interest__label {
-  flex-direction: row-reverse;
-}
+
 
 [dir="rtl"] .interest__benefits_item:hover {
   transform: translateX(-5px);

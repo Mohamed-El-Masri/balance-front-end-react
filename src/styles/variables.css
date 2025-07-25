@@ -7,21 +7,19 @@
   --balance-brown-700: #BEB5A9; /* رمادي مائل للبيج */
   --balance-brown-600: #D3C3B9; /* بيج رملي ناعم */
   --balance-brown-500: #E1D4C2; /* بيج فاتح جداً */
+  
   --balance-blue-950: #10232A; /* أزرق داكن جداً */
   --balance-blue-900: #3D4D55; /* رمادي مزرق أنيق */
   --balance-blue-800: #A79E9C; /* رمادي فاتح مائل للوردي */
-  --balance-blue-700: #C1BFBF; /* رمادي فاتح جداً */
-  --balance-blue-600: #D9D7D7; /* رمادي ناعم جداً */
-  --balance-blue-500: #F0F0F0; /* أبيض رمادي ناعم */
-
-  /* Accent Colors */
-  --balance-accent-950: #4A3B2F; /* لون نحاسي داكن جداً */
+  
   --balance-accent: #B58863; /* لون نحاسي/برونزي */
   --balance-accent-light: #FBBF24; /* لون أصفر نحاسي فاتح */
   --balance-accent-dark: #F59E0B; /* لون أصفر نحاسي داكن */
   --balance-accent-hover: #FBBF24; /* لون أصفر نحاسي عند التمرير */
+
+
   --balance-black: #161616; /* أسود داكن جداً (charcoal black) */
-  --balance-white: #FFFFFF; /* أبيض ناصع */
+  --balance-white: #FFFFFF;
 
   /* Neutral Colors */
   --balance-gray-900: #1a1a1a;

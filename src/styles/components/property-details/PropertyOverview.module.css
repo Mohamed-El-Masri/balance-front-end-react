@@ -1,31 +1,60 @@
 /* Property Overview Component */
 .overview {
-  background: white;
-  border-radius: 16px;
-  padding: 32px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  margin-bottom: 32px;
-  border: 1px solid #f3f4f6;
+  background: var(--balance-white);
+  border-radius: var(--balance-border-radius-xl);
+  padding: var(--balance-spacing-2xl);
+  box-shadow: var(--balance-shadow-xl);
+  margin-bottom: var(--balance-spacing-3xl);
+  border: 1px solid var(--balance-gray-100);
+  position: relative;
+  overflow: hidden;
+  margin-inline: auto;
+  width: var(--container-width);
+
+}
+
+.overview::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 70% 30%, rgba(181, 136, 99, 0.03) 0%, transparent 50%),
+    radial-gradient(circle at 30% 70%, rgba(110, 71, 59, 0.02) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.overview > * {
+  position: relative;
+  z-index: 1;
 }
 
 .overview__title {
-  font-size: 1.75rem;
+  font-size: var(--balance-font-size-3xl);
   font-weight: 700;
-  color: #1f2937;
-  margin-bottom: 24px;
-  padding-bottom: 12px;
-  border-bottom: 2px solid #fbbf24;
+  color: var(--balance-brown-950);
+  margin-bottom: var(--balance-spacing-xl);
+  padding-bottom: var(--balance-spacing-md);
+  border-bottom: 3px solid var(--balance-accent);
   position: relative;
+  background: linear-gradient(135deg, var(--balance-brown-950) 0%, var(--balance-brown-900) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .overview__title::after {
   content: '';
   position: absolute;
-  bottom: -2px;
+  bottom: -3px;
   left: 0;
-  width: 60px;
-  height: 2px;
-  background: #78350f;
+  width: 80px;
+  height: 3px;
+  background: var(--balance-brown-950);
+  border-radius: 2px;
 }
 
 .overview__grid {
@@ -147,68 +176,106 @@
 }
 
 /* Responsive Design */
+@media (max-width: 1024px) {
+  .overview {
+    padding: var(--balance-spacing-xl);
+    margin-bottom: var(--balance-spacing-2xl);
+    width: var(--container-width);
+  }
+
+  .overview__grid {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--balance-spacing-md);
+    margin-bottom: var(--balance-spacing-xl);
+  }
+
+  .overview__facilities_grid {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  }
+}
+
 @media (max-width: 768px) {
   .overview {
-    padding: 20px;
-    margin-bottom: 20px;
+    padding: var(--balance-spacing-lg);
+    margin-bottom: var(--balance-spacing-xl);
+    width: 98%;
   }
 
   .overview__title {
-    font-size: 1.5rem;
-    margin-bottom: 20px;
+    font-size: var(--balance-font-size-2xl);
+    margin-bottom: var(--balance-spacing-lg);
+    text-align: center;
+  }
+
+  .overview__title::after {
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
   }
 
   .overview__grid {
     grid-template-columns: 1fr;
-    gap: 16px;
-    margin-bottom: 24px;
+    gap: var(--balance-spacing-sm);
+    margin-bottom: var(--balance-spacing-lg);
   }
 
   .overview__item {
-    padding: 16px;
+    padding: var(--balance-spacing-md);
+    flex-direction: column;
+    text-align: center;
+    gap: var(--balance-spacing-sm);
   }
 
   .overview__item_icon {
     width: 40px;
     height: 40px;
+    align-self: center;
   }
 
   .overview__item_value {
-    font-size: 1rem;
+    font-size: var(--balance-font-size-base);
   }
 
   .overview__facilities {
-    padding: 20px;
+    padding: var(--balance-spacing-lg);
   }
 
   .overview__facilities_title {
-    font-size: 1.1rem;
-    margin-bottom: 16px;
+    font-size: var(--balance-font-size-lg);
+    margin-bottom: var(--balance-spacing-md);
+    justify-content: center;
   }
 
   .overview__facilities_grid {
     grid-template-columns: 1fr;
-    gap: 10px;
+    gap: var(--balance-spacing-sm);
   }
 
   .overview__facility {
-    padding: 10px;
+    padding: var(--balance-spacing-sm);
+    justify-content: center;
   }
 }
 
 @media (max-width: 480px) {
   .overview {
-    padding: 16px;
+    padding: var(--balance-spacing-md);
+    margin-bottom: var(--balance-spacing-lg);
+    width: 98%;
+
   }
 
   .overview__title {
-    font-size: 1.25rem;
-    margin-bottom: 16px;
+    font-size: var(--balance-font-size-xl);
+    margin-bottom: var(--balance-spacing-md);
+  }
+
+  .overview__title::after {
+    width: 40px;
   }
 
   .overview__item {
-    padding: 12px;
-    gap: 12px;
+    padding: var(--balance-spacing-sm);
   }
 
   .overview__item_icon {
@@ -217,24 +284,70 @@
   }
 
   .overview__item_label {
-    font-size: 0.8rem;
+    font-size: var(--balance-font-size-xs);
   }
 
   .overview__item_value {
-    font-size: 0.9rem;
+    font-size: var(--balance-font-size-sm);
   }
 
   .overview__facilities {
-    padding: 16px;
+    padding: var(--balance-spacing-md);
   }
 
   .overview__facilities_title {
-    font-size: 1rem;
-    margin-bottom: 12px;
+    font-size: var(--balance-font-size-base);
+    margin-bottom: var(--balance-spacing-sm);
   }
 
   .overview__facility {
-    padding: 8px 10px;
-    font-size: 0.9rem;
+    padding: var(--balance-spacing-xs);
+    font-size: var(--balance-font-size-sm);
+  }
+}
+
+@media (max-width: 320px) {
+  .overview {
+    padding: var(--balance-spacing-sm);
+    margin-bottom: var(--balance-spacing-md);
+    width: 98%;
+  }
+
+  .overview__title {
+    font-size: var(--balance-font-size-lg);
+  }
+
+  .overview__item {
+    padding: var(--balance-spacing-xs);
+  }
+
+  .overview__item_icon {
+    width: 32px;
+    height: 32px;
+  }
+
+  .overview__facilities {
+    padding: var(--balance-spacing-sm);
+  }
+
+  .overview__facilities_title {
+    font-size: var(--balance-font-size-sm);
+  }
+
+  .overview__facility {
+    padding: var(--balance-spacing-xs);
+    font-size: var(--balance-font-size-xs);
+  }
+}
+
+/* RTL Responsive Support */
+@media (max-width: 768px) {
+  [dir="rtl"] .overview__title::after {
+    right: 50%;
+    transform: translateX(50%);
+  }
+
+  [dir="rtl"] .overview__facility:hover {
+    transform: translateX(-5px);
   }
 }

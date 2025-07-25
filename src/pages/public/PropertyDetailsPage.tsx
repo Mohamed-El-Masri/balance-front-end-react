@@ -11,6 +11,7 @@ import PropertyVideo from '../../components/ui/property-details/PropertyVideo';
 import PropertyLocationMap from '../../components/ui/property-details/PropertyLocationMap';
 import PropertyContact from '../../components/ui/property-details/PropertyContact';
 import { useLanguage } from '../../contexts/useLanguage';
+import styles from '../../styles/components/property-details/PropertyDetailsPage.module.css';
 
 // Mock data - في التطبيق الحقيقي سيأتي من API
 const mockPropertyData = {
@@ -165,15 +166,15 @@ const PropertyDetailsPage: React.FC = () => {
   const content = {
     en: {
       loadingProperty: 'Loading Property Details...',
-      favoriteAdded: 'Property added to favorites!',
-      favoriteRemoved: 'Property removed from favorites!',
-      contactSent: 'Contact request sent successfully!'
+      favoriteAdded: '❤️ Property added to favorites!',
+      favoriteRemoved: '💔 Property removed from favorites!',
+      contactSent: '✅ Contact request sent successfully!'
     },
     ar: {
       loadingProperty: 'جاري تحميل تفاصيل العقار...',
-      favoriteAdded: 'تم إضافة العقار للمفضلة!',
-      favoriteRemoved: 'تم إزالة العقار من المفضلة!',
-      contactSent: 'تم إرسال طلب التواصل بنجاح!'
+      favoriteAdded: '❤️ تم إضافة العقار للمفضلة!',
+      favoriteRemoved: '💔 تم إزالة العقار من المفضلة!',
+      contactSent: '✅ تم إرسال طلب التواصل بنجاح!'
     }
   };
 
@@ -209,17 +210,24 @@ const PropertyDetailsPage: React.FC = () => {
   }, [id]);
 
   const handleFavoriteToggle = () => {
+    const wasFavorited = propertyData.isFavorited;
+    
     setPropertyData(prev => ({
       ...prev,
       isFavorited: !prev.isFavorited
     }));
     
-    // Show toast notification
+    // Show toast notification with correct message
     setToast({
       show: true,
-      message: propertyData.isFavorited ? t.favoriteRemoved : t.favoriteAdded,
+      message: wasFavorited ? t.favoriteRemoved : t.favoriteAdded,
       type: 'success'
     });
+    
+    // Auto close toast after 4 seconds
+    setTimeout(() => {
+      setToast(prev => ({ ...prev, show: false }));
+    }, 4000);
   };
 
   const closeToast = () => {
@@ -228,16 +236,20 @@ const PropertyDetailsPage: React.FC = () => {
 
   if (loading) {
     return (
-      <LoadingSpinner 
-        text={t.loadingProperty}
-        size="large"
-        overlay={true}
-      />
+      <div className={styles.loadingContainer}>
+        <div className="spinner-wrapper">
+          <LoadingSpinner 
+            text={t.loadingProperty}
+            size="large"
+            overlay={false}
+          />
+        </div>
+      </div>
     );
   }
 
   return (
-    <div className="property-details-page">
+    <div className={styles['property-details-page']}>
       {/* Toast Notification */}
       <Toast 
         message={toast.message}
@@ -347,16 +359,6 @@ const PropertyDetailsPage: React.FC = () => {
         agentEmail={propertyData.agent.email}
         agentPhoto={propertyData.agent.image}
       />
-
-      {/* Toast Notification */}
-      {toast.show && (
-        <Toast 
-          message={toast.message}
-          type={toast.type}
-          isVisible={toast.show}
-          onClose={() => setToast({ ...toast, show: false })}
-        />
-      )}
     </div>
   );
 };

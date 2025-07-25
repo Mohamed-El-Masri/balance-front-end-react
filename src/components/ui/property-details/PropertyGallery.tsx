@@ -139,7 +139,10 @@ const PropertyGallery: React.FC<PropertyGalleryProps> = ({
   }
 
   return (
-    <div className={styles.gallery} dir={isArabic ? 'rtl' : 'ltr'}>
+    <div
+      className={styles.gallery}
+      dir={isArabic ? 'rtl' : 'ltr'}
+    >
       {/* Media Type Tabs */}
       <div className={styles.gallery__tabs}>
         {images.length > 0 && (

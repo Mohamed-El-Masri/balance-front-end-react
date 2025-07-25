@@ -47,7 +47,8 @@ const PropertyVideo: React.FC<PropertyVideoProps> = ({
   }
 
   return (
-    <div className={styles.video} dir={isArabic ? 'rtl' : 'ltr'}>
+    <div className={styles.video} dir={isArabic ? 'rtl' : 'ltr'}
+    >
       <h2 className={styles.video__title}>{t.title}</h2>
       
       {!isPlaying ? (

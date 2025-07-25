@@ -159,7 +159,8 @@ const PropertyOverview: React.FC<PropertyOverviewProps> = ({
   }
 
   return (
-    <div className={styles.overview} dir={isArabic ? 'rtl' : 'ltr'}>
+    <div className={styles.overview} dir={isArabic ? 'rtl' : 'ltr'}
+    >
       <h2 className={styles.overview__title}>{t.title}</h2>
       
       <div className={styles.overview__grid}>

@@ -250,7 +250,8 @@ const PropertyInfo: React.FC<PropertyInfoProps> = ({
   };
 
   return (
-    <div className={styles.property_info} dir={isArabic ? 'rtl' : 'ltr'}>
+    <div className={styles.property_info} dir={isArabic ? 'rtl' : 'ltr'}
+    >
       {/* Header */}
       <div className={styles.property_info__header}>
         <div className={styles.property_info__title_section}>

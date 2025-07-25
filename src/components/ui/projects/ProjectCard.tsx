@@ -1,5 +1,5 @@
 import React from 'react';
-import { MapPin, Calendar, Eye, ArrowRight, ArrowLeft } from 'lucide-react';
+import { MapPin, Calendar, Eye, ArrowRight, ArrowLeft, Heart } from 'lucide-react';
 import styles from '../../../styles/components/projects/ProjectCard.module.css';
 import { useLanguage } from '../../../contexts/useLanguage';
 
@@ -26,9 +26,16 @@ export interface Project {
 interface ProjectCardProps {
   project: Project;
   onViewDetails: (slug: string) => void;
+  onFavoriteToggle?: (projectId: number) => void;
+  isFavorited?: boolean;
 }
 
-const ProjectCard: React.FC<ProjectCardProps> = ({ project, onViewDetails }) => {
+const ProjectCard: React.FC<ProjectCardProps> = ({ 
+  project, 
+  onViewDetails, 
+  onFavoriteToggle,
+  isFavorited = false 
+}) => {
   const { currentLanguage } = useLanguage();
   const isArabic = currentLanguage.code === 'ar';
 
@@ -37,6 +44,8 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onViewDetails }) => 
       viewDetails: 'View Details',
       available: 'Available',
       comingSoon: 'Coming Soon',
+      addToFavorites: 'Add to Favorites',
+      removeFromFavorites: 'Remove from Favorites',
       units: 'units',
       completionDate: 'Completion'
     },
@@ -44,6 +53,8 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onViewDetails }) => 
       viewDetails: 'عرض التفاصيل',
       available: 'متاح',
       comingSoon: 'قريباً',
+      addToFavorites: 'أضف للمفضلة',
+      removeFromFavorites: 'إزالة من المفضلة',
       units: 'وحدة',
       completionDate: 'تاريخ الإنجاز'
     }
@@ -67,6 +78,12 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onViewDetails }) => 
       : styles.project_card__status_coming;
   };
 
+  const handleFavoriteClick = (event: React.MouseEvent) => {
+    event.stopPropagation();
+    if (onFavoriteToggle) {
+      onFavoriteToggle(project.id);
+    }
+  };
   return (
     <div className={styles.project_card} dir={isArabic ? 'rtl' : 'ltr'}>
       {/* Image */}
@@ -81,6 +98,20 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onViewDetails }) => 
         <div className={`${styles.project_card__status} ${getStatusClass(project.status)}`}>
           {getStatusText(project.status)}
         </div>
+
+        {/* Favorite Button */}
+        {onFavoriteToggle && (
+          <button 
+            className={`${styles.project_card__favorite} ${isFavorited ? styles.project_card__favorite_active : ''}`}
+            onClick={handleFavoriteClick}
+            title={isFavorited ? t.removeFromFavorites : t.addToFavorites}
+          >
+            <Heart 
+              size={20} 
+              fill={isFavorited ? '#FBBF24' : 'none'} 
+            />
+          </button>
+        )}
 
         {/* View Overlay */}
         <div className={styles.project_card__overlay}>

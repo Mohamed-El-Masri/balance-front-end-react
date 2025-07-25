@@ -1,31 +1,40 @@
 /* Property Contact Component */
 .contact {
-  background: white;
-  border-radius: 16px;
-  padding: 32px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  margin-bottom: 32px;
-  border: 1px solid #f3f4f6;
+  background: var(--balance-white);
+  border-radius: var(--balance-border-radius-xl);
+  padding: var(--balance-spacing-2xl);
+  box-shadow: var(--balance-shadow-xl);
+  margin-bottom: var(--balance-spacing-3xl);
+  border: 1px solid var(--balance-gray-100);
+  position: relative;
+  overflow: hidden;
+  margin-inline: auto;
+  width: var(--container-width);
 }
 
 .contact__title {
-  font-size: 1.75rem;
+  font-size: var(--balance-font-size-3xl);
   font-weight: 700;
-  color: #1f2937;
-  margin-bottom: 24px;
-  padding-bottom: 12px;
-  border-bottom: 2px solid #fbbf24;
+  color: var(--balance-brown-950);
+  margin-bottom: var(--balance-spacing-xl);
+  padding-bottom: var(--balance-spacing-md);
+  border-bottom: 3px solid var(--balance-accent);
   position: relative;
+  background: linear-gradient(135deg, var(--balance-brown-950) 0%, var(--balance-brown-900) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .contact__title::after {
   content: '';
   position: absolute;
-  bottom: -2px;
+  bottom: -3px;
   left: 0;
-  width: 60px;
-  height: 2px;
-  background: #78350f;
+  width: 80px;
+  height: 3px;
+  background: var(--balance-brown-950);
+  border-radius: 2px;
 }
 
 .contact__content {
@@ -244,7 +253,7 @@
 }
 
 [dir="rtl"] .contact__content {
-  grid-template-columns: 2fr 1fr;
+  grid-template-columns: 1fr 2fr;
 }
 
 [dir="rtl"] .contact__agent_card {
@@ -274,6 +283,8 @@
   .contact {
     padding: 20px;
     margin-bottom: 20px;
+    width: 98%;
+    margin-inline: auto;
   }
 
   .contact__title {

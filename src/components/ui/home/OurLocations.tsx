@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import styles from '../../../styles/components/home/OurLocations.module.css';
 import { useLanguage } from '../../../contexts/useLanguage';
 
@@ -187,43 +187,14 @@ const OurLocations: React.FC = () => {
 
   const t = isArabic ? content.ar : content.en;
 
-  // تحميل Google Maps API
-  useEffect(() => {
-    const loadGoogleMaps = () => {
-      // Check if Google Maps is already loaded or script is already being loaded
-      if ((window.google && window.google.maps) || googleMapsScriptLoaded) {
-        setMapLoaded(true);
-        return;
-      }
-
-      // Mark that we're loading the script to prevent multiple loads
-      googleMapsScriptLoaded = true;
-
-      const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || 'AIzaSyBb7zIoQBrl3GWQ2E4DyJ677ZVDtkQu_sQ';
-      const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&callback=initMap&libraries=marker`;
-      script.async = true;
-      script.defer = true;
-      
-      // Only define initMap if it doesn't already exist
-      if (!window.initMap) {
-        window.initMap = () => {
-          setMapLoaded(true);
-        };
-      }
-
-      document.head.appendChild(script);
-    };
-
-    loadGoogleMaps();
-  }, []);
-
-  // إنشاء الخريطة عند تحميلها
-  useEffect(() => {
-    if (!mapLoaded) return;
-
+  // إنشاء دالة لتهيئة الخريطة
+  const initializeMap = useCallback(() => {
     const mapElement = document.getElementById('google-map');
-    if (!mapElement) return;
+    if (!mapElement || !window.google || !window.google.maps) return;
+    
+    // منع إنشاء خرائط متعددة
+    if (mapElement.dataset.mapInitialized === 'true') return;
+    mapElement.dataset.mapInitialized = 'true';
 
     // مركز الخريطة (وسط المملكة العربية السعودية)
     const centerLocation = { lat: 24.7136, lng: 46.6753 };
@@ -326,8 +297,52 @@ const OurLocations: React.FC = () => {
         infoWindow.open(map, marker);
       });
     });
+  }, [isArabic]);
 
-  }, [mapLoaded, isArabic]);
+  // تحميل Google Maps API
+  useEffect(() => {
+    const loadGoogleMaps = () => {
+      // Check if Google Maps is already loaded or script is already being loaded
+      if ((window.google && window.google.maps) || googleMapsScriptLoaded) {
+        setMapLoaded(true);
+        return;
+      }
+
+      // Mark that we're loading the script to prevent multiple loads
+      googleMapsScriptLoaded = true;
+
+      const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || 'AIzaSyBb7zIoQBrl3GWQ2E4DyJ677ZVDtkQu_sQ';
+      const script = document.createElement('script');
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&callback=initMap&libraries=marker`;
+      script.async = true;
+      script.defer = true;
+      
+      // Only define initMap if it doesn't already exist
+      if (!window.initMap) {
+        window.initMap = () => {
+          setMapLoaded(true);
+          // تهيئة الخريطة مباشرة عند تحميل API
+          setTimeout(initializeMap, 100);
+        };
+      }
+
+      document.head.appendChild(script);
+    };
+
+    loadGoogleMaps();
+  }, []);
+
+  // تهيئة الخريطة عند تحميلها أو تغيير اللغة
+  useEffect(() => {
+    if (mapLoaded && window.google && window.google.maps) {
+      // إعادة تعيين حالة الخريطة عند تغيير اللغة
+      const mapElement = document.getElementById('google-map');
+      if (mapElement) {
+        mapElement.dataset.mapInitialized = 'false';
+      }
+      initializeMap();
+    }
+  }, [mapLoaded, initializeMap]);
 
   return (
     <section className={styles.locations} dir={isArabic ? 'rtl' : 'ltr'}>

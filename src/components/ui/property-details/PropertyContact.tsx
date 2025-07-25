@@ -200,7 +200,8 @@ const PropertyContact: React.FC<PropertyContactProps> = ({
   const phoneUrl = agentPhone ? `tel:${agentPhone}` : '#';
 
   return (
-    <div className={styles.contact} dir={isArabic ? 'rtl' : 'ltr'}>
+    <div className={styles.contact} dir={isArabic ? 'rtl' : 'ltr'} 
+    >
       <h2 className={styles.contact__title}>{t.title}</h2>
       
       <div className={styles.contact__content}>
