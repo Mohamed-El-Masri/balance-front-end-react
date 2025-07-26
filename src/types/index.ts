@@ -16,7 +16,7 @@ import type {
   GoogleLoginRequest,
   ApiError,
   AuthContextType 
-} from './Auth'
+} from './Auth.ts'
 
 // Re-export all types
 export type { Property }
