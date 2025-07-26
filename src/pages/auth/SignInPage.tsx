@@ -26,6 +26,12 @@ const SignInPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // Validation states for real-time feedback
+  const [validationState, setValidationState] = useState({
+    email: false,
+    password: false
+  });
+
   const content = {
     en: {
       title: 'Welcome Back',
@@ -89,33 +95,34 @@ const SignInPage: React.FC = () => {
       ...prev,
       [name]: type === 'checkbox' ? checked : value
     }));
+
+    // Real-time validation
+    if (name === 'email') {
+      const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+      setValidationState(prev => ({
+        ...prev,
+        email: emailRegex.test(value)
+      }));
+    }
+
+    if (name === 'password') {
+      setValidationState(prev => ({
+        ...prev,
+        password: value.length >= 6
+      }));
+    }
   };
 
   const validateForm = (): boolean => {
-    if (!formData.email) {
-      return false;
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email)) {
-      return false;
-    }
-
-    if (!formData.password) {
-      return false;
-    }
-
-    if (formData.password.length < 6) {
-      return false;
-    }
-
-    return true;
+    return validationState.email && validationState.password;
   };
+
+  const isFormValid = validateForm();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!validateForm()) return;
+    if (!isFormValid) return;
 
     try {
       await login({ 
@@ -158,10 +165,27 @@ const SignInPage: React.FC = () => {
                   value={formData.email}
                   onChange={handleInputChange}
                   placeholder={t.placeholders.email}
-                  className={styles.signin__input}
+                  className={`${styles.signin__input} ${
+                    formData.email ? 
+                      (validationState.email ? styles.signin__input_valid : styles.signin__input_invalid) : 
+                      ''
+                  }`}
                   disabled={loading}
                 />
               </div>
+              {formData.email && (
+                <div 
+                  className={`${styles.signin__email_hint} ${
+                    validationState.email ? 'valid' : 'invalid'
+                  }`}
+                >
+                  {validationState.email ? (
+                    isArabic ? '✓ تنسيق البريد الإلكتروني صحيح' : '✓ Valid email format'
+                  ) : (
+                    isArabic ? '✗ تنسيق البريد الإلكتروني غير صحيح' : '✗ Invalid email format'
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Password Field */}
@@ -175,7 +199,11 @@ const SignInPage: React.FC = () => {
                   value={formData.password}
                   onChange={handleInputChange}
                   placeholder={t.placeholders.password}
-                  className={styles.signin__input}
+                  className={`${styles.signin__input} ${
+                    formData.password ? 
+                      (validationState.password ? styles.signin__input_valid : styles.signin__input_invalid) : 
+                      ''
+                  }`}
                   disabled={loading}
                 />
                 <button
@@ -187,6 +215,19 @@ const SignInPage: React.FC = () => {
                   {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
               </div>
+              {formData.password && (
+                <div 
+                  className={`${styles.signin__password_hint} ${
+                    validationState.password ? 'valid' : 'invalid'
+                  }`}
+                >
+                  {validationState.password ? (
+                    isArabic ? '✓ كلمة المرور مقبولة' : '✓ Password accepted'
+                  ) : (
+                    isArabic ? '✗ كلمة المرور يجب أن تكون 6 أحرف على الأقل' : '✗ Password must be at least 6 characters'
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Remember Me & Forgot Password */}
@@ -209,8 +250,10 @@ const SignInPage: React.FC = () => {
             {/* Submit Button */}
             <button
               type="submit"
-              className={styles.signin__submit_btn}
-              disabled={loading}
+              className={`${styles.signin__submit_btn} ${
+                (!isFormValid || loading) ? styles.signin__submit_btn_disabled : ''
+              }`}
+              disabled={!isFormValid || loading}
             >
               {loading ? (
                 <div className={styles.signin__loading}>

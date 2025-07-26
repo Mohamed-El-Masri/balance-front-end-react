@@ -919,3 +919,451 @@
     opacity: 0.8;
   }
 }
+
+/* Professional Helper Text and Hints */
+.signup__helper_text {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-top: 0.5rem;
+  line-height: 1.4;
+  padding: 0.75rem 1rem;
+  background: linear-gradient(135deg, rgba(181, 136, 99, 0.08) 0%, rgba(110, 71, 59, 0.05) 100%);
+  border-radius: 8px;
+  border-left: 3px solid var(--balance-amber-400);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.signup__helper_text::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, var(--balance-amber-400), transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.signup__helper_text:hover::before {
+  opacity: 1;
+}
+
+[dir="rtl"] .signup__helper_text {
+  border-left: none;
+  border-right: 3px solid var(--balance-amber-400);
+}
+
+/* Enhanced Password Hints */
+.signup__password_hints {
+  margin-top: 0.75rem;
+  padding: 1rem;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(34, 197, 94, 0.05) 100%);
+  border-radius: 12px;
+  border: 1px solid rgba(59, 130, 246, 0.1);
+  transition: all 0.3s ease;
+}
+
+.signup__password_hints:hover {
+  border-color: rgba(59, 130, 246, 0.2);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+}
+
+.signup__hint_title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--balance-blue-700);
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.signup__hint_title::before {
+  content: '🔐';
+  font-size: 1rem;
+}
+
+.signup__hint_list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.signup__hint_item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0;
+  font-size: 0.8125rem;
+  transition: all 0.3s ease;
+}
+
+.signup__hint_icon {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.signup__hint_item.valid .signup__hint_icon {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+}
+
+.signup__hint_item.valid .signup__hint_icon::before {
+  content: '✓';
+}
+
+.signup__hint_item.invalid .signup__hint_icon {
+  background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+  color: #6b7280;
+  border: 1px solid #d1d5db;
+}
+
+.signup__hint_item.invalid .signup__hint_icon::before {
+  content: '•';
+}
+
+.signup__hint_item.valid {
+  color: #059669;
+}
+
+.signup__hint_item.invalid {
+  color: #6b7280;
+}
+
+/* Email Validation Hints */
+.signup__email_hint {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  padding: 0.75rem;
+  background: rgba(181, 136, 99, 0.05);
+  border-radius: 8px;
+  font-size: 0.8125rem;
+  color: #6b7280;
+  border-left: 3px solid var(--balance-amber-400);
+  transition: all 0.3s ease;
+}
+
+[dir="rtl"] .signup__email_hint {
+  border-left: none;
+  border-right: 3px solid var(--balance-amber-400);
+}
+
+.signup__email_hint.valid {
+  background: rgba(34, 197, 94, 0.1);
+  color: #059669;
+  border-left-color: #10b981;
+}
+
+[dir="rtl"] .signup__email_hint.valid {
+  border-right-color: #10b981;
+}
+
+.signup__email_hint.invalid {
+  background: rgba(239, 68, 68, 0.1);
+  color: #dc2626;
+  border-left-color: #ef4444;
+}
+
+[dir="rtl"] .signup__email_hint.invalid {
+  border-right-color: #ef4444;
+}
+
+/* Phone Validation Hints */
+.signup__phone_hint {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  padding: 0.75rem;
+  background: rgba(181, 136, 99, 0.05);
+  border-radius: 8px;
+  font-size: 0.8125rem;
+  color: #6b7280;
+  border-left: 3px solid var(--balance-amber-400);
+  transition: all 0.3s ease;
+}
+
+[dir="rtl"] .signup__phone_hint {
+  border-left: none;
+  border-right: 3px solid var(--balance-amber-400);
+}
+
+.signup__phone_hint.valid {
+  background: rgba(34, 197, 94, 0.1);
+  color: #059669;
+  border-left-color: #10b981;
+}
+
+[dir="rtl"] .signup__phone_hint.valid {
+  border-right-color: #10b981;
+}
+
+.signup__phone_hint.invalid {
+  background: rgba(239, 68, 68, 0.1);
+  color: #dc2626;
+  border-left-color: #ef4444;
+}
+
+[dir="rtl"] .signup__phone_hint.invalid {
+  border-right-color: #ef4444;
+}
+
+/* Name Validation Hints */
+.signup__name_hint {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  padding: 0.75rem;
+  background: rgba(181, 136, 99, 0.05);
+  border-radius: 8px;
+  font-size: 0.8125rem;
+  color: #6b7280;
+  border-left: 3px solid var(--balance-amber-400);
+  transition: all 0.3s ease;
+}
+
+[dir="rtl"] .signup__name_hint {
+  border-left: none;
+  border-right: 3px solid var(--balance-amber-400);
+}
+
+.signup__name_hint.valid {
+  background: rgba(34, 197, 94, 0.1);
+  color: #059669;
+  border-left-color: #10b981;
+}
+
+[dir="rtl"] .signup__name_hint.valid {
+  border-right-color: #10b981;
+}
+
+.signup__name_hint.invalid {
+  background: rgba(239, 68, 68, 0.1);
+  color: #dc2626;
+  border-left-color: #ef4444;
+}
+
+[dir="rtl"] .signup__name_hint.invalid {
+  border-right-color: #ef4444;
+}
+
+/* Input Validation States */
+.signup__input_valid {
+  border-color: #10b981 !important;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1) !important;
+}
+
+.signup__input_invalid {
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
+}
+
+/* Enhanced Password Hints Full Width */
+.signup__password_hints_wrapper {
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.signup__password_hints {
+  margin-top: 0;
+  padding: 1rem;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(34, 197, 94, 0.05) 100%);
+  border-radius: 12px;
+  border: 1px solid rgba(59, 130, 246, 0.1);
+  transition: all 0.3s ease;
+}
+
+.signup__password_hints:hover {
+  border-color: rgba(59, 130, 246, 0.2);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+}
+
+.signup__hint_title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--balance-blue-700);
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.signup__hint_title::before {
+  content: '🔐';
+  font-size: 1rem;
+}
+
+.signup__hint_grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.5rem;
+}
+
+.signup__hint_item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.375rem 0;
+  font-size: 0.8125rem;
+  transition: all 0.3s ease;
+}
+
+.signup__hint_icon {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.signup__hint_item.valid .signup__hint_icon {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  animation: checkmarkBounce 0.4s ease-out;
+}
+
+.signup__hint_item.valid .signup__hint_icon::before {
+  content: '✓';
+}
+
+.signup__hint_item.invalid .signup__hint_icon {
+  background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+  color: #6b7280;
+  border: 1px solid #d1d5db;
+}
+
+.signup__hint_item.invalid .signup__hint_icon::before {
+  content: '•';
+}
+
+.signup__hint_item.valid {
+  color: #059669;
+  font-weight: 500;
+}
+
+.signup__hint_item.invalid {
+  color: #6b7280;
+}
+
+/* Submit Button Disabled State */
+.signup__submit_btn_disabled {
+  background: var(--balance-gray-300) !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+  box-shadow: none !important;
+  opacity: 0.6;
+}
+
+.signup__submit_btn_disabled::before {
+  display: none !important;
+}
+
+.signup__submit_btn_disabled:hover {
+  background: var(--balance-gray-300) !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+@keyframes checkmarkBounce {
+  0% {
+    transform: scale(0.8);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Professional Password Hints Styles (matching ProfilePage) */
+.signup__password_hints_wrapper {
+  margin-top: var(--balance-spacing-lg);
+  width: 100%;
+}
+
+.signup__password_hints {
+  padding: var(--balance-spacing-lg);
+  background: var(--balance-gray-50);
+  border-radius: var(--balance-border-radius-lg);
+  border: 1px solid var(--balance-gray-200);
+}
+
+.signup__hints_title {
+  font-size: var(--balance-font-size-sm);
+  font-weight: 600;
+  color: var(--balance-gray-700);
+  margin-bottom: var(--balance-spacing-md);
+}
+
+.signup__hints_grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--balance-spacing-sm);
+}
+
+.signup__hint {
+  display: flex;
+  align-items: center;
+  gap: var(--balance-spacing-xs);
+  font-size: var(--balance-font-size-xs);
+  transition: all 0.3s ease;
+}
+
+.signup__hint_icon {
+  font-size: var(--balance-font-size-sm);
+  font-weight: bold;
+  min-width: 18px;
+  text-align: center;
+}
+
+.signup__hint_valid {
+  color: #22c55e;
+}
+
+.signup__hint_valid .signup__hint_icon {
+  color: #22c55e;
+}
+
+.signup__hint_invalid {
+  color: var(--balance-gray-500);
+}
+
+.signup__hint_invalid .signup__hint_icon {
+  color: #ef4444;
+}
+
+/* RTL Support for Password Hints */
+[dir="rtl"] .signup__hints_grid {
+  direction: rtl;
+}
+
+[dir="rtl"] .signup__hint {
+  flex-direction: row-reverse;
+}
+
+/* Responsive Design for Password Hints */
+@media (max-width: 768px) {
+  .signup__hints_grid {
+    grid-template-columns: 1fr;
+  }
+}

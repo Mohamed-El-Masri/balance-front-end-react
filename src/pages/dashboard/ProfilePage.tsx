@@ -10,6 +10,7 @@ interface EditUserData {
   lastName: string;
   email: string;
   phone: string;
+  whatsapp: string;
   bio: string;
   location: string;
 }
@@ -39,6 +40,7 @@ interface ContentType {
   lastName: string;
   email: string;
   phone: string;
+  whatsapp: string;
   bio: string;
   location: string;
   memberSince: string;
@@ -54,6 +56,7 @@ interface ContentType {
     firstName: string;
     lastName: string;
     phone: string;
+    whatsapp: string;
     bio: string;
     location: string;
     currentPassword: string;
@@ -91,6 +94,7 @@ const ProfilePage: React.FC = () => {
         lastName: user?.lastName || savedData.lastName || '',
         email: user?.email || savedData.email || '',
         phone: user?.phoneNumber || savedData.phone || '',
+        whatsapp: savedData.whatsapp || '',
         bio: savedData.bio || '',
         location: savedData.location || ''
       };
@@ -101,6 +105,7 @@ const ProfilePage: React.FC = () => {
         lastName: user?.lastName || '',
         email: user?.email || '',
         phone: user?.phoneNumber || '',
+        whatsapp: '',
         bio: '',
         location: ''
       };
@@ -130,6 +135,15 @@ const ProfilePage: React.FC = () => {
     currentPassword: '',
     newPassword: '',
     confirmPassword: ''
+  });
+
+  // Password validation state
+  const [passwordValidation, setPasswordValidation] = useState({
+    minLength: false,
+    hasUppercase: false,
+    hasLowercase: false,
+    hasNumber: false,
+    hasSpecial: false
   });
 
   // Mock favorites and interests
@@ -183,6 +197,7 @@ const ProfilePage: React.FC = () => {
         lastName: user.lastName || savedData.lastName || '',
         email: user.email || savedData.email || '',
         phone: user.phoneNumber || savedData.phone || '',
+        whatsapp: savedData.whatsapp || '',
         bio: savedData.bio || '',
         location: savedData.location || ''
       });
@@ -206,6 +221,7 @@ const ProfilePage: React.FC = () => {
       lastName: 'Last Name',
       email: 'Email Address',
       phone: 'Phone Number',
+      whatsapp: 'WhatsApp Number',
       bio: 'Bio',
       location: 'Location',
       memberSince: 'Member Since',
@@ -221,6 +237,7 @@ const ProfilePage: React.FC = () => {
         firstName: 'Enter your first name',
         lastName: 'Enter your last name',
         phone: 'Enter your phone number',
+        whatsapp: 'Enter your WhatsApp number',
         bio: 'Tell us about yourself',
         location: 'Enter your location',
         currentPassword: 'Enter current password',
@@ -234,6 +251,14 @@ const ProfilePage: React.FC = () => {
         passwordMismatch: 'Passwords do not match',
         passwordRequired: 'All password fields are required',
         passwordTooShort: 'Password must be at least 8 characters'
+      },
+      passwordHints: {
+        title: 'Password Requirements:',
+        minLength: 'At least 8 characters',
+        hasUppercase: 'At least one uppercase letter (A-Z)',
+        hasLowercase: 'At least one lowercase letter (a-z)',
+        hasNumber: 'At least one number (0-9)',
+        hasSpecial: 'At least one special character (!@#$%^&*)'
       },
       currency: 'SAR',
       sqm: 'sqm'
@@ -254,6 +279,7 @@ const ProfilePage: React.FC = () => {
       lastName: 'اسم العائلة',
       email: 'البريد الإلكتروني',
       phone: 'رقم الهاتف',
+      whatsapp: 'رقم الواتساب',
       bio: 'نبذة شخصية',
       location: 'الموقع',
       memberSince: 'عضو منذ',
@@ -269,6 +295,7 @@ const ProfilePage: React.FC = () => {
         firstName: 'أدخل اسمك الأول',
         lastName: 'أدخل اسم العائلة',
         phone: 'أدخل رقم هاتفك',
+        whatsapp: 'أدخل رقم الواتساب',
         bio: 'أخبرنا عن نفسك',
         location: 'أدخل موقعك',
         currentPassword: 'أدخل كلمة المرور الحالية',
@@ -283,6 +310,14 @@ const ProfilePage: React.FC = () => {
         passwordRequired: 'جميع حقول كلمة المرور مطلوبة',
         passwordTooShort: 'يجب أن تكون كلمة المرور 8 أحرف على الأقل'
       },
+      passwordHints: {
+        title: 'متطلبات كلمة المرور:',
+        minLength: '8 أحرف على الأقل',
+        hasUppercase: 'حرف كبير واحد على الأقل (A-Z)',
+        hasLowercase: 'حرف صغير واحد على الأقل (a-z)',
+        hasNumber: 'رقم واحد على الأقل (0-9)',
+        hasSpecial: 'رمز خاص واحد على الأقل (!@#$%^&*)'
+      },
       currency: 'ريال',
       sqm: 'م²'
     }
@@ -296,6 +331,17 @@ const ProfilePage: React.FC = () => {
 
   const handlePasswordChange = (field: string, value: string) => {
     setPasswordData(prev => ({ ...prev, [field]: value }));
+    
+    // Validate new password in real-time
+    if (field === 'newPassword') {
+      setPasswordValidation({
+        minLength: value.length >= 8,
+        hasUppercase: /[A-Z]/.test(value),
+        hasLowercase: /[a-z]/.test(value),
+        hasNumber: /[0-9]/.test(value),
+        hasSpecial: /[!@#$%^&*(),.?":{}|<>]/.test(value)
+      });
+    }
   };
 
   const handleSaveProfile = async () => {
@@ -367,6 +413,7 @@ const ProfilePage: React.FC = () => {
         lastName: user.lastName || savedData.lastName || '',
         email: user.email || savedData.email || '',
         phone: user.phoneNumber || savedData.phone || '',
+        whatsapp: savedData.whatsapp || '',
         bio: savedData.bio || '',
         location: savedData.location || ''
       });
@@ -627,6 +674,45 @@ const ProfilePage: React.FC = () => {
                     className={styles.profile__input}
                   />
                 </div>
+
+                {/* Password Hints */}
+                {passwordData.newPassword && (
+                  <div className={styles.profile__password_hints}>
+                    <h4 className={styles.profile__hints_title}>{t.passwordHints.title}</h4>
+                    <div className={styles.profile__hints_grid}>
+                      <div className={`${styles.profile__hint} ${passwordValidation.minLength ? styles.profile__hint_valid : styles.profile__hint_invalid}`}>
+                        <span className={styles.profile__hint_icon}>
+                          {passwordValidation.minLength ? '✓' : '✗'}
+                        </span>
+                        <span>{t.passwordHints.minLength}</span>
+                      </div>
+                      <div className={`${styles.profile__hint} ${passwordValidation.hasUppercase ? styles.profile__hint_valid : styles.profile__hint_invalid}`}>
+                        <span className={styles.profile__hint_icon}>
+                          {passwordValidation.hasUppercase ? '✓' : '✗'}
+                        </span>
+                        <span>{t.passwordHints.hasUppercase}</span>
+                      </div>
+                      <div className={`${styles.profile__hint} ${passwordValidation.hasLowercase ? styles.profile__hint_valid : styles.profile__hint_invalid}`}>
+                        <span className={styles.profile__hint_icon}>
+                          {passwordValidation.hasLowercase ? '✓' : '✗'}
+                        </span>
+                        <span>{t.passwordHints.hasLowercase}</span>
+                      </div>
+                      <div className={`${styles.profile__hint} ${passwordValidation.hasNumber ? styles.profile__hint_valid : styles.profile__hint_invalid}`}>
+                        <span className={styles.profile__hint_icon}>
+                          {passwordValidation.hasNumber ? '✓' : '✗'}
+                        </span>
+                        <span>{t.passwordHints.hasNumber}</span>
+                      </div>
+                      <div className={`${styles.profile__hint} ${passwordValidation.hasSpecial ? styles.profile__hint_valid : styles.profile__hint_invalid}`}>
+                        <span className={styles.profile__hint_icon}>
+                          {passwordValidation.hasSpecial ? '✓' : '✗'}
+                        </span>
+                        <span>{t.passwordHints.hasSpecial}</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
                 
                 <div className={styles.profile__form_group}>
                   <label className={styles.profile__label}>{t.confirmPassword}</label>
@@ -734,6 +820,21 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
           />
         ) : (
           <p className={styles.profile__value}>{user?.phoneNumber}</p>
+        )}
+      </div>
+
+      <div className={styles.profile__form_group}>
+        <label className={styles.profile__label}>{t.whatsapp}</label>
+        {isEditing ? (
+          <input
+            type="tel"
+            value={editData.whatsapp}
+            onChange={(e) => onInputChange('whatsapp', e.target.value)}
+            placeholder={t.placeholders.whatsapp}
+            className={styles.profile__input}
+          />
+        ) : (
+          <p className={styles.profile__value}>{editData.whatsapp || '-'}</p>
         )}
       </div>
 

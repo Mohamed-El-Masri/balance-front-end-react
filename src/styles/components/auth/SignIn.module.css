@@ -246,6 +246,31 @@
   cursor: not-allowed;
 }
 
+/* Validation States */
+.signin__input_valid {
+  border-color: #22c55e !important;
+  background: #f0fdf4 !important;
+}
+
+.signin__input_valid:focus {
+  border-color: #22c55e !important;
+  box-shadow: 
+    0 0 0 3px rgba(34, 197, 94, 0.1),
+    0 4px 12px rgba(34, 197, 94, 0.15) !important;
+}
+
+.signin__input_invalid {
+  border-color: #ef4444 !important;
+  background: #fef2f2 !important;
+}
+
+.signin__input_invalid:focus {
+  border-color: #ef4444 !important;
+  box-shadow: 
+    0 0 0 3px rgba(239, 68, 68, 0.1),
+    0 4px 12px rgba(239, 68, 68, 0.15) !important;
+}
+
 .signin__password_toggle {
   position: absolute;
   right: 16px;
@@ -396,6 +421,14 @@
   opacity: 0.7;
   cursor: not-allowed;
   transform: none;
+}
+
+.signin__submit_btn_disabled {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+  background: #9ca3af !important;
+  transform: none !important;
+  pointer-events: none;
 }
 
 .signin__loading {
@@ -846,4 +879,83 @@
   * {
     animation-duration: 0.3s !important;
   }
+}
+
+/* Validation Hints for SignIn */
+.signin__email_hint {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  padding: 0.75rem;
+  background: rgba(181, 136, 99, 0.05);
+  border-radius: 8px;
+  font-size: 0.8125rem;
+  color: #6b7280;
+  border-left: 3px solid var(--balance-amber-400);
+  transition: all 0.3s ease;
+}
+
+[dir="rtl"] .signin__email_hint {
+  border-left: none;
+  border-right: 3px solid var(--balance-amber-400);
+}
+
+.signin__email_hint.valid {
+  background: rgba(34, 197, 94, 0.1);
+  color: #059669;
+  border-left-color: #10b981;
+}
+
+[dir="rtl"] .signin__email_hint.valid {
+  border-right-color: #10b981;
+}
+
+.signin__email_hint.invalid {
+  background: rgba(239, 68, 68, 0.1);
+  color: #dc2626;
+  border-left-color: #ef4444;
+}
+
+[dir="rtl"] .signin__email_hint.invalid {
+  border-right-color: #ef4444;
+}
+
+.signin__password_hint {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  padding: 0.75rem;
+  background: rgba(181, 136, 99, 0.05);
+  border-radius: 8px;
+  font-size: 0.8125rem;
+  color: #6b7280;
+  border-left: 3px solid var(--balance-amber-400);
+  transition: all 0.3s ease;
+}
+
+[dir="rtl"] .signin__password_hint {
+  border-left: none;
+  border-right: 3px solid var(--balance-amber-400);
+}
+
+.signin__password_hint.valid {
+  background: rgba(34, 197, 94, 0.1);
+  color: #059669;
+  border-left-color: #10b981;
+}
+
+[dir="rtl"] .signin__password_hint.valid {
+  border-right-color: #10b981;
+}
+
+.signin__password_hint.invalid {
+  background: rgba(239, 68, 68, 0.1);
+  color: #dc2626;
+  border-left-color: #ef4444;
+}
+
+[dir="rtl"] .signin__password_hint.invalid {
+  border-right-color: #ef4444;
 }
