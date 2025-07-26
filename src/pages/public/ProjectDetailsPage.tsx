@@ -12,7 +12,7 @@ import ProjectLocationMap from '../../components/ui/project-details/ProjectLocat
 import ProjectProperties from '../../components/ui/project-details/ProjectProperties';
 import RegisterInterest from '../../components/ui/project-details/RegisterInterest';
 import { useLanguage } from '../../contexts/useLanguage';
-import type { Property } from '../../components/ui/project-details/index';
+import type { ProjectDetailProperty } from '../../components/ui/project-details/index';
 
 interface InterestFormData {
   fullName: string;
@@ -233,7 +233,7 @@ const ProjectDetailsPage: React.FC = () => {
     setToast(prev => ({ ...prev, show: false }));
   };
 
-  const handlePropertyClick = (property: Property) => {
+  const handlePropertyClick = (property: ProjectDetailProperty) => {
     console.log('Property clicked:', property);
     // يمكن إضافة navigation إلى صفحة تفاصيل العقار
   };

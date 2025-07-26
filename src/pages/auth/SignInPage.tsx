@@ -1,9 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
-import { useLanguage } from '../../contexts/useLanguage';
-import { useAuth } from '../../contexts/useAuth';
-import { useToast } from '../../contexts/useToast';
+import { useLanguage, useAuth } from '../../contexts';
 import LoadingSpinner from '../../components/ui/LoadingSpinner';
 import styles from '../../styles/components/auth/SignIn.module.css';
 
@@ -24,8 +22,7 @@ const SignInPage: React.FC = () => {
   });
 
   const [showPassword, setShowPassword] = useState(false);
-  const { login, loading, error, clearError } = useAuth();
-  const { showToast } = useToast();
+  const { login, loading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -85,14 +82,6 @@ const SignInPage: React.FC = () => {
   };
 
   const t = isArabic ? content.ar : content.en;
-  
-  // Handle redirect after login
-  useEffect(() => {
-    if (error) {
-      showToast('error', error);
-      clearError();
-    }
-  }, [error, showToast, clearError]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -104,23 +93,19 @@ const SignInPage: React.FC = () => {
 
   const validateForm = (): boolean => {
     if (!formData.email) {
-      showToast('error', t.validation.emailRequired);
       return false;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
-      showToast('error', t.validation.emailInvalid);
       return false;
     }
 
     if (!formData.password) {
-      showToast('error', t.validation.passwordRequired);
       return false;
     }
 
     if (formData.password.length < 6) {
-      showToast('error', t.validation.passwordMinLength);
       return false;
     }
 
@@ -138,14 +123,12 @@ const SignInPage: React.FC = () => {
         password: formData.password 
       });
       
-      showToast('success', t.validation.signInSuccess);
-      
-      // Get redirect path from location state or default to dashboard
-      const from = location.state?.from || '/dashboard';
+      // Get redirect path from location state or default to profile
+      const from = location.state?.from || '/profile';
       navigate(from, { replace: true });
 
     } catch {
-      showToast('error', t.validation.signInError);
+      // AuthContext will handle the error toast
     }
   };
 

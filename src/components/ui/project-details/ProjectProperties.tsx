@@ -18,7 +18,7 @@ import styles from '../../../styles/components/project-details/ProjectProperties
 import { useLanguage } from '../../../contexts/useLanguage';
 import Toast from '../common/Toast';
 
-interface Property {
+interface ProjectProperty {
   id: string;
   name: string;
   nameAr: string;
@@ -50,8 +50,8 @@ interface PropertyFilters {
 }
 
 interface ProjectPropertiesProps {
-  properties: Property[];
-  onPropertyClick: (property: Property) => void;
+  properties: ProjectProperty[];
+  onPropertyClick: (property: ProjectProperty) => void;
   onFavoriteToggle: (propertyId: string) => void;
 }
 
@@ -227,7 +227,7 @@ const ProjectProperties: React.FC<ProjectPropertiesProps> = ({
     setCurrentPage(1);
   };
 
-  const handleFavoriteToggle = (property: Property, event: React.MouseEvent) => {
+  const handleFavoriteToggle = (property: ProjectProperty, event: React.MouseEvent) => {
     event.stopPropagation();
     const isCurrentlyFavorited = property.isFavorited;
     

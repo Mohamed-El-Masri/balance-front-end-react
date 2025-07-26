@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { User, Heart, Eye, Lock, Edit3, Save, X } from 'lucide-react';
-import { useLanguage } from '../../contexts/useLanguage';
-import { useAuth } from '../../contexts/useAuth';
-import { useToast } from '../../contexts/useToast';
+import { useLanguage, useAuth, useToast } from '../../contexts';
 import LoadingSpinner from '../../components/ui/LoadingSpinner';
 import styles from '../../styles/components/dashboard/Profile.module.css';
 
@@ -15,7 +14,7 @@ interface EditUserData {
   location: string;
 }
 
-interface Property {
+interface ProfileProperty {
   id: string;
   title: string;
   titleAr: string;
@@ -77,18 +76,54 @@ const ProfilePage: React.FC = () => {
   const { currentLanguage } = useLanguage();
   const { user, updateUser, changePassword, loading } = useAuth();
   const { showToast } = useToast();
+  const [searchParams, setSearchParams] = useSearchParams();
   const isArabic = currentLanguage.code === 'ar';
 
   const [isEditing, setIsEditing] = useState(false);
-  const [editData, setEditData] = useState<EditUserData>({
-    firstName: user?.firstName || '',
-    lastName: user?.lastName || '',
-    email: user?.email || '',
-    phone: user?.phoneNumber || '',
-    bio: '',
-    location: ''
+  // Initialize editData with user data and localStorage data
+  const [editData, setEditData] = useState<EditUserData>(() => {
+    try {
+      const savedProfile = localStorage.getItem('userProfile');
+      const savedData = savedProfile ? JSON.parse(savedProfile) : {};
+      
+      return {
+        firstName: user?.firstName || savedData.firstName || '',
+        lastName: user?.lastName || savedData.lastName || '',
+        email: user?.email || savedData.email || '',
+        phone: user?.phoneNumber || savedData.phone || '',
+        bio: savedData.bio || '',
+        location: savedData.location || ''
+      };
+    } catch {
+      // If there's an error parsing localStorage, use default values
+      return {
+        firstName: user?.firstName || '',
+        lastName: user?.lastName || '',
+        email: user?.email || '',
+        phone: user?.phoneNumber || '',
+        bio: '',
+        location: ''
+      };
+    }
   });
-  const [activeTab, setActiveTab] = useState<'profile' | 'favorites' | 'interests' | 'password'>('profile');
+  
+  // Get initial tab from URL params or default to 'profile'
+  const initialTab = (searchParams.get('tab') as 'profile' | 'favorites' | 'interests' | 'password') || 'profile';
+  const [activeTab, setActiveTab] = useState<'profile' | 'favorites' | 'interests' | 'password'>(initialTab);
+  
+  // Handle tab changes and update URL
+  const handleTabChange = (tab: 'profile' | 'favorites' | 'interests' | 'password') => {
+    setActiveTab(tab);
+    setSearchParams({ tab });
+  };
+
+  // Update activeTab when URL changes
+  useEffect(() => {
+    const urlTab = searchParams.get('tab') as 'profile' | 'favorites' | 'interests' | 'password';
+    if (urlTab && ['profile', 'favorites', 'interests', 'password'].includes(urlTab)) {
+      setActiveTab(urlTab);
+    }
+  }, [searchParams]);
   const [favoritesFilter, setFavoritesFilter] = useState<'all' | 'projects' | 'properties'>('all');
   const [interestsFilter, setInterestsFilter] = useState<'all' | 'projects' | 'properties'>('all');
   const [passwordData, setPasswordData] = useState({
@@ -98,7 +133,7 @@ const ProfilePage: React.FC = () => {
   });
 
   // Mock favorites and interests
-  const [favorites] = useState<Property[]>([
+  const [favorites] = useState<ProfileProperty[]>([
     {
       id: '1',
       title: 'Luxury Villa in Riyadh',
@@ -123,7 +158,7 @@ const ProfilePage: React.FC = () => {
     }
   ]);
 
-  const [interests] = useState<Property[]>([
+  const [interests] = useState<ProfileProperty[]>([
     {
       id: '3',
       title: 'Balance Residence Project',
@@ -137,16 +172,19 @@ const ProfilePage: React.FC = () => {
     }
   ]);
 
-  // Sync edit data with user data when user changes
+  // Sync edit data with user data and localStorage when user changes
   useEffect(() => {
     if (user) {
+      const savedProfile = localStorage.getItem('userProfile');
+      const savedData = savedProfile ? JSON.parse(savedProfile) : {};
+      
       setEditData({
-        firstName: user.firstName || '',
-        lastName: user.lastName || '',
-        email: user.email || '',
-        phone: user.phoneNumber || '',
-        bio: '',
-        location: ''
+        firstName: user.firstName || savedData.firstName || '',
+        lastName: user.lastName || savedData.lastName || '',
+        email: user.email || savedData.email || '',
+        phone: user.phoneNumber || savedData.phone || '',
+        bio: savedData.bio || '',
+        location: savedData.location || ''
       });
     }
   }, [user]);
@@ -262,9 +300,26 @@ const ProfilePage: React.FC = () => {
 
   const handleSaveProfile = async () => {
     try {
-      // Here you would call the API to update user profile
-      // For now, we'll just update the local state
-      await updateUser();
+      // Update user profile with the edit data (API call)
+      if (updateUser) {
+        await updateUser({
+          firstName: editData.firstName,
+          lastName: editData.lastName,
+          phoneNumber: editData.phone
+        });
+      }
+      
+      // Save all profile data to localStorage (including bio and location)
+      const profileData = {
+        firstName: editData.firstName,
+        lastName: editData.lastName,
+        email: editData.email,
+        phone: editData.phone,
+        bio: editData.bio,
+        location: editData.location
+      };
+      localStorage.setItem('userProfile', JSON.stringify(profileData));
+      
       setIsEditing(false);
       showToast('success', t.validation.profileUpdated);
     } catch {
@@ -304,13 +359,16 @@ const ProfilePage: React.FC = () => {
 
   const handleCancelEdit = () => {
     if (user) {
+      const savedProfile = localStorage.getItem('userProfile');
+      const savedData = savedProfile ? JSON.parse(savedProfile) : {};
+      
       setEditData({
-        firstName: user.firstName || '',
-        lastName: user.lastName || '',
-        email: user.email || '',
-        phone: user.phoneNumber || '',
-        bio: '',
-        location: ''
+        firstName: user.firstName || savedData.firstName || '',
+        lastName: user.lastName || savedData.lastName || '',
+        email: user.email || savedData.email || '',
+        phone: user.phoneNumber || savedData.phone || '',
+        bio: savedData.bio || '',
+        location: savedData.location || ''
       });
     }
     setIsEditing(false);
@@ -329,13 +387,13 @@ const ProfilePage: React.FC = () => {
       : `${price.toLocaleString('en-US')} ${t.currency}`;
   };
 
-  const getFilteredItems = (items: Property[], filter: string) => {
+  const getFilteredItems = (items: ProfileProperty[], filter: string) => {
     if (filter === 'all') return items;
     if (filter === 'projects') return items.filter(item => item.type === 'villa');
     if (filter === 'properties') return items.filter(item => item.type !== 'villa');
     return items;
   };
-  const renderPropertyCard = (property: Property) => (
+  const renderPropertyCard = (property: ProfileProperty) => (
     <div key={property.id} className={styles.profile__property_card}>
       <div className={styles.profile__property_image}>
         <img 
@@ -422,21 +480,21 @@ const ProfilePage: React.FC = () => {
         {/* Navigation Tabs */}
         <div className={styles.profile__nav}>
           <button
-            onClick={() => setActiveTab('profile')}
+            onClick={() => handleTabChange('profile')}
             className={`${styles.profile__nav_btn} ${activeTab === 'profile' ? styles.active : ''}`}
           >
             <User size={16} />
             {t.profile}
           </button>
           <button
-            onClick={() => setActiveTab('favorites')}
+            onClick={() => handleTabChange('favorites')}
             className={`${styles.profile__nav_btn} ${activeTab === 'favorites' ? styles.active : ''}`}
           >
             <Heart size={16} />
             {t.favorites}
           </button>
           <button
-            onClick={() => setActiveTab('interests')}
+            onClick={() => handleTabChange('interests')}
             className={`${styles.profile__nav_btn} ${activeTab === 'interests' ? styles.active : ''}`}
           >
             <Eye size={16} />
@@ -444,7 +502,7 @@ const ProfilePage: React.FC = () => {
           </button>
           {user && !('isThirdPartyAuth' in user && user.isThirdPartyAuth) && (
             <button
-              onClick={() => setActiveTab('password')}
+              onClick={() => handleTabChange('password')}
               className={`${styles.profile__nav_btn} ${activeTab === 'password' ? styles.active : ''}`}
             >
               <Lock size={16} />

@@ -1,153 +1,22 @@
-export interface Property {
-  id: string
-  title: string
-  description: string
-  price: number
-  area: number
-  bedrooms: number
-  bathrooms: number
-  location: string
-  type: 'residential' | 'commercial' | 'investment' | 'luxury'
-  status: 'for_sale' | 'for_rent' | 'sold' | 'rented'
-  images: string[]
-  features: string[]
-  coordinates: {
-    lat: number
-    lng: number
-  }
-  projectName?: string
-  projectNameAr?: string
-  projectSlug?: string
-  createdAt: string
-  updatedAt: string
-}
-
-export interface Project {
-  id: string
-  slug: string
-  title: {
-    ar: string
-    en: string
-  }
-  description: {
-    ar: string
-    en: string
-  }
-  status: {
-    ar: string
-    en: string
-  }
-  type: {
-    ar: string
-    en: string
-  }
-  location: {
-    ar: string
-    en: string
-  }
-  totalUnits?: number
-  completionDate?: string
-  startingPrice?: number
-  images: string[]
-  features: {
-    ar: string[]
-    en: string[]
-  }
-  coordinates: {
-    lat: number
-    lng: number
-  }
-  amenities?: {
-    ar: string[]
-    en: string[]
-  }
-  developer?: {
-    ar: string
-    en: string
-  }
-}
-
-
-// Export types from auth.ts
-import type { User as AuthUser } from './auth';
-
-// Re-export types with 'export type'
+// Export all types from their individual files
+export type { Property } from './Property'
+export type { Project } from './Project'
+export type { User, AppUser } from './User'
+export type { Language } from './Language'
+export type { Theme } from './Theme'
+export type { ContactForm, InterestFormData } from './Forms'
+export type { GoogleMapsLocation } from './GoogleMaps'
 export type { 
-  AuthResponse,
-  LoginRequest,
-  RegisterRequest,
+  AuthResponse, 
+  LoginRequest, 
+  RegisterRequest, 
   ChangePasswordRequest,
   ForgotPasswordRequest,
   ResetPasswordRequest,
+  GoogleLoginRequest,
   ApiError,
-  Phone,
-  Favorite
-} from './auth';
+  AuthContextType 
+} from './Auth'
 
-// Extend the User interface from auth.ts for app-specific properties
-export interface AppUser extends AuthUser {
-  role: 'Guest' | 'User' | 'Employee' | 'Admin' | 'SuperAdmin';
-  createdAt: string;
-}
-
-export interface Language {
-  code: 'ar' | 'en'
-  name: string
-  direction: 'rtl' | 'ltr'
-}
-
-export interface Theme {
-  mode: 'light' | 'dark'
-}
-
-export interface ContactForm {
-  name: string
-  email: string
-  phone: string
-  message: string
-  propertyId?: string
-}
-
-export interface InterestFormData {
-  name: string
-  email: string
-  phone: string
-  contactMethod: 'email' | 'phone' | 'both'
-  message?: string
-  visitDate?: string
-  visitTime?: string
-}
-
-// Google Maps API Types
-declare global {
-  interface Window {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    google: any;
-    initMap: () => void;
-  }
-}
-
-export interface GoogleMapsLocation {
-  id: number;
-  name: {
-    ar: string;
-    en: string;
-  };
-  address: {
-    ar: string;
-    en: string;
-  };
-  coordinates: {
-    lat: number;
-    lng: number;
-  };
-  phone: string;
-  status: {
-    ar: string;
-    en: string;
-  };
-  type: {
-    ar: string;
-    en: string;
-  };
-}
+// Re-export global declarations
+import './GoogleMaps'

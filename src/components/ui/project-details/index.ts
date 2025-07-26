@@ -32,7 +32,7 @@ export interface ProjectData {
   };
   address: string;
   addressAr: string;
-  properties: Property[];
+  properties: ProjectDetailProperty[];
 }
 
 export interface ProjectOverview {
@@ -44,7 +44,7 @@ export interface ProjectOverview {
   featuresAr: string[];
 }
 
-export interface Property {
+export interface ProjectDetailProperty {
   id: string;
   name: string;
   nameAr: string;

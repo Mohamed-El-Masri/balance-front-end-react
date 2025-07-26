@@ -1,10 +1,18 @@
-import React, { useEffect, useState } from 'react';
-import type { ReactNode } from 'react';
-import authService from '../services/authService';
-import type { User, LoginRequest, RegisterRequest, ChangePasswordRequest } from '../types/auth';
+import React, { createContext, useState, useEffect, type ReactNode } from 'react';
+import type { 
+  User, 
+  AuthContextType, 
+  LoginRequest, 
+  RegisterRequest, 
+  ChangePasswordRequest,
+  ResetPasswordRequest,
+  GoogleLoginRequest 
+} from '../types';
+import { authAPI } from '../services/authAPI';
+import { useToast } from './useToast';
 import { useLanguage } from './useLanguage';
-import { AuthContext } from './AuthContext.context';
-import type { AuthContextType } from './types';
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 interface AuthProviderProps {
   children: ReactNode;
@@ -12,143 +20,269 @@ interface AuthProviderProps {
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [token, setToken] = useState<string | null>(localStorage.getItem('authToken'));
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { showToast } = useToast();
   const { currentLanguage } = useLanguage();
-  const isArabic = currentLanguage.code === 'ar';
 
+  const isAuthenticated = !!user && !!token;
+
+  const clearError = () => setError(null);
+
+  // Check if user is authenticated on app load
   useEffect(() => {
-    initializeAuth();
-  }, []);
-
-  const initializeAuth = async () => {
-    try {
-      if (authService.isAuthenticated()) {
-        // Try to get stored user first for faster UI rendering
-        const storedUser = authService.getStoredUser();
-        if (storedUser) {
-          setUser(storedUser);
+    const initAuth = async () => {
+      if (token) {
+        try {
+          const userData = await authAPI.getCurrentUser();
+          setUser(userData);
+        } catch {
+          // Token is invalid, clear it
+          localStorage.removeItem('authToken');
+          setToken(null);
+          setUser(null);
         }
-        
-        // Then fetch the fresh user data from API
-        const freshUser = await authService.getCurrentUser();
-        setUser(freshUser);
       }
-    } catch (error) {
-      console.error('Failed to initialize auth:', error);
-      await authService.logout();
-    } finally {
-      setLoading(false);
-    }
-  };
+      setIsLoading(false);
+    };
 
-  const login = async (credentials: LoginRequest) => {
-    setLoading(true);
-    setError(null);
+    initAuth();
+  }, [token]);
+
+  const login = async (credentials: LoginRequest): Promise<void> => {
     try {
-      const response = await authService.login(credentials);
+      setIsLoading(true);
+      setError(null);
+      const response = await authAPI.login(credentials);
+      
+      // Store token
+      localStorage.setItem('authToken', response.token);
+      setToken(response.token);
       setUser(response.user);
+      
+      showToast(
+        'success', 
+        currentLanguage.code === 'ar' 
+          ? 'تم تسجيل الدخول بنجاح' 
+          : 'Login successful'
+      );
     } catch (error) {
-      if (error instanceof Error) {
-        setError(error.message);
-      } else {
-        setError(isArabic ? 'فشل تسجيل الدخول' : 'Login failed');
-      }
+      const message = error instanceof Error ? error.message : 'Login failed';
+      setError(message);
+      showToast(
+        'error', 
+        currentLanguage.code === 'ar' 
+          ? 'فشل في تسجيل الدخول' 
+          : message
+      );
       throw error;
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
-  const register = async (userData: RegisterRequest) => {
-    setLoading(true);
-    setError(null);
+  const register = async (userData: RegisterRequest): Promise<void> => {
     try {
-      const response = await authService.register(userData);
+      setIsLoading(true);
+      setError(null);
+      const response = await authAPI.register(userData);
+      
+      // Store token
+      localStorage.setItem('authToken', response.token);
+      setToken(response.token);
       setUser(response.user);
+      
+      showToast(
+        'success', 
+        currentLanguage.code === 'ar' 
+          ? 'تم إنشاء الحساب بنجاح' 
+          : 'Account created successfully'
+      );
     } catch (error) {
-      if (error instanceof Error) {
-        setError(error.message);
-      } else {
-        setError(isArabic ? 'فشل إنشاء الحساب' : 'Registration failed');
-      }
+      const message = error instanceof Error ? error.message : 'Registration failed';
+      setError(message);
+      showToast(
+        'error', 
+        currentLanguage.code === 'ar' 
+          ? 'فشل في إنشاء الحساب' 
+          : message
+      );
       throw error;
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
-  const logout = async () => {
-    setLoading(true);
+  const logout = async (): Promise<void> => {
     try {
-      await authService.logout();
+      await authAPI.logout();
+    } catch (error) {
+      // Continue with logout even if API call fails
+      console.error('Logout API error:', error);
+    } finally {
+      // Clear local state
+      localStorage.removeItem('authToken');
+      setToken(null);
       setUser(null);
-    } catch (error) {
-      console.error('Logout error:', error);
-    } finally {
-      setLoading(false);
+      
+      showToast(
+        'success', 
+        currentLanguage.code === 'ar' 
+          ? 'تم تسجيل الخروج بنجاح' 
+          : 'Logged out successfully'
+      );
     }
   };
 
-  const updateUser = async () => {
+  const googleLogin = async (googleData: GoogleLoginRequest): Promise<void> => {
     try {
-      const updatedUser = await authService.getCurrentUser();
-      setUser(updatedUser);
+      setIsLoading(true);
+      const response = await authAPI.googleLogin(googleData);
+      
+      // Store token
+      localStorage.setItem('authToken', response.token);
+      setToken(response.token);
+      setUser(response.user);
+      
+      showToast(
+        'success', 
+        currentLanguage.code === 'ar' 
+          ? 'تم تسجيل الدخول بنجاح' 
+          : 'Login successful'
+      );
     } catch (error) {
-      console.error('Failed to update user:', error);
-    }
-  };
-
-  const changePassword = async (data: ChangePasswordRequest) => {
-    setLoading(true);
-    setError(null);
-    try {
-      await authService.changePassword(data);
-    } catch (error) {
-      if (error instanceof Error) {
-        setError(error.message);
-      } else {
-        setError(isArabic ? 'فشل تغيير كلمة المرور' : 'Failed to change password');
-      }
+      const message = error instanceof Error ? error.message : 'Google login failed';
+      showToast(
+        'error', 
+        currentLanguage.code === 'ar' 
+          ? 'فشل في تسجيل الدخول بـ Google' 
+          : message
+      );
       throw error;
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
-  const forgotPassword = async (email: string) => {
-    setLoading(true);
-    setError(null);
+  const changePassword = async (passwordData: ChangePasswordRequest): Promise<void> => {
     try {
-      await authService.forgotPassword(email);
+      await authAPI.changePassword(passwordData);
+      showToast(
+        'success', 
+        currentLanguage.code === 'ar' 
+          ? 'تم تغيير كلمة المرور بنجاح' 
+          : 'Password changed successfully'
+      );
     } catch (error) {
-      if (error instanceof Error) {
-        setError(error.message);
-      } else {
-        setError(isArabic ? 'فشل إرسال رابط إعادة تعيين كلمة المرور' : 'Failed to send password reset link');
-      }
+      const message = error instanceof Error ? error.message : 'Password change failed';
+      showToast(
+        'error', 
+        currentLanguage.code === 'ar' 
+          ? 'فشل في تغيير كلمة المرور' 
+          : message
+      );
       throw error;
-    } finally {
-      setLoading(false);
     }
   };
 
-  const clearError = () => {
-    setError(null);
+  const forgotPassword = async (email: string): Promise<void> => {
+    try {
+      await authAPI.forgotPassword(email);
+      showToast(
+        'success', 
+        currentLanguage.code === 'ar' 
+          ? 'تم إرسال رابط إعادة تعيين كلمة المرور' 
+          : 'Password reset link sent'
+      );
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to send reset link';
+      showToast(
+        'error', 
+        currentLanguage.code === 'ar' 
+          ? 'فشل في إرسال رابط إعادة التعيين' 
+          : message
+      );
+      throw error;
+    }
+  };
+
+  const resetPassword = async (resetData: ResetPasswordRequest): Promise<void> => {
+    try {
+      await authAPI.resetPassword(resetData);
+      showToast(
+        'success', 
+        currentLanguage.code === 'ar' 
+          ? 'تم إعادة تعيين كلمة المرور بنجاح' 
+          : 'Password reset successfully'
+      );
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Password reset failed';
+      showToast(
+        'error', 
+        currentLanguage.code === 'ar' 
+          ? 'فشل في إعادة تعيين كلمة المرور' 
+          : message
+      );
+      throw error;
+    }
+  };
+
+  const refreshUserData = async (): Promise<void> => {
+    if (!token) return;
+    
+    try {
+      const userData = await authAPI.getCurrentUser();
+      setUser(userData);
+    } catch (error) {
+      console.error('Failed to refresh user data:', error);
+      // Token might be invalid, trigger logout
+      await logout();
+    }
+  };
+
+  const updateUser = async (userData: Partial<User>): Promise<void> => {
+    if (!user) return;
+    
+    try {
+      // Update local user data
+      setUser({ ...user, ...userData });
+      showToast(
+        'success', 
+        currentLanguage.code === 'ar' 
+          ? 'تم تحديث البيانات بنجاح' 
+          : 'Profile updated successfully'
+      );
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Update failed';
+      setError(message);
+      showToast(
+        'error', 
+        currentLanguage.code === 'ar' 
+          ? 'فشل في تحديث البيانات' 
+          : message
+      );
+      throw error;
+    }
   };
 
   const value: AuthContextType = {
     user,
-    loading,
+    token,
+    isAuthenticated,
+    isLoading,
+    loading: isLoading, // alias for compatibility
     error,
     login,
     register,
     logout,
-    updateUser,
+    googleLogin,
     changePassword,
     forgotPassword,
+    resetPassword,
+    refreshUserData,
+    updateUser,
     clearError,
-    isAuthenticated: !!user && authService.isAuthenticated(),
   };
 
   return (
@@ -157,3 +291,5 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     </AuthContext.Provider>
   );
 };
+
+export { AuthContext };

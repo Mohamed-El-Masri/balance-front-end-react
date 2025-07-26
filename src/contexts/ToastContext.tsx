@@ -1,62 +1,32 @@
-import React, { useState, useCallback, type ReactNode } from 'react';
-import { v4 as uuidv4 } from 'uuid';
-import { ToastContext } from './ToastContext.context';
-import type { ToastMessage, ToastType } from './types';
-import Toast from '../components/ui/Toast';
+import React, { useState, type ReactNode } from 'react';
+import { ToastContext, type ToastType, type ToastData } from './ToastContextDef';
 
 interface ToastProviderProps {
   children: ReactNode;
 }
 
 export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
-  const [toasts, setToasts] = useState<ToastMessage[]>([]);
+  const [toasts, setToasts] = useState<ToastData[]>([]);
 
-  const hideToast = useCallback((id: string) => {
-    setToasts((prevToasts) => prevToasts.filter((toast) => toast.id !== id));
-  }, []);
+  const showToast = (type: ToastType, message: string, duration: number = 5000) => {
+    const id = Math.random().toString(36).substr(2, 9);
+    const newToast: ToastData = { id, type, message, duration };
+    
+    setToasts(prev => [...prev, newToast]);
 
-  const showToast = useCallback((type: ToastType, message: string, duration = 5000) => {
-    const id = uuidv4();
-    const newToast: ToastMessage = {
-      id,
-      type,
-      message,
-      duration,
-    };
+    // Auto remove toast after duration
+    setTimeout(() => {
+      removeToast(id);
+    }, duration);
+  };
 
-    setToasts((prevToasts) => [...prevToasts, newToast]);
-
-    // Auto-remove toast after duration
-    if (duration !== Infinity) {
-      setTimeout(() => {
-        hideToast(id);
-      }, duration);
-    }
-  }, [hideToast]);
+  const removeToast = (id: string) => {
+    setToasts(prev => prev.filter(toast => toast.id !== id));
+  };
 
   return (
-    <ToastContext.Provider value={{ toasts, showToast, hideToast }}>
+    <ToastContext.Provider value={{ toasts, showToast, removeToast }}>
       {children}
-      <div className="toast-container" style={{
-        position: 'fixed',
-        top: '20px',
-        right: '20px',
-        zIndex: 9999,
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '10px',
-      }}>
-        {toasts.map((toast) => (
-          <Toast
-            key={toast.id}
-            message={toast.message}
-            type={toast.type}
-            isVisible={true}
-            onClose={() => hideToast(toast.id)}
-            duration={toast.duration}
-          />
-        ))}
-      </div>
     </ToastContext.Provider>
   );
 };

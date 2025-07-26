@@ -1,9 +1,28 @@
 /* Toast Component Styles */
-.toast {
+
+/* Toast Container */
+.toastContainer {
   position: fixed;
-  top: var(--balance-spacing-xl);
-  right: var(--balance-spacing-xl);
+  top: 0;
+  right: 0;
   z-index: 10000;
+  pointer-events: none;
+  padding: var(--balance-spacing-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--balance-spacing-md);
+}
+
+[dir="rtl"] .toastContainer {
+  right: auto;
+  left: 0;
+}
+
+.toast {
+  position: relative;
+  top: auto;
+  right: auto;
+  z-index: auto;
   min-width: 320px;
   max-width: 500px;
   border-radius: var(--balance-border-radius-xl);
@@ -13,6 +32,7 @@
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   font-family: var(--balance-font-family);
   border: 2px solid transparent;
+  pointer-events: auto;
 }
 
 .toast.show {

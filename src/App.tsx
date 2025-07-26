@@ -1,8 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import { LanguageProvider } from './contexts/LanguageContext'
-import { ThemeProvider } from './contexts/ThemeContext'
-import { AuthProvider } from './contexts/AuthContext'
-import { ToastProvider } from './contexts/ToastContext'
+import { LanguageProvider, ThemeProvider, ToastProvider, AuthProvider } from './contexts'
+import ToastContainer from './components/ui/ToastContainer'
+
 
 // Public Routes
 import HomePage from './pages/public/HomePage'
@@ -11,6 +10,7 @@ import ProjectDetailsPage from './pages/public/ProjectDetailsPage'
 import PropertyDetailsPage from './pages/public/PropertyDetailsPage'
 import ContactPage from './pages/public/ContactPage'
 import AboutPage from './pages/public/AboutPage'
+import NotFoundPage from './pages/public/NotFoundPage'
 
 // Auth Routes
 import SignInPage from './pages/auth/SignInPage'
@@ -22,7 +22,6 @@ import ProfilePage from './pages/dashboard/ProfilePage'
 
 // Shared Layout
 import PublicLayout from './layouts/PublicLayout'
-import ProtectedRoute from './components/auth/ProtectedRoute'
 
 function App() {
   return (
@@ -41,28 +40,20 @@ function App() {
                     <Route path="properties/:id" element={<PropertyDetailsPage />} />
                     <Route path="contact" element={<ContactPage />} />
                     <Route path="about" element={<AboutPage />} />
-                  </Route>
-                  
-                  {/* Authentication Routes (no layout, redirect if logged in) */}
-                  <Route element={<ProtectedRoute requireAuth={false} />}>
+                    
+                    {/* Authentication Routes (now with layout) */}
                     <Route path="signin" element={<SignInPage />} />
                     <Route path="signup" element={<SignUpPage />} />
                     <Route path="forgot-password" element={<ForgotPasswordPage />} />
+                    
+                    {/* User Profile Route */}
+                    <Route path="profile" element={<ProfilePage />} />
+                    
+                    {/* 404 Not Found Page */}
+                    <Route path="*" element={<NotFoundPage />} />
                   </Route>
-                  
-                  {/* Protected Dashboard Routes */}
-                  <Route element={<ProtectedRoute requireAuth={true} />}>
-                    <Route path="dashboard" element={<PublicLayout />}>
-                      <Route index element={<ProfilePage />} />
-                      <Route path="profile" element={<ProfilePage />} />
-                    </Route>
-                  </Route>
-                  
-                 
-                  
-                  {/* Catch all for 404 */}
-                  <Route path="*" element={<div>Page Not Found</div>} />
                 </Routes>
+                <ToastContainer />
               </div>
             </Router>
           </AuthProvider>

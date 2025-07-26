@@ -1,28 +1,4 @@
-export interface User {
-  id: string;
-  userName: string;
-  email: string;
-  phoneNumber: string;
-  firstName?: string;
-  lastName?: string;
-  profilePictureUrl?: string | null;
-  isActive: boolean;
-  lastLoginAt?: string;
-  phones: Phone[];
-  favorites: Favorite[];
-  roleNames: string[];
-}
-
-export interface Phone {
-  id: string;
-  number: string;
-  type: string;
-}
-
-export interface Favorite {
-  id: string;
-  propertyId: string;
-}
+import type { User } from './User';
 
 export interface AuthResponse {
   token: string;
@@ -57,26 +33,37 @@ export interface ForgotPasswordRequest {
 }
 
 export interface ResetPasswordRequest {
-  email: string;
   token: string;
-  newPassword: string;
-  confirmNewPassword: string;
-}
-
-export interface ApiError {
-  message: string;
-  errors?: Record<string, string[]>;
   newPassword: string;
   confirmNewPassword: string;
 }
 
 export interface GoogleLoginRequest {
   idToken: string;
-  roleName?: string;
+  roleName: string;
 }
 
 export interface ApiError {
   title: string;
   detail: string;
   status: number;
+}
+
+export interface AuthContextType {
+  user: User | null;
+  token: string | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  loading: boolean; // alias for compatibility
+  error: string | null;
+  login: (credentials: LoginRequest) => Promise<void>;
+  register: (userData: RegisterRequest) => Promise<void>;
+  logout: () => Promise<void>;
+  googleLogin: (googleData: GoogleLoginRequest) => Promise<void>;
+  changePassword: (passwordData: ChangePasswordRequest) => Promise<void>;
+  forgotPassword: (email: string) => Promise<void>;
+  resetPassword: (resetData: ResetPasswordRequest) => Promise<void>;
+  refreshUserData: () => Promise<void>;
+  updateUser?: (userData: Partial<User>) => Promise<void>;
+  clearError: () => void;
 }

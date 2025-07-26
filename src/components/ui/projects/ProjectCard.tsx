@@ -3,7 +3,7 @@ import { MapPin, Calendar, Eye, ArrowRight, ArrowLeft, Heart } from 'lucide-reac
 import styles from '../../../styles/components/projects/ProjectCard.module.css';
 import { useLanguage } from '../../../contexts/useLanguage';
 
-export interface Project {
+export interface ProjectCardData {
   id: number;
   title: string;
   titleAr: string;
@@ -24,7 +24,7 @@ export interface Project {
 }
 
 interface ProjectCardProps {
-  project: Project;
+  project: ProjectCardData;
   onViewDetails: (slug: string) => void;
   onFavoriteToggle?: (projectId: number) => void;
   isFavorited?: boolean;

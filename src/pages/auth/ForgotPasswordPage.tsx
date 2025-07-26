@@ -1,9 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Mail, ArrowLeft, CheckCircle } from 'lucide-react';
-import { useLanguage } from '../../contexts/useLanguage';
-import { useAuth } from '../../contexts/useAuth';
-import { useToast } from '../../contexts/useToast';
+import { useLanguage, useAuth } from '../../contexts';
 import LoadingSpinner from '../../components/ui/LoadingSpinner';
 import styles from '../../styles/components/auth/ForgotPassword.module.css';
 
@@ -14,8 +12,7 @@ const ForgotPasswordPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [emailSent, setEmailSent] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { forgotPassword, error, clearError } = useAuth();
-  const { showToast } = useToast();
+  const { forgotPassword } = useAuth();
 
   const content = {
     en: {
@@ -62,23 +59,13 @@ const ForgotPasswordPage: React.FC = () => {
 
   const t = isArabic ? content.ar : content.en;
 
-  // Handle errors from AuthContext
-  useEffect(() => {
-    if (error) {
-      showToast('error', error);
-      clearError();
-    }
-  }, [error, showToast, clearError]);
-
   const validateEmail = (email: string): boolean => {
     if (!email) {
-      showToast('error', t.validation.emailRequired);
       return false;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      showToast('error', t.validation.emailInvalid);
       return false;
     }
 
@@ -94,9 +81,8 @@ const ForgotPasswordPage: React.FC = () => {
     try {
       await forgotPassword(email);
       setEmailSent(true);
-      showToast('success', t.validation.linkSent);
     } catch {
-      showToast('error', t.validation.sendError);
+      // Error is handled by AuthContext
     } finally {
       setLoading(false);
     }
@@ -107,9 +93,8 @@ const ForgotPasswordPage: React.FC = () => {
 
     try {
       await forgotPassword(email);
-      showToast('success', t.validation.linkSent);
     } catch {
-      showToast('error', t.validation.sendError);
+      // Error is handled by AuthContext
     }
   };
 

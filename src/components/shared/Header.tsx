@@ -1,7 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { useLanguage } from '../../contexts/useLanguage'
-import { useAuth } from '../../contexts/useAuth'
-import { useToast } from '../../contexts/useToast'
+import { useLanguage, useAuth, useToast } from '../../contexts'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { Menu, X, ChevronDown, User, UserCircle, Heart, Star, LogOut } from 'lucide-react'
 import styles from '../../styles/components/Header.module.css'
@@ -49,7 +47,7 @@ const Header: React.FC = () => {
       icon: UserCircle,
       label: currentLanguage.code === 'ar' ? 'الملف الشخصي' : 'Profile',
       onClick: () => {
-        navigate('/profile')
+        navigate('/profile?tab=profile')
         setIsUserDropdownOpen(false)
       }
     },
@@ -57,7 +55,7 @@ const Header: React.FC = () => {
       icon: Heart,
       label: currentLanguage.code === 'ar' ? 'الاهتمامات' : 'Interests',
       onClick: () => {
-        navigate('/profile')
+        navigate('/profile?tab=interests')
         setIsUserDropdownOpen(false)
       }
     },
@@ -65,7 +63,7 @@ const Header: React.FC = () => {
       icon: Star,
       label: currentLanguage.code === 'ar' ? 'المفضلة' : 'Favorites',
       onClick: () => {
-        navigate('/profile')
+        navigate('/profile?tab=favorites')
         setIsUserDropdownOpen(false)
       }
     },

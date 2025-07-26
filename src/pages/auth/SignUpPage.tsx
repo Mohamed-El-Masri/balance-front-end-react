@@ -1,9 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Mail, Lock, User, Phone } from 'lucide-react';
-import { useLanguage } from '../../contexts/useLanguage';
-import { useAuth } from '../../contexts/useAuth';
-import { useToast } from '../../contexts/useToast';
+import { useLanguage, useAuth } from '../../contexts';
 import LoadingSpinner from '../../components/ui/LoadingSpinner';
 import Modal from '../../components/ui/Modal';
 import TermsOfServiceContent from '../../components/ui/TermsOfServiceContent';
@@ -40,8 +38,7 @@ const SignUpPage: React.FC = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [showTermsModal, setShowTermsModal] = useState(false);
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
-  const { register, loading, error, clearError } = useAuth();
-  const { showToast } = useToast();
+  const { register, loading } = useAuth();
   const navigate = useNavigate();
 
   const content = {
@@ -134,14 +131,6 @@ const SignUpPage: React.FC = () => {
   };
 
   const t = isArabic ? content.ar : content.en;
-  
-  // Handle errors from AuthContext
-  useEffect(() => {
-    if (error) {
-      showToast('error', error);
-      clearError();
-    }
-  }, [error, showToast, clearError]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -153,46 +142,38 @@ const SignUpPage: React.FC = () => {
 
   const validateForm = (): boolean => {
     if (!formData.firstName.trim()) {
-      showToast('error', t.validation.firstNameRequired);
       return false;
     }
 
     if (!formData.lastName.trim()) {
-      showToast('error', t.validation.lastNameRequired);
       return false;
     }
 
     if (!formData.email) {
-      showToast('error', t.validation.emailRequired);
       return false;
     }
 
     // More strict email validation
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     if (!emailRegex.test(formData.email)) {
-      showToast('error', 'تنسيق البريد الإلكتروني غير صحيح');
       return false;
     }
 
     if (!formData.phone) {
-      showToast('error', t.validation.phoneRequired);
       return false;
     }
 
     // Validate international phone format (+20xxxxxxxxx)
     const phoneRegex = /^\+[1-9]\d{1,14}$/;
     if (!phoneRegex.test(formData.phone.replace(/\s/g, ''))) {
-      showToast('error', 'من فضلك أدخل رقم الهاتف بالتنسيق الدولي، مثال: +201001234567');
       return false;
     }
 
     if (!formData.password) {
-      showToast('error', t.validation.passwordRequired);
       return false;
     }
 
     if (formData.password.length < 8) {
-      showToast('error', t.validation.passwordMinLength);
       return false;
     }
 
@@ -203,17 +184,14 @@ const SignUpPage: React.FC = () => {
     const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(formData.password);
     
     if (!hasUpperCase || !hasLowerCase || !hasNumbers || !hasSpecialChar) {
-      showToast('error', 'كلمة المرور يجب أن تحتوي على حروف كبيرة وصغيرة وأرقام ورموز خاصة');
       return false;
     }
 
     if (formData.password !== formData.confirmPassword) {
-      showToast('error', t.validation.passwordMatch);
       return false;
     }
 
     if (!formData.agreeToTerms) {
-      showToast('error', t.validation.termsRequired);
       return false;
     }
 
@@ -254,19 +232,13 @@ const SignUpPage: React.FC = () => {
         phoneNumber: formData.phone
       });
       
-      showToast('success', t.validation.signUpSuccess);
-      
-      // Redirect to signin page after successful registration
-      setTimeout(() => {
-        navigate('/signin');
-      }, 2000);
       // Redirect to signin page after successful registration
       setTimeout(() => {
         navigate('/signin');
       }, 2000);
 
     } catch {
-      // Error is handled by the AuthContext and displayed through the useEffect
+      // Error is handled by the AuthContext
     }
   };
 
