@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Mail, Lock, User, Phone } from 'lucide-react';
 import { useLanguage } from '../../contexts/useLanguage';
-import Toast from '../../components/ui/Toast';
+import { useAuth } from '../../contexts/useAuth';
+import { useToast } from '../../contexts/useToast';
+import LoadingSpinner from '../../components/ui/LoadingSpinner';
 import Modal from '../../components/ui/Modal';
 import TermsOfServiceContent from '../../components/ui/TermsOfServiceContent';
 import PrivacyPolicyContent from '../../components/ui/PrivacyPolicyContent';
@@ -36,14 +38,11 @@ const SignUpPage: React.FC = () => {
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [showTermsModal, setShowTermsModal] = useState(false);
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
-  const [toast, setToast] = useState<{
-    show: boolean;
-    message: string;
-    type: 'success' | 'error' | 'info';
-  }>({ show: false, message: '', type: 'success' });
+  const { register, loading, error, clearError } = useAuth();
+  const { showToast } = useToast();
+  const navigate = useNavigate();
 
   const content = {
     en: {
@@ -68,9 +67,9 @@ const SignUpPage: React.FC = () => {
       placeholders: {
         firstName: 'Enter your first name',
         lastName: 'Enter your last name',
-        email: 'Enter your email address',
-        phone: 'Enter your phone number',
-        password: 'Create a password',
+        email: 'example@domain.com',
+        phone: '+201001234567',
+        password: 'Create a strong password',
         confirmPassword: 'Confirm your password'
       },
       validation: {
@@ -111,9 +110,9 @@ const SignUpPage: React.FC = () => {
       placeholders: {
         firstName: 'أدخل اسمك الأول',
         lastName: 'أدخل اسم العائلة',
-        email: 'أدخل بريدك الإلكتروني',
-        phone: 'أدخل رقم هاتفك',
-        password: 'أنشئ كلمة مرور',
+        email: 'example@domain.com',
+        phone: '+201001234567',
+        password: 'أنشئ كلمة مرور قوية',
         confirmPassword: 'أكد كلمة المرور'
       },
       validation: {
@@ -135,6 +134,14 @@ const SignUpPage: React.FC = () => {
   };
 
   const t = isArabic ? content.ar : content.en;
+  
+  // Handle errors from AuthContext
+  useEffect(() => {
+    if (error) {
+      showToast('error', error);
+      clearError();
+    }
+  }, [error, showToast, clearError]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -146,62 +153,71 @@ const SignUpPage: React.FC = () => {
 
   const validateForm = (): boolean => {
     if (!formData.firstName.trim()) {
-      showToast(t.validation.firstNameRequired, 'error');
+      showToast('error', t.validation.firstNameRequired);
       return false;
     }
 
     if (!formData.lastName.trim()) {
-      showToast(t.validation.lastNameRequired, 'error');
+      showToast('error', t.validation.lastNameRequired);
       return false;
     }
 
     if (!formData.email) {
-      showToast(t.validation.emailRequired, 'error');
+      showToast('error', t.validation.emailRequired);
       return false;
     }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    // More strict email validation
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     if (!emailRegex.test(formData.email)) {
-      showToast(t.validation.emailInvalid, 'error');
+      showToast('error', 'تنسيق البريد الإلكتروني غير صحيح');
       return false;
     }
 
     if (!formData.phone) {
-      showToast(t.validation.phoneRequired, 'error');
+      showToast('error', t.validation.phoneRequired);
       return false;
     }
 
-    const phoneRegex = /^[+]?[1-9][\d]{0,15}$/;
+    // Validate international phone format (+20xxxxxxxxx)
+    const phoneRegex = /^\+[1-9]\d{1,14}$/;
     if (!phoneRegex.test(formData.phone.replace(/\s/g, ''))) {
-      showToast(t.validation.phoneInvalid, 'error');
+      showToast('error', 'من فضلك أدخل رقم الهاتف بالتنسيق الدولي، مثال: +201001234567');
       return false;
     }
 
     if (!formData.password) {
-      showToast(t.validation.passwordRequired, 'error');
+      showToast('error', t.validation.passwordRequired);
       return false;
     }
 
     if (formData.password.length < 8) {
-      showToast(t.validation.passwordMinLength, 'error');
+      showToast('error', t.validation.passwordMinLength);
+      return false;
+    }
+
+    // Check password complexity
+    const hasUpperCase = /[A-Z]/.test(formData.password);
+    const hasLowerCase = /[a-z]/.test(formData.password);
+    const hasNumbers = /\d/.test(formData.password);
+    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(formData.password);
+    
+    if (!hasUpperCase || !hasLowerCase || !hasNumbers || !hasSpecialChar) {
+      showToast('error', 'كلمة المرور يجب أن تحتوي على حروف كبيرة وصغيرة وأرقام ورموز خاصة');
       return false;
     }
 
     if (formData.password !== formData.confirmPassword) {
-      showToast(t.validation.passwordMatch, 'error');
+      showToast('error', t.validation.passwordMatch);
       return false;
     }
 
     if (!formData.agreeToTerms) {
-      showToast(t.validation.termsRequired, 'error');
+      showToast('error', t.validation.termsRequired);
       return false;
     }
 
     return true;
-  };
-
-  const showToast = (message: string, type: 'success' | 'error' | 'info') => {
-    setToast({ show: true, message, type });
   };
 
   const openTermsModal = (e: React.MouseEvent) => {
@@ -227,33 +243,30 @@ const SignUpPage: React.FC = () => {
     
     if (!validateForm()) return;
 
-    setLoading(true);
-
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      await register({
+        userName: `${formData.firstName}${formData.lastName}`,
+        email: formData.email,
+        password: formData.password,
+        confirmPassword: formData.confirmPassword,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        phoneNumber: formData.phone
+      });
       
-      // Mock successful signup
-      showToast(t.validation.signUpSuccess, 'success');
+      showToast('success', t.validation.signUpSuccess);
       
-      // Clear form after successful signup
+      // Redirect to signin page after successful registration
       setTimeout(() => {
-        setFormData({
-          firstName: '',
-          lastName: '',
-          email: '',
-          phone: '',
-          password: '',
-          confirmPassword: '',
-          agreeToTerms: false,
-          subscribeToNewsletter: false
-        });
+        navigate('/signin');
+      }, 2000);
+      // Redirect to signin page after successful registration
+      setTimeout(() => {
+        navigate('/signin');
       }, 2000);
 
     } catch {
-      showToast(t.validation.signUpError, 'error');
-    } finally {
-      setLoading(false);
+      // Error is handled by the AuthContext and displayed through the useEffect
     }
   };
 
@@ -322,6 +335,9 @@ const SignUpPage: React.FC = () => {
                   disabled={loading}
                 />
               </div>
+              <div className={styles.signup__helper_text}>
+                {isArabic ? 'مثال: example@domain.com' : 'Example: example@domain.com'}
+              </div>
             </div>
 
             {/* Phone Field */}
@@ -338,6 +354,9 @@ const SignUpPage: React.FC = () => {
                   className={styles.signup__input}
                   disabled={loading}
                 />
+              </div>
+              <div className={styles.signup__helper_text}>
+                {isArabic ? 'يجب أن يبدأ الرقم بـ + ورمز البلد (مثال: +201001234567)' : 'Must start with + and country code (e.g., +201001234567)'}
               </div>
             </div>
 
@@ -364,6 +383,9 @@ const SignUpPage: React.FC = () => {
                   >
                     {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                   </button>
+                </div>
+                <div className={styles.signup__helper_text}>
+                  {isArabic ? 'يجب أن تحتوي كلمة المرور على حروف كبيرة وصغيرة وأرقام ورموز خاصة' : 'Password must contain uppercase, lowercase, numbers and special characters'}
                 </div>
               </div>
 
@@ -520,16 +542,9 @@ const SignUpPage: React.FC = () => {
       >
         <PrivacyPolicyContent isArabic={isArabic} />
       </Modal>
-
-      {/* Toast Notification */}
-      {toast.show && (
-        <Toast
-          message={toast.message}
-          type={toast.type}
-          isVisible={toast.show}
-          onClose={() => setToast({ ...toast, show: false })}
-        />
-      )}
+      
+      {/* Loading Overlay */}
+      {loading && <LoadingSpinner fullScreen />}
     </div>
   );
 };

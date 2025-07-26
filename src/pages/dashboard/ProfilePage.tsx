@@ -1,20 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { User, Heart, Eye, Lock, Edit3, Save, X } from 'lucide-react';
 import { useLanguage } from '../../contexts/useLanguage';
-import Toast from '../../components/ui/Toast';
+import { useAuth } from '../../contexts/useAuth';
+import { useToast } from '../../contexts/useToast';
+import LoadingSpinner from '../../components/ui/LoadingSpinner';
 import styles from '../../styles/components/dashboard/Profile.module.css';
 
-interface UserData {
-  id: string;
+interface EditUserData {
   firstName: string;
   lastName: string;
   email: string;
   phone: string;
-  avatar?: string;
-  bio?: string;
-  location?: string;
-  joinDate: string;
-  isThirdPartyAuth: boolean; // Google/Facebook login
+  bio: string;
+  location: string;
 }
 
 interface Property {
@@ -77,32 +75,27 @@ interface ContentType {
 
 const ProfilePage: React.FC = () => {
   const { currentLanguage } = useLanguage();
+  const { user, updateUser, changePassword, loading } = useAuth();
+  const { showToast } = useToast();
   const isArabic = currentLanguage.code === 'ar';
 
-  // Mock user data
-  const [userData, setUserData] = useState<UserData>({
-    id: '1',
-    firstName: 'أحمد',
-    lastName: 'محمد',
-    email: 'ahmed.mohamed@example.com',
-    phone: '+966123456789',
-    bio: 'مهتم بالاستثمار العقاري في المملكة العربية السعودية',
-    location: 'الرياض، المملكة العربية السعودية',
-    joinDate: '2024-01-15',
-    isThirdPartyAuth: false
-  });
-
   const [isEditing, setIsEditing] = useState(false);
-  const [editData, setEditData] = useState<UserData>(userData);
+  const [editData, setEditData] = useState<EditUserData>({
+    firstName: user?.firstName || '',
+    lastName: user?.lastName || '',
+    email: user?.email || '',
+    phone: user?.phoneNumber || '',
+    bio: '',
+    location: ''
+  });
   const [activeTab, setActiveTab] = useState<'profile' | 'favorites' | 'interests' | 'password'>('profile');
   const [favoritesFilter, setFavoritesFilter] = useState<'all' | 'projects' | 'properties'>('all');
   const [interestsFilter, setInterestsFilter] = useState<'all' | 'projects' | 'properties'>('all');
-  const [loading, setLoading] = useState(false);
-  const [toast, setToast] = useState<{
-    show: boolean;
-    message: string;
-    type: 'success' | 'error' | 'info';
-  }>({ show: false, message: '', type: 'success' });
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  });
 
   // Mock favorites and interests
   const [favorites] = useState<Property[]>([
@@ -143,6 +136,20 @@ const ProfilePage: React.FC = () => {
       area: 200
     }
   ]);
+
+  // Sync edit data with user data when user changes
+  useEffect(() => {
+    if (user) {
+      setEditData({
+        firstName: user.firstName || '',
+        lastName: user.lastName || '',
+        email: user.email || '',
+        phone: user.phoneNumber || '',
+        bio: '',
+        location: ''
+      });
+    }
+  }, [user]);
 
   const content = {
     en: {
@@ -245,30 +252,67 @@ const ProfilePage: React.FC = () => {
 
   const t = isArabic ? content.ar : content.en;
 
-  const showToast = (message: string, type: 'success' | 'error' | 'info') => {
-    setToast({ show: true, message, type });
-  };
-
-  const handleInputChange = (field: keyof UserData, value: string) => {
+  const handleInputChange = (field: keyof EditUserData, value: string) => {
     setEditData(prev => ({ ...prev, [field]: value }));
   };
 
+  const handlePasswordChange = (field: string, value: string) => {
+    setPasswordData(prev => ({ ...prev, [field]: value }));
+  };
+
   const handleSaveProfile = async () => {
-    setLoading(true);
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      setUserData(editData);
+      // Here you would call the API to update user profile
+      // For now, we'll just update the local state
+      await updateUser();
       setIsEditing(false);
-      showToast(t.validation.profileUpdated, 'success');
+      showToast('success', t.validation.profileUpdated);
     } catch {
-      showToast(t.validation.updateError, 'error');
-    } finally {
-      setLoading(false);
+      showToast('error', t.validation.updateError);
+    }
+  };
+
+  const handleChangePassword = async () => {
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      showToast('error', t.validation.passwordMismatch);
+      return;
+    }
+
+    if (passwordData.newPassword.length < 8) {
+      showToast('error', t.validation.passwordTooShort);
+      return;
+    }
+
+    try {
+      await changePassword({
+        email: user?.email || '',
+        currentPassword: passwordData.currentPassword,
+        newPassword: passwordData.newPassword,
+        confirmNewPassword: passwordData.confirmPassword
+      });
+      
+      setPasswordData({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: ''
+      });
+      showToast('success', t.validation.passwordUpdated);
+    } catch {
+      showToast('error', t.validation.updateError);
     }
   };
 
   const handleCancelEdit = () => {
-    setEditData(userData);
+    if (user) {
+      setEditData({
+        firstName: user.firstName || '',
+        lastName: user.lastName || '',
+        email: user.email || '',
+        phone: user.phoneNumber || '',
+        bio: '',
+        location: ''
+      });
+    }
     setIsEditing(false);
   };
 
@@ -327,19 +371,19 @@ const ProfilePage: React.FC = () => {
         {/* Header */}
         <div className={styles.profile__header}>
           <div className={styles.profile__avatar}>
-            {userData.avatar ? (
-              <img src={userData.avatar} alt="Profile" />
+            {user?.profilePictureUrl ? (
+              <img src={user.profilePictureUrl} alt="Profile" />
             ) : (
               <User size={40} />
             )}
           </div>
           <div className={styles.profile__user_info}>
             <h1 className={styles.profile__name}>
-              {userData.firstName} {userData.lastName}
+              {user?.firstName} {user?.lastName}
             </h1>
-            <p className={styles.profile__email}>{userData.email}</p>
+            <p className={styles.profile__email}>{user?.email}</p>
             <p className={styles.profile__member_since}>
-              {t.memberSince}: {formatDate(userData.joinDate)}
+              {t.memberSince}: {user?.lastLoginAt ? formatDate(user.lastLoginAt) : 'N/A'}
             </p>
           </div>
           {activeTab === 'profile' && (
@@ -398,7 +442,7 @@ const ProfilePage: React.FC = () => {
             <Eye size={16} />
             {t.interests}
           </button>
-          {!userData.isThirdPartyAuth && (
+          {user && !('isThirdPartyAuth' in user && user.isThirdPartyAuth) && (
             <button
               onClick={() => setActiveTab('password')}
               className={`${styles.profile__nav_btn} ${activeTab === 'password' ? styles.active : ''}`}
@@ -413,7 +457,7 @@ const ProfilePage: React.FC = () => {
         <div className={styles.profile__content}>
           {activeTab === 'profile' && (
             <ProfileTab 
-              userData={userData}
+              user={user}
               editData={editData}
               isEditing={isEditing}
               onInputChange={handleInputChange}
@@ -500,41 +544,81 @@ const ProfilePage: React.FC = () => {
             </div>
           )}
 
-          {activeTab === 'password' && !userData.isThirdPartyAuth && (
-            <PasswordTab 
-              t={t}
-              showToast={showToast}
-              isArabic={isArabic}
-            />
+          {activeTab === 'password' && (
+            <div className={styles.profile__tab_content}>
+              <h2 className={styles.profile__section_title}>{t.changePassword}</h2>
+              <div className={styles.profile__form}>
+                <div className={styles.profile__form_group}>
+                  <label className={styles.profile__label}>{t.currentPassword}</label>
+                  <input
+                    type="password"
+                    value={passwordData.currentPassword}
+                    onChange={(e) => handlePasswordChange('currentPassword', e.target.value)}
+                    placeholder={t.placeholders.currentPassword}
+                    className={styles.profile__input}
+                  />
+                </div>
+                
+                <div className={styles.profile__form_group}>
+                  <label className={styles.profile__label}>{t.newPassword}</label>
+                  <input
+                    type="password"
+                    value={passwordData.newPassword}
+                    onChange={(e) => handlePasswordChange('newPassword', e.target.value)}
+                    placeholder={t.placeholders.newPassword}
+                    className={styles.profile__input}
+                  />
+                </div>
+                
+                <div className={styles.profile__form_group}>
+                  <label className={styles.profile__label}>{t.confirmPassword}</label>
+                  <input
+                    type="password"
+                    value={passwordData.confirmPassword}
+                    onChange={(e) => handlePasswordChange('confirmPassword', e.target.value)}
+                    placeholder={t.placeholders.confirmPassword}
+                    className={styles.profile__input}
+                  />
+                </div>
+                
+                <button
+                  onClick={handleChangePassword}
+                  disabled={loading || !passwordData.currentPassword || !passwordData.newPassword || !passwordData.confirmPassword}
+                  className={styles.profile__save_btn}
+                >
+                  <Lock size={16} />
+                  {t.updatePassword}
+                </button>
+              </div>
+            </div>
           )}
         </div>
       </div>
-
-      {/* Toast Notification */}
-      {toast.show && (
-        <Toast
-          message={toast.message}
-          type={toast.type}
-          isVisible={toast.show}
-          onClose={() => setToast({ ...toast, show: false })}
-        />
-      )}
+      
+      {/* Loading Overlay */}
+      {loading && <LoadingSpinner fullScreen />}
     </div>
   );
 };
 
 // Profile Tab Component
 interface ProfileTabProps {
-  userData: UserData;
-  editData: UserData;
+  user: {
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+    phoneNumber?: string;
+    isThirdPartyAuth?: boolean;
+  } | null;
+  editData: EditUserData;
   isEditing: boolean;
-  onInputChange: (field: keyof UserData, value: string) => void;
+  onInputChange: (field: keyof EditUserData, value: string) => void;
   t: ContentType;
   isArabic: boolean;
 }
 
 const ProfileTab: React.FC<ProfileTabProps> = ({ 
-  userData, 
+  user, 
   editData, 
   isEditing, 
   onInputChange, 
@@ -556,7 +640,7 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
               className={styles.profile__input}
             />
           ) : (
-            <p className={styles.profile__value}>{userData.firstName}</p>
+            <p className={styles.profile__value}>{user?.firstName}</p>
           )}
         </div>
         <div className={styles.profile__form_group}>
@@ -570,14 +654,14 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
               className={styles.profile__input}
             />
           ) : (
-            <p className={styles.profile__value}>{userData.lastName}</p>
+            <p className={styles.profile__value}>{user?.lastName}</p>
           )}
         </div>
       </div>
 
       <div className={styles.profile__form_group}>
         <label className={styles.profile__label}>{t.email}</label>
-        <p className={styles.profile__value}>{userData.email}</p>
+        <p className={styles.profile__value}>{user?.email}</p>
       </div>
 
       <div className={styles.profile__form_group}>
@@ -591,7 +675,7 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
             className={styles.profile__input}
           />
         ) : (
-          <p className={styles.profile__value}>{userData.phone}</p>
+          <p className={styles.profile__value}>{user?.phoneNumber}</p>
         )}
       </div>
 
@@ -606,7 +690,7 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
             rows={3}
           />
         ) : (
-          <p className={styles.profile__value}>{userData.bio || (isArabic ? 'غير محدد' : 'Not specified')}</p>
+          <p className={styles.profile__value}>{editData.bio || (isArabic ? 'غير محدد' : 'Not specified')}</p>
         )}
       </div>
 
@@ -621,128 +705,11 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
             className={styles.profile__input}
           />
         ) : (
-          <p className={styles.profile__value}>{userData.location || (isArabic ? 'غير محدد' : 'Not specified')}</p>
+          <p className={styles.profile__value}>{editData.location || (isArabic ? 'غير محدد' : 'Not specified')}</p>
         )}
       </div>
     </div>
   </div>
 );
-
-// Password Tab Component
-interface PasswordTabProps {
-  t: ContentType;
-  showToast: (message: string, type: 'success' | 'error' | 'info') => void;
-  isArabic: boolean;
-}
-
-const PasswordTab: React.FC<PasswordTabProps> = ({ t, showToast, isArabic }) => {
-  const [passwordData, setPasswordData] = useState({
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: ''
-  });
-  const [loading, setLoading] = useState(false);
-
-  const validatePassword = (): boolean => {
-    if (!passwordData.currentPassword || !passwordData.newPassword || !passwordData.confirmPassword) {
-      showToast(t.validation.passwordRequired, 'error');
-      return false;
-    }
-
-    if (passwordData.newPassword.length < 8) {
-      showToast(t.validation.passwordTooShort, 'error');
-      return false;
-    }
-
-    if (passwordData.newPassword !== passwordData.confirmPassword) {
-      showToast(t.validation.passwordMismatch, 'error');
-      return false;
-    }
-
-    return true;
-  };
-
-  const handleUpdatePassword = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!validatePassword()) return;
-
-    setLoading(true);
-    try {
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      showToast(t.validation.passwordUpdated, 'success');
-      setPasswordData({
-        currentPassword: '',
-        newPassword: '',
-        confirmPassword: ''
-      });
-    } catch {
-      showToast(t.validation.updateError, 'error');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <div className={styles.profile__tab_content}>
-      <h2 className={styles.profile__section_title}>{t.changePassword}</h2>
-      <form className={styles.profile__password_form} onSubmit={handleUpdatePassword}>
-        <div className={styles.profile__form_group}>
-          <label className={styles.profile__label}>{t.currentPassword}</label>
-          <input
-            type="password"
-            value={passwordData.currentPassword}
-            onChange={(e) => setPasswordData(prev => ({ ...prev, currentPassword: e.target.value }))}
-            placeholder={t.placeholders.currentPassword}
-            className={styles.profile__input}
-            disabled={loading}
-          />
-        </div>
-
-        <div className={styles.profile__form_group}>
-          <label className={styles.profile__label}>{t.newPassword}</label>
-          <input
-            type="password"
-            value={passwordData.newPassword}
-            onChange={(e) => setPasswordData(prev => ({ ...prev, newPassword: e.target.value }))}
-            placeholder={t.placeholders.newPassword}
-            className={styles.profile__input}
-            disabled={loading}
-          />
-        </div>
-
-        <div className={styles.profile__form_group}>
-          <label className={styles.profile__label}>{t.confirmPassword}</label>
-          <input
-            type="password"
-            value={passwordData.confirmPassword}
-            onChange={(e) => setPasswordData(prev => ({ ...prev, confirmPassword: e.target.value }))}
-            placeholder={t.placeholders.confirmPassword}
-            className={styles.profile__input}
-            disabled={loading}
-          />
-        </div>
-
-        <button
-          type="submit"
-          className={styles.profile__update_password_btn}
-          disabled={loading}
-        >
-          {loading ? (
-            <div className={styles.profile__loading}>
-              <div className={styles.profile__spinner}></div>
-              {isArabic ? 'جاري التحديث...' : 'Updating...'}
-            </div>
-          ) : (
-            <>
-              <Lock size={16} />
-              {t.updatePassword}
-            </>
-          )}
-        </button>
-      </form>
-    </div>
-  );
-};
 
 export default ProfilePage;

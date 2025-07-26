@@ -1,14 +1,17 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useLanguage } from '../../contexts/useLanguage'
+import { useAuth } from '../../contexts/useAuth'
+import { useToast } from '../../contexts/useToast'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { Menu, X, ChevronDown, User, UserCircle, Heart, Star, LogOut } from 'lucide-react'
 import styles from '../../styles/components/Header.module.css'
 
 const Header: React.FC = () => {
   const { changeLanguage, currentLanguage } = useLanguage()
+  const { isAuthenticated, logout } = useAuth()
+  const { showToast } = useToast()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
-  const [isAuthenticated, setIsAuthenticated] = useState(false) // Simulate auth state
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false)
   const location = useLocation()
   const navigate = useNavigate()
@@ -69,8 +72,14 @@ const Header: React.FC = () => {
     {
       icon: LogOut,
       label: currentLanguage.code === 'ar' ? 'تسجيل الخروج' : 'Sign Out',
-      onClick: () => {
-        setIsAuthenticated(false)
+      onClick: async () => {
+        try {
+          await logout()
+          showToast('success', currentLanguage.code === 'ar' ? 'تم تسجيل الخروج بنجاح' : 'Logged out successfully')
+          navigate('/')
+        } catch {
+          showToast('error', currentLanguage.code === 'ar' ? 'حدث خطأ أثناء تسجيل الخروج' : 'Error during logout')
+        }
         setIsUserDropdownOpen(false)
       }
     }

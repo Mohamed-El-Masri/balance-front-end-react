@@ -67,14 +67,27 @@ export interface Project {
   }
 }
 
-export interface User {
-  id: string
-  name: string
-  email: string
-  phone: string
-  role: 'admin' | 'agent' | 'customer'
-  avatar?: string
-  createdAt: string
+
+// Export types from auth.ts
+import type { User as AuthUser } from './auth';
+
+// Re-export types with 'export type'
+export type { 
+  AuthResponse,
+  LoginRequest,
+  RegisterRequest,
+  ChangePasswordRequest,
+  ForgotPasswordRequest,
+  ResetPasswordRequest,
+  ApiError,
+  Phone,
+  Favorite
+} from './auth';
+
+// Extend the User interface from auth.ts for app-specific properties
+export interface AppUser extends AuthUser {
+  role: 'Guest' | 'User' | 'Employee' | 'Admin' | 'SuperAdmin';
+  createdAt: string;
 }
 
 export interface Language {

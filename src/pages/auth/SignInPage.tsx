@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
 import { useLanguage } from '../../contexts/useLanguage';
-import Toast from '../../components/ui/Toast';
+import { useAuth } from '../../contexts/useAuth';
+import { useToast } from '../../contexts/useToast';
+import LoadingSpinner from '../../components/ui/LoadingSpinner';
 import styles from '../../styles/components/auth/SignIn.module.css';
 
 interface SignInFormData {
@@ -22,12 +24,10 @@ const SignInPage: React.FC = () => {
   });
 
   const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [toast, setToast] = useState<{
-    show: boolean;
-    message: string;
-    type: 'success' | 'error' | 'info';
-  }>({ show: false, message: '', type: 'success' });
+  const { login, loading, error, clearError } = useAuth();
+  const { showToast } = useToast();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const content = {
     en: {
@@ -85,6 +85,14 @@ const SignInPage: React.FC = () => {
   };
 
   const t = isArabic ? content.ar : content.en;
+  
+  // Handle redirect after login
+  useEffect(() => {
+    if (error) {
+      showToast('error', error);
+      clearError();
+    }
+  }, [error, showToast, clearError]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -96,31 +104,27 @@ const SignInPage: React.FC = () => {
 
   const validateForm = (): boolean => {
     if (!formData.email) {
-      showToast(t.validation.emailRequired, 'error');
+      showToast('error', t.validation.emailRequired);
       return false;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
-      showToast(t.validation.emailInvalid, 'error');
+      showToast('error', t.validation.emailInvalid);
       return false;
     }
 
     if (!formData.password) {
-      showToast(t.validation.passwordRequired, 'error');
+      showToast('error', t.validation.passwordRequired);
       return false;
     }
 
     if (formData.password.length < 6) {
-      showToast(t.validation.passwordMinLength, 'error');
+      showToast('error', t.validation.passwordMinLength);
       return false;
     }
 
     return true;
-  };
-
-  const showToast = (message: string, type: 'success' | 'error' | 'info') => {
-    setToast({ show: true, message, type });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -128,25 +132,20 @@ const SignInPage: React.FC = () => {
     
     if (!validateForm()) return;
 
-    setLoading(true);
-
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      await login({ 
+        email: formData.email, 
+        password: formData.password 
+      });
       
-      // Mock successful login
-      showToast(t.validation.signInSuccess, 'success');
+      showToast('success', t.validation.signInSuccess);
       
-      // Redirect after successful login
-      setTimeout(() => {
-        // Here you would typically redirect to dashboard or home page
-        console.log('Redirecting to dashboard...');
-      }, 1500);
+      // Get redirect path from location state or default to dashboard
+      const from = location.state?.from || '/dashboard';
+      navigate(from, { replace: true });
 
     } catch {
-      showToast(t.validation.signInError, 'error');
-    } finally {
-      setLoading(false);
+      showToast('error', t.validation.signInError);
     }
   };
 
@@ -288,16 +287,9 @@ const SignInPage: React.FC = () => {
           </div>
         </div>
       </div>
-
-      {/* Toast Notification */}
-      {toast.show && (
-        <Toast
-          message={toast.message}
-          type={toast.type}
-          isVisible={toast.show}
-          onClose={() => setToast({ ...toast, show: false })}
-        />
-      )}
+      
+      {/* Loading Overlay */}
+      {loading && <LoadingSpinner fullScreen />}
     </div>
   );
 };

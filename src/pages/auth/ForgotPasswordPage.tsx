@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Mail, ArrowLeft, CheckCircle } from 'lucide-react';
 import { useLanguage } from '../../contexts/useLanguage';
-import Toast from '../../components/ui/Toast';
+import { useAuth } from '../../contexts/useAuth';
+import { useToast } from '../../contexts/useToast';
+import LoadingSpinner from '../../components/ui/LoadingSpinner';
 import styles from '../../styles/components/auth/ForgotPassword.module.css';
 
 const ForgotPasswordPage: React.FC = () => {
@@ -10,13 +12,10 @@ const ForgotPasswordPage: React.FC = () => {
   const isArabic = currentLanguage.code === 'ar';
 
   const [email, setEmail] = useState('');
-  const [loading, setLoading] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
-  const [toast, setToast] = useState<{
-    show: boolean;
-    message: string;
-    type: 'success' | 'error' | 'info';
-  }>({ show: false, message: '', type: 'success' });
+  const [loading, setLoading] = useState(false);
+  const { forgotPassword, error, clearError } = useAuth();
+  const { showToast } = useToast();
 
   const content = {
     en: {
@@ -54,65 +53,63 @@ const ForgotPasswordPage: React.FC = () => {
       validation: {
         emailRequired: 'البريد الإلكتروني مطلوب',
         emailInvalid: 'يرجى إدخال بريد إلكتروني صحيح',
-        emailNotFound: 'لا يوجد حساب بهذا البريد الإلكتروني',
+        emailNotFound: 'لم يتم العثور على حساب بهذا البريد الإلكتروني',
         linkSent: 'تم إرسال رابط إعادة تعيين كلمة المرور بنجاح',
-        sendError: 'فشل في إرسال رابط إعادة التعيين. يرجى المحاولة مرة أخرى.'
+        sendError: 'فشل في إرسال الرابط. يرجى المحاولة مرة أخرى.'
       }
     }
   };
 
   const t = isArabic ? content.ar : content.en;
 
-  const validateForm = (): boolean => {
+  // Handle errors from AuthContext
+  useEffect(() => {
+    if (error) {
+      showToast('error', error);
+      clearError();
+    }
+  }, [error, showToast, clearError]);
+
+  const validateEmail = (email: string): boolean => {
     if (!email) {
-      showToast(t.validation.emailRequired, 'error');
+      showToast('error', t.validation.emailRequired);
       return false;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      showToast(t.validation.emailInvalid, 'error');
+      showToast('error', t.validation.emailInvalid);
       return false;
     }
 
     return true;
   };
 
-  const showToast = (message: string, type: 'success' | 'error' | 'info') => {
-    setToast({ show: true, message, type });
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!validateForm()) return;
+    if (!validateEmail(email)) return;
 
     setLoading(true);
-
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Mock successful email send
-      showToast(t.validation.linkSent, 'success');
+      await forgotPassword(email);
       setEmailSent(true);
-
+      showToast('success', t.validation.linkSent);
     } catch {
-      showToast(t.validation.sendError, 'error');
+      showToast('error', t.validation.sendError);
     } finally {
       setLoading(false);
     }
   };
 
   const handleResend = async () => {
-    setLoading(true);
+    if (!validateEmail(email)) return;
+
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      showToast(t.validation.linkSent, 'success');
+      await forgotPassword(email);
+      showToast('success', t.validation.linkSent);
     } catch {
-      showToast(t.validation.sendError, 'error');
-    } finally {
-      setLoading(false);
+      showToast('error', t.validation.sendError);
     }
   };
 
@@ -120,42 +117,38 @@ const ForgotPasswordPage: React.FC = () => {
     return (
       <div className={styles.forgot_password} dir={isArabic ? 'rtl' : 'ltr'}>
         <div className={styles.forgot_password__container}>
-          <div className={styles.forgot_password__success}>
+          <div className={styles.forgot_password__content}>
             <div className={styles.forgot_password__success_icon}>
               <CheckCircle size={64} />
             </div>
-            <h1 className={styles.forgot_password__title}>{t.emailSentTitle}</h1>
+            
+            <h1 className={styles.forgot_password__title}>
+              {t.emailSentTitle}
+            </h1>
+            
             <p className={styles.forgot_password__subtitle}>
               {t.emailSentMessage}
             </p>
-            <div className={styles.forgot_password__email}>
-              <strong>{email}</strong>
-            </div>
+            
             <div className={styles.forgot_password__actions}>
               <button
                 onClick={handleResend}
                 className={styles.forgot_password__resend_btn}
                 disabled={loading}
               >
-                {loading ? (isArabic ? 'جاري الإرسال...' : 'Sending...') : t.resendLink}
+                {t.resendLink}
               </button>
-              <Link to="/signin" className={styles.forgot_password__back_link}>
+              
+              <Link 
+                to="/signin" 
+                className={styles.forgot_password__back_link}
+              >
                 <ArrowLeft size={16} />
                 {t.backToSignIn}
               </Link>
             </div>
           </div>
         </div>
-
-        {/* Toast Notification */}
-        {toast.show && (
-          <Toast
-            message={toast.message}
-            type={toast.type}
-            isVisible={toast.show}
-            onClose={() => setToast({ ...toast, show: false })}
-          />
-        )}
       </div>
     );
   }
@@ -163,16 +156,21 @@ const ForgotPasswordPage: React.FC = () => {
   return (
     <div className={styles.forgot_password} dir={isArabic ? 'rtl' : 'ltr'}>
       <div className={styles.forgot_password__container}>
-        <div className={styles.forgot_password__form_section}>
+        <div className={styles.forgot_password__content}>
           <div className={styles.forgot_password__header}>
-            <h1 className={styles.forgot_password__title}>{t.title}</h1>
-            <p className={styles.forgot_password__subtitle}>{t.subtitle}</p>
+            <h1 className={styles.forgot_password__title}>
+              {t.title}
+            </h1>
+            <p className={styles.forgot_password__subtitle}>
+              {t.subtitle}
+            </p>
           </div>
 
           <form className={styles.forgot_password__form} onSubmit={handleSubmit}>
-            {/* Email Field */}
             <div className={styles.forgot_password__form_group}>
-              <label className={styles.forgot_password__label}>{t.email}</label>
+              <label className={styles.forgot_password__label}>
+                {t.email}
+              </label>
               <div className={styles.forgot_password__input_wrapper}>
                 <Mail className={styles.forgot_password__input_icon} size={20} />
                 <input
@@ -186,40 +184,33 @@ const ForgotPasswordPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Submit Button */}
             <button
               type="submit"
               className={styles.forgot_password__submit_btn}
-              disabled={loading}
+              disabled={loading || !email}
             >
               {loading ? (
-                <div className={styles.forgot_password__loading}>
-                  <div className={styles.forgot_password__spinner}></div>
-                  {isArabic ? 'جاري الإرسال...' : 'Sending...'}
-                </div>
+                <LoadingSpinner size="small" />
               ) : (
-                t.sendLink
+                <>
+                  <Mail size={16} />
+                  {t.sendLink}
+                </>
               )}
             </button>
+          </form>
 
-            {/* Back to Sign In */}
-            <Link to="/signin" className={styles.forgot_password__back_link}>
+          <div className={styles.forgot_password__footer}>
+            <Link 
+              to="/signin" 
+              className={styles.forgot_password__back_link}
+            >
               <ArrowLeft size={16} />
               {t.backToSignIn}
             </Link>
-          </form>
+          </div>
         </div>
       </div>
-
-      {/* Toast Notification */}
-      {toast.show && (
-        <Toast
-          message={toast.message}
-          type={toast.type}
-          isVisible={toast.show}
-          onClose={() => setToast({ ...toast, show: false })}
-        />
-      )}
     </div>
   );
 };
