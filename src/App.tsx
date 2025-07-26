@@ -1,7 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { LanguageProvider, ThemeProvider, ToastProvider, AuthProvider } from './contexts'
 import ToastContainer from './components/ui/ToastContainer'
-import ProtectedRoute from './components/auth/ProtectedRoute'
 
 
 // Public Routes
@@ -11,13 +10,11 @@ import ProjectDetailsPage from './pages/public/ProjectDetailsPage'
 import PropertyDetailsPage from './pages/public/PropertyDetailsPage'
 import ContactPage from './pages/public/ContactPage'
 import AboutPage from './pages/public/AboutPage'
-import NotFoundPage from './pages/public/NotFoundPage'
 
 // Auth Routes
 import SignInPage from './pages/auth/SignInPage'
 import SignUpPage from './pages/auth/SignUpPage'
 import ForgotPasswordPage from './pages/auth/ForgotPasswordPage'
-import ResetPasswordPage from './pages/auth/ResetPasswordPage'
 
 // Dashboard Routes
 import ProfilePage from './pages/dashboard/ProfilePage'
@@ -42,39 +39,23 @@ function App() {
                     <Route path="properties/:id" element={<PropertyDetailsPage />} />
                     <Route path="contact" element={<ContactPage />} />
                     <Route path="about" element={<AboutPage />} />
-                    
-                    {/* Authentication Routes (protected - require NOT being logged in) */}
-                    <Route path="signin" element={
-                      <ProtectedRoute requireAuth={false}>
-                        <SignInPage />
-                      </ProtectedRoute>
-                    } />
-                    <Route path="signup" element={
-                      <ProtectedRoute requireAuth={false}>
-                        <SignUpPage />
-                      </ProtectedRoute>
-                    } />
-                    <Route path="forgot-password" element={
-                      <ProtectedRoute requireAuth={false}>
-                        <ForgotPasswordPage />
-                      </ProtectedRoute>
-                    } />
-                    <Route path="reset-password" element={
-                      <ProtectedRoute requireAuth={false}>
-                        <ResetPasswordPage />
-                      </ProtectedRoute>
-                    } />
-                    
-                    {/* User Profile Route (protected - requires login) */}
-                    <Route path="profile" element={
-                      <ProtectedRoute requireAuth={true}>
-                        <ProfilePage />
-                      </ProtectedRoute>
-                    } />
-                    
-                    {/* 404 Not Found Page */}
-                    <Route path="*" element={<NotFoundPage />} />
                   </Route>
+                  
+                  {/* Authentication Routes (no layout, redirect if logged in) */}
+                    <Route path="signin" element={<SignInPage />} />
+                    <Route path="signup" element={<SignUpPage />} />
+                    <Route path="forgot-password" element={<ForgotPasswordPage />} />
+                  
+                  {/* Protected Dashboard Routes */}
+                    <Route path="dashboard" element={<PublicLayout />}>
+                      <Route index element={<ProfilePage />} />
+                      <Route path="profile" element={<ProfilePage />} />
+                    </Route>
+                  
+                 
+                  
+                  {/* Catch all for 404 */}
+                  <Route path="*" element={<div>Page Not Found</div>} />
                 </Routes>
                 <ToastContainer />
               </div>

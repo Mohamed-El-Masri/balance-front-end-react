@@ -5,16 +5,15 @@ import {
   ProjectCard, 
   Pagination,
   type ActiveFilters,
-  type ProjectCardData 
+  type Project 
 } from '../../components/ui/projects';
 import PageBreadcrumb from '../../components/ui/shared/PageBreadcrumb';
+import Toast from '../../components/ui/common/Toast';
 import styles from '../../styles/pages/ProjectsPage.module.css';
 import { useLanguage } from '../../contexts/useLanguage';
-import { useToast } from '../../contexts/useToast';
 
 const ProjectsPage: React.FC = () => {
   const { currentLanguage } = useLanguage();
-  const { showToast } = useToast();
   const isArabic = currentLanguage.code === 'ar';
   const navigate = useNavigate();
   
@@ -26,6 +25,11 @@ const ProjectsPage: React.FC = () => {
     area: ''
   });
   const [favoriteProjects, setFavoriteProjects] = useState<Set<number>>(new Set());
+  const [toast, setToast] = useState<{
+    show: boolean;
+    message: string;
+    type: 'success' | 'error' | 'info';
+  }>({ show: false, message: '', type: 'success' });
   
   const itemsPerPage = 6;
 
@@ -53,7 +57,7 @@ const ProjectsPage: React.FC = () => {
   const t = isArabic ? content.ar : content.en;
 
   // Mock projects data
-  const allProjects: ProjectCardData[] = useMemo(() => [
+  const allProjects: Project[] = useMemo(() => [
     {
       id: 1,
       title: 'Balance Residence',
@@ -330,11 +334,27 @@ const ProjectsPage: React.FC = () => {
     
     setFavoriteProjects(newFavorites);
     
-    // Show toast notification using global toast
-    showToast('success', isCurrentlyFavorited ? t.favoriteRemoved : t.favoriteAdded);
+    // Show toast notification
+    setToast({
+      show: true,
+      message: isCurrentlyFavorited ? t.favoriteRemoved : t.favoriteAdded,
+      type: 'success'
+    });
+  };
+
+  const closeToast = () => {
+    setToast(prev => ({ ...prev, show: false }));
   };
   return (
     <>
+      {/* Toast Notification */}
+      <Toast 
+        message={toast.message}
+        type={toast.type}
+        isVisible={toast.show}
+        onClose={closeToast}
+      />
+      
       {/* Breadcrumb */}
       <PageBreadcrumb
         title={t.pageTitle}

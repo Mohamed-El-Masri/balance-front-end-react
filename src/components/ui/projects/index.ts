@@ -5,4 +5,4 @@ export { default as Pagination } from './Pagination';
 
 // Export types
 export type { ActiveFilters } from './ProjectFilter';
-export type { ProjectCardData } from './ProjectCard';
+export type { Project } from './ProjectCard';

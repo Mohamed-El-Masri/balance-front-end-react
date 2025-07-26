@@ -47,7 +47,7 @@ const Header: React.FC = () => {
       icon: UserCircle,
       label: currentLanguage.code === 'ar' ? 'الملف الشخصي' : 'Profile',
       onClick: () => {
-        navigate('/profile?tab=profile')
+        navigate('/profile')
         setIsUserDropdownOpen(false)
       }
     },
@@ -55,7 +55,7 @@ const Header: React.FC = () => {
       icon: Heart,
       label: currentLanguage.code === 'ar' ? 'الاهتمامات' : 'Interests',
       onClick: () => {
-        navigate('/profile?tab=interests')
+        navigate('/profile')
         setIsUserDropdownOpen(false)
       }
     },
@@ -63,7 +63,7 @@ const Header: React.FC = () => {
       icon: Star,
       label: currentLanguage.code === 'ar' ? 'المفضلة' : 'Favorites',
       onClick: () => {
-        navigate('/profile?tab=favorites')
+        navigate('/profile')
         setIsUserDropdownOpen(false)
       }
     },

@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Mail, Lock, User, Phone } from 'lucide-react';
-import { useLanguage, useAuth } from '../../contexts';
+import { useLanguage, useAuth, useToast } from '../../contexts';
 import LoadingSpinner from '../../components/ui/LoadingSpinner';
 import Modal from '../../components/ui/Modal';
 import TermsOfServiceContent from '../../components/ui/TermsOfServiceContent';
@@ -38,25 +38,9 @@ const SignUpPage: React.FC = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [showTermsModal, setShowTermsModal] = useState(false);
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
-  const { register, loading } = useAuth();
+  const { register, loading, error, clearError } = useAuth();
+  const { showToast } = useToast();
   const navigate = useNavigate();
-  
-  // Validation states for real-time feedback
-  const [validationState, setValidationState] = useState({
-    firstName: { isValid: false, isEmpty: true },
-    lastName: { isValid: false, isEmpty: true },
-    email: { isValid: false, isEmpty: true },
-    phone: { isValid: false, isEmpty: true },
-    password: {
-      minLength: false,
-      hasUppercase: false,
-      hasLowercase: false,
-      hasNumber: false,
-      hasSpecial: false,
-      passwordsMatch: false
-    },
-    agreeToTerms: false
-  });
 
   const content = {
     en: {
@@ -82,7 +66,7 @@ const SignUpPage: React.FC = () => {
         firstName: 'Enter your first name',
         lastName: 'Enter your last name',
         email: 'example@domain.com',
-        phone: '+966501234567',
+        phone: '+201001234567',
         password: 'Create a strong password',
         confirmPassword: 'Confirm your password'
       },
@@ -100,15 +84,6 @@ const SignUpPage: React.FC = () => {
         signUpError: 'Something went wrong. Please try again.',
         emailExists: 'An account with this email already exists.',
         signUpSuccess: 'Account created successfully! Please check your email to verify your account.'
-      },
-      passwordHints: {
-        title: 'Password Requirements:',
-        minLength: 'At least 8 characters',
-        hasUppercase: 'At least one uppercase letter (A-Z)',
-        hasLowercase: 'At least one lowercase letter (a-z)',
-        hasNumber: 'At least one number (0-9)',
-        hasSpecial: 'At least one special character (!@#$%^&*)',
-        passwordsMatch: 'Passwords match'
       }
     },
     ar: {
@@ -134,7 +109,7 @@ const SignUpPage: React.FC = () => {
         firstName: 'أدخل اسمك الأول',
         lastName: 'أدخل اسم العائلة',
         email: 'example@domain.com',
-        phone: '+966501234567',
+        phone: '+201001234567',
         password: 'أنشئ كلمة مرور قوية',
         confirmPassword: 'أكد كلمة المرور'
       },
@@ -152,20 +127,19 @@ const SignUpPage: React.FC = () => {
         signUpError: 'حدث خطأ ما. يرجى المحاولة مرة أخرى.',
         emailExists: 'يوجد حساب بهذا البريد الإلكتروني بالفعل.',
         signUpSuccess: 'تم إنشاء الحساب بنجاح! يرجى التحقق من بريدك الإلكتروني لتفعيل حسابك.'
-      },
-      passwordHints: {
-        title: 'متطلبات كلمة المرور:',
-        minLength: '8 أحرف على الأقل',
-        hasUppercase: 'حرف كبير واحد على الأقل (A-Z)',
-        hasLowercase: 'حرف صغير واحد على الأقل (a-z)',
-        hasNumber: 'رقم واحد على الأقل (0-9)',
-        hasSpecial: 'رمز خاص واحد على الأقل (!@#$%^&*)',
-        passwordsMatch: 'كلمات المرور متطابقة'
       }
     }
   };
 
   const t = isArabic ? content.ar : content.en;
+  
+  // Handle errors from AuthContext
+  useEffect(() => {
+    if (error) {
+      showToast('error', error);
+      clearError();
+    }
+  }, [error, showToast, clearError]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -173,90 +147,76 @@ const SignUpPage: React.FC = () => {
       ...prev,
       [name]: type === 'checkbox' ? checked : value
     }));
-
-    // Real-time validation
-    if (name === 'firstName') {
-      setValidationState(prev => ({
-        ...prev,
-        firstName: {
-          isValid: value.trim().length >= 2,
-          isEmpty: value.trim() === ''
-        }
-      }));
-    }
-
-    if (name === 'lastName') {
-      setValidationState(prev => ({
-        ...prev,
-        lastName: {
-          isValid: value.trim().length >= 2,
-          isEmpty: value.trim() === ''
-        }
-      }));
-    }
-
-    if (name === 'email') {
-      const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-      setValidationState(prev => ({
-        ...prev,
-        email: {
-          isValid: emailRegex.test(value),
-          isEmpty: value.trim() === ''
-        }
-      }));
-    }
-
-    if (name === 'phone') {
-      const phoneRegex = /^\+[1-9]\d{1,14}$/;
-      setValidationState(prev => ({
-        ...prev,
-        phone: {
-          isValid: phoneRegex.test(value.replace(/\s/g, '')),
-          isEmpty: value.trim() === ''
-        }
-      }));
-    }
-
-    if (name === 'password' || name === 'confirmPassword') {
-      const currentPassword = name === 'password' ? value : formData.password;
-      const currentConfirmPassword = name === 'confirmPassword' ? value : formData.confirmPassword;
-      
-      setValidationState(prev => ({
-        ...prev,
-        password: {
-          minLength: currentPassword.length >= 8,
-          hasUppercase: /[A-Z]/.test(currentPassword),
-          hasLowercase: /[a-z]/.test(currentPassword),
-          hasNumber: /\d/.test(currentPassword),
-          hasSpecial: /[!@#$%^&*(),.?":{}|<>]/.test(currentPassword),
-          passwordsMatch: currentPassword === currentConfirmPassword && currentPassword.length > 0
-        }
-      }));
-    }
-
-    if (name === 'agreeToTerms') {
-      setValidationState(prev => ({
-        ...prev,
-        agreeToTerms: checked
-      }));
-    }
   };
 
   const validateForm = (): boolean => {
-    return validationState.firstName.isValid &&
-           validationState.lastName.isValid &&
-           validationState.email.isValid &&
-           validationState.phone.isValid &&
-           validationState.password.minLength &&
-           validationState.password.hasUppercase &&
-           validationState.password.hasLowercase &&
-           validationState.password.hasNumber &&
-           validationState.password.hasSpecial &&
-           validationState.password.passwordsMatch &&
-           validationState.agreeToTerms;
-  };
+    if (!formData.firstName.trim()) {
+      showToast('error', t.validation.firstNameRequired);
+      return false;
+    }
 
-  const isFormValid = validateForm();
+    if (!formData.lastName.trim()) {
+      showToast('error', t.validation.lastNameRequired);
+      return false;
+    }
+
+    if (!formData.email) {
+      showToast('error', t.validation.emailRequired);
+      return false;
+    }
+
+    // More strict email validation
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!emailRegex.test(formData.email)) {
+      showToast('error', 'تنسيق البريد الإلكتروني غير صحيح');
+      return false;
+    }
+
+    if (!formData.phone) {
+      showToast('error', t.validation.phoneRequired);
+      return false;
+    }
+
+    // Validate international phone format (+20xxxxxxxxx)
+    const phoneRegex = /^\+[1-9]\d{1,14}$/;
+    if (!phoneRegex.test(formData.phone.replace(/\s/g, ''))) {
+      showToast('error', 'من فضلك أدخل رقم الهاتف بالتنسيق الدولي، مثال: +201001234567');
+      return false;
+    }
+
+    if (!formData.password) {
+      showToast('error', t.validation.passwordRequired);
+      return false;
+    }
+
+    if (formData.password.length < 8) {
+      showToast('error', t.validation.passwordMinLength);
+      return false;
+    }
+
+    // Check password complexity
+    const hasUpperCase = /[A-Z]/.test(formData.password);
+    const hasLowerCase = /[a-z]/.test(formData.password);
+    const hasNumbers = /\d/.test(formData.password);
+    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(formData.password);
+    
+    if (!hasUpperCase || !hasLowerCase || !hasNumbers || !hasSpecialChar) {
+      showToast('error', 'كلمة المرور يجب أن تحتوي على حروف كبيرة وصغيرة وأرقام ورموز خاصة');
+      return false;
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      showToast('error', t.validation.passwordMatch);
+      return false;
+    }
+
+    if (!formData.agreeToTerms) {
+      showToast('error', t.validation.termsRequired);
+      return false;
+    }
+
+    return true;
+  };
 
   const openTermsModal = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -279,7 +239,7 @@ const SignUpPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!isFormValid) return;
+    if (!validateForm()) return;
 
     try {
       await register({
@@ -292,13 +252,19 @@ const SignUpPage: React.FC = () => {
         phoneNumber: formData.phone
       });
       
+      showToast('success', t.validation.signUpSuccess);
+      
+      // Redirect to signin page after successful registration
+      setTimeout(() => {
+        navigate('/signin');
+      }, 2000);
       // Redirect to signin page after successful registration
       setTimeout(() => {
         navigate('/signin');
       }, 2000);
 
     } catch {
-      // Error is handled by the AuthContext
+      // Error is handled by the AuthContext and displayed through the useEffect
     }
   };
 
@@ -329,28 +295,10 @@ const SignUpPage: React.FC = () => {
                     value={formData.firstName}
                     onChange={handleInputChange}
                     placeholder={t.placeholders.firstName}
-                    className={`${styles.signup__input} ${
-                      formData.firstName ? 
-                        (validationState.firstName.isValid ? 
-                         styles.signup__input_valid : styles.signup__input_invalid) 
-                        : ''
-                    }`}
+                    className={styles.signup__input}
                     disabled={loading}
                   />
                 </div>
-                {formData.firstName && (
-                  <div 
-                    className={`${styles.signup__name_hint} ${
-                      validationState.firstName.isValid ? 'valid' : 'invalid'
-                    }`}
-                  >
-                    {validationState.firstName.isValid ? (
-                      isArabic ? '✓ الاسم الأول صحيح' : '✓ Valid first name'
-                    ) : (
-                      isArabic ? '✗ الاسم الأول مطلوب (حرفين على الأقل)' : '✗ First name required (at least 2 characters)'
-                    )}
-                  </div>
-                )}
               </div>
 
               <div className={styles.signup__form_group}>
@@ -363,28 +311,10 @@ const SignUpPage: React.FC = () => {
                     value={formData.lastName}
                     onChange={handleInputChange}
                     placeholder={t.placeholders.lastName}
-                    className={`${styles.signup__input} ${
-                      formData.lastName ? 
-                        (validationState.lastName.isValid ? 
-                         styles.signup__input_valid : styles.signup__input_invalid) 
-                        : ''
-                    }`}
+                    className={styles.signup__input}
                     disabled={loading}
                   />
                 </div>
-                {formData.lastName && (
-                  <div 
-                    className={`${styles.signup__name_hint} ${
-                      validationState.lastName.isValid ? 'valid' : 'invalid'
-                    }`}
-                  >
-                    {validationState.lastName.isValid ? (
-                      isArabic ? '✓ اسم العائلة صحيح' : '✓ Valid last name'
-                    ) : (
-                      isArabic ? '✗ اسم العائلة مطلوب (حرفين على الأقل)' : '✗ Last name required (at least 2 characters)'
-                    )}
-                  </div>
-                )}
               </div>
             </div>
 
@@ -399,31 +329,12 @@ const SignUpPage: React.FC = () => {
                   value={formData.email}
                   onChange={handleInputChange}
                   placeholder={t.placeholders.email}
-                  className={`${styles.signup__input} ${
-                    formData.email ? 
-                      (validationState.email.isValid ? 
-                       styles.signup__input_valid : styles.signup__input_invalid) 
-                      : ''
-                  }`}
+                  className={styles.signup__input}
                   disabled={loading}
                 />
               </div>
-              <div 
-                className={`${styles.signup__email_hint} ${
-                  validationState.email.isEmpty 
-                    ? '' 
-                    : validationState.email.isValid 
-                      ? 'valid' 
-                      : 'invalid'
-                }`}
-              >
-                {validationState.email.isEmpty ? (
-                  isArabic ? 'مثال: example@domain.com' : 'Example: example@domain.com'
-                ) : validationState.email.isValid ? (
-                  isArabic ? '✓ تنسيق البريد الإلكتروني صحيح' : '✓ Valid email format'
-                ) : (
-                  isArabic ? '✗ تنسيق البريد الإلكتروني غير صحيح' : '✗ Invalid email format'
-                )}
+              <div className={styles.signup__helper_text}>
+                {isArabic ? 'مثال: example@domain.com' : 'Example: example@domain.com'}
               </div>
             </div>
 
@@ -438,31 +349,12 @@ const SignUpPage: React.FC = () => {
                   value={formData.phone}
                   onChange={handleInputChange}
                   placeholder={t.placeholders.phone}
-                  className={`${styles.signup__input} ${
-                    formData.phone ? 
-                      (validationState.phone.isValid ? 
-                       styles.signup__input_valid : styles.signup__input_invalid) 
-                      : ''
-                  }`}
+                  className={styles.signup__input}
                   disabled={loading}
                 />
               </div>
-              <div 
-                className={`${styles.signup__phone_hint} ${
-                  validationState.phone.isEmpty 
-                    ? '' 
-                    : validationState.phone.isValid 
-                      ? 'valid' 
-                      : 'invalid'
-                }`}
-              >
-                {validationState.phone.isEmpty ? (
-                  isArabic ? 'يجب أن يبدأ الرقم بـ + ورمز البلد (مثال: +966501234567)' : 'Must start with + and country code (e.g., +966501234567)'
-                ) : validationState.phone.isValid ? (
-                  isArabic ? '✓ تنسيق رقم الهاتف صحيح' : '✓ Valid phone format'
-                ) : (
-                  isArabic ? '✗ تنسيق رقم الهاتف غير صحيح' : '✗ Invalid phone format'
-                )}
+              <div className={styles.signup__helper_text}>
+                {isArabic ? 'يجب أن يبدأ الرقم بـ + ورمز البلد (مثال: +201001234567)' : 'Must start with + and country code (e.g., +201001234567)'}
               </div>
             </div>
 
@@ -478,16 +370,7 @@ const SignUpPage: React.FC = () => {
                     value={formData.password}
                     onChange={handleInputChange}
                     placeholder={t.placeholders.password}
-                    className={`${styles.signup__input} ${
-                      formData.password ? 
-                        (validationState.password.minLength && 
-                         validationState.password.hasUppercase && 
-                         validationState.password.hasLowercase && 
-                         validationState.password.hasNumber && 
-                         validationState.password.hasSpecial ? 
-                         styles.signup__input_valid : styles.signup__input_invalid) 
-                        : ''
-                    }`}
+                    className={styles.signup__input}
                     disabled={loading}
                   />
                   <button
@@ -498,6 +381,9 @@ const SignUpPage: React.FC = () => {
                   >
                     {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                   </button>
+                </div>
+                <div className={styles.signup__helper_text}>
+                  {isArabic ? 'يجب أن تحتوي كلمة المرور على حروف كبيرة وصغيرة وأرقام ورموز خاصة' : 'Password must contain uppercase, lowercase, numbers and special characters'}
                 </div>
               </div>
 
@@ -511,12 +397,7 @@ const SignUpPage: React.FC = () => {
                     value={formData.confirmPassword}
                     onChange={handleInputChange}
                     placeholder={t.placeholders.confirmPassword}
-                    className={`${styles.signup__input} ${
-                      formData.confirmPassword ? 
-                        (validationState.password.passwordsMatch ? 
-                         styles.signup__input_valid : styles.signup__input_invalid) 
-                        : ''
-                    }`}
+                    className={styles.signup__input}
                     disabled={loading}
                   />
                   <button
@@ -530,55 +411,6 @@ const SignUpPage: React.FC = () => {
                 </div>
               </div>
             </div>
-
-            {/* Enhanced Password Strength Hints - Professional Style */}
-            {(formData.password || formData.confirmPassword) && (
-              <div className={styles.signup__password_hints_wrapper}>
-                <div className={styles.signup__password_hints}>
-                  <h4 className={styles.signup__hints_title}>{t.passwordHints.title}</h4>
-                  <div className={styles.signup__hints_grid}>
-                    <div className={`${styles.signup__hint} ${validationState.password.minLength ? styles.signup__hint_valid : styles.signup__hint_invalid}`}>
-                      <span className={styles.signup__hint_icon}>
-                        {validationState.password.minLength ? '✓' : '✗'}
-                      </span>
-                      <span>{t.passwordHints.minLength}</span>
-                    </div>
-                    <div className={`${styles.signup__hint} ${validationState.password.hasUppercase ? styles.signup__hint_valid : styles.signup__hint_invalid}`}>
-                      <span className={styles.signup__hint_icon}>
-                        {validationState.password.hasUppercase ? '✓' : '✗'}
-                      </span>
-                      <span>{t.passwordHints.hasUppercase}</span>
-                    </div>
-                    <div className={`${styles.signup__hint} ${validationState.password.hasLowercase ? styles.signup__hint_valid : styles.signup__hint_invalid}`}>
-                      <span className={styles.signup__hint_icon}>
-                        {validationState.password.hasLowercase ? '✓' : '✗'}
-                      </span>
-                      <span>{t.passwordHints.hasLowercase}</span>
-                    </div>
-                    <div className={`${styles.signup__hint} ${validationState.password.hasNumber ? styles.signup__hint_valid : styles.signup__hint_invalid}`}>
-                      <span className={styles.signup__hint_icon}>
-                        {validationState.password.hasNumber ? '✓' : '✗'}
-                      </span>
-                      <span>{t.passwordHints.hasNumber}</span>
-                    </div>
-                    <div className={`${styles.signup__hint} ${validationState.password.hasSpecial ? styles.signup__hint_valid : styles.signup__hint_invalid}`}>
-                      <span className={styles.signup__hint_icon}>
-                        {validationState.password.hasSpecial ? '✓' : '✗'}
-                      </span>
-                      <span>{t.passwordHints.hasSpecial}</span>
-                    </div>
-                    {formData.confirmPassword && (
-                      <div className={`${styles.signup__hint} ${validationState.password.passwordsMatch ? styles.signup__hint_valid : styles.signup__hint_invalid}`}>
-                        <span className={styles.signup__hint_icon}>
-                          {validationState.password.passwordsMatch ? '✓' : '✗'}
-                        </span>
-                        <span>{t.passwordHints.passwordsMatch}</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )}
 
             {/* Terms and Newsletter */}
             <div className={styles.signup__checkboxes}>
@@ -625,8 +457,8 @@ const SignUpPage: React.FC = () => {
             {/* Submit Button */}
             <button
               type="submit"
-              className={`${styles.signup__submit_btn} ${!isFormValid ? styles.signup__submit_btn_disabled : ''}`}
-              disabled={loading || !isFormValid}
+              className={styles.signup__submit_btn}
+              disabled={loading}
             >
               {loading ? (
                 <div className={styles.signup__loading}>

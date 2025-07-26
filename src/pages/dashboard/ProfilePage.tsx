@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
 import { User, Heart, Eye, Lock, Edit3, Save, X } from 'lucide-react';
 import { useLanguage, useAuth, useToast } from '../../contexts';
 import LoadingSpinner from '../../components/ui/LoadingSpinner';
@@ -10,7 +9,6 @@ interface EditUserData {
   lastName: string;
   email: string;
   phone: string;
-  whatsapp: string;
   bio: string;
   location: string;
 }
@@ -40,7 +38,6 @@ interface ContentType {
   lastName: string;
   email: string;
   phone: string;
-  whatsapp: string;
   bio: string;
   location: string;
   memberSince: string;
@@ -56,7 +53,6 @@ interface ContentType {
     firstName: string;
     lastName: string;
     phone: string;
-    whatsapp: string;
     bio: string;
     location: string;
     currentPassword: string;
@@ -79,71 +75,24 @@ const ProfilePage: React.FC = () => {
   const { currentLanguage } = useLanguage();
   const { user, updateUser, changePassword, loading } = useAuth();
   const { showToast } = useToast();
-  const [searchParams, setSearchParams] = useSearchParams();
   const isArabic = currentLanguage.code === 'ar';
 
   const [isEditing, setIsEditing] = useState(false);
-  // Initialize editData with user data and localStorage data
-  const [editData, setEditData] = useState<EditUserData>(() => {
-    try {
-      const savedProfile = localStorage.getItem('userProfile');
-      const savedData = savedProfile ? JSON.parse(savedProfile) : {};
-      
-      return {
-        firstName: user?.firstName || savedData.firstName || '',
-        lastName: user?.lastName || savedData.lastName || '',
-        email: user?.email || savedData.email || '',
-        phone: user?.phoneNumber || savedData.phone || '',
-        whatsapp: savedData.whatsapp || '',
-        bio: savedData.bio || '',
-        location: savedData.location || ''
-      };
-    } catch {
-      // If there's an error parsing localStorage, use default values
-      return {
-        firstName: user?.firstName || '',
-        lastName: user?.lastName || '',
-        email: user?.email || '',
-        phone: user?.phoneNumber || '',
-        whatsapp: '',
-        bio: '',
-        location: ''
-      };
-    }
+  const [editData, setEditData] = useState<EditUserData>({
+    firstName: user?.firstName || '',
+    lastName: user?.lastName || '',
+    email: user?.email || '',
+    phone: user?.phoneNumber || '',
+    bio: '',
+    location: ''
   });
-  
-  // Get initial tab from URL params or default to 'profile'
-  const initialTab = (searchParams.get('tab') as 'profile' | 'favorites' | 'interests' | 'password') || 'profile';
-  const [activeTab, setActiveTab] = useState<'profile' | 'favorites' | 'interests' | 'password'>(initialTab);
-  
-  // Handle tab changes and update URL
-  const handleTabChange = (tab: 'profile' | 'favorites' | 'interests' | 'password') => {
-    setActiveTab(tab);
-    setSearchParams({ tab });
-  };
-
-  // Update activeTab when URL changes
-  useEffect(() => {
-    const urlTab = searchParams.get('tab') as 'profile' | 'favorites' | 'interests' | 'password';
-    if (urlTab && ['profile', 'favorites', 'interests', 'password'].includes(urlTab)) {
-      setActiveTab(urlTab);
-    }
-  }, [searchParams]);
+  const [activeTab, setActiveTab] = useState<'profile' | 'favorites' | 'interests' | 'password'>('profile');
   const [favoritesFilter, setFavoritesFilter] = useState<'all' | 'projects' | 'properties'>('all');
   const [interestsFilter, setInterestsFilter] = useState<'all' | 'projects' | 'properties'>('all');
   const [passwordData, setPasswordData] = useState({
     currentPassword: '',
     newPassword: '',
     confirmPassword: ''
-  });
-
-  // Password validation state
-  const [passwordValidation, setPasswordValidation] = useState({
-    minLength: false,
-    hasUppercase: false,
-    hasLowercase: false,
-    hasNumber: false,
-    hasSpecial: false
   });
 
   // Mock favorites and interests
@@ -186,20 +135,16 @@ const ProfilePage: React.FC = () => {
     }
   ]);
 
-  // Sync edit data with user data and localStorage when user changes
+  // Sync edit data with user data when user changes
   useEffect(() => {
     if (user) {
-      const savedProfile = localStorage.getItem('userProfile');
-      const savedData = savedProfile ? JSON.parse(savedProfile) : {};
-      
       setEditData({
-        firstName: user.firstName || savedData.firstName || '',
-        lastName: user.lastName || savedData.lastName || '',
-        email: user.email || savedData.email || '',
-        phone: user.phoneNumber || savedData.phone || '',
-        whatsapp: savedData.whatsapp || '',
-        bio: savedData.bio || '',
-        location: savedData.location || ''
+        firstName: user.firstName || '',
+        lastName: user.lastName || '',
+        email: user.email || '',
+        phone: user.phoneNumber || '',
+        bio: '',
+        location: ''
       });
     }
   }, [user]);
@@ -221,7 +166,6 @@ const ProfilePage: React.FC = () => {
       lastName: 'Last Name',
       email: 'Email Address',
       phone: 'Phone Number',
-      whatsapp: 'WhatsApp Number',
       bio: 'Bio',
       location: 'Location',
       memberSince: 'Member Since',
@@ -237,7 +181,6 @@ const ProfilePage: React.FC = () => {
         firstName: 'Enter your first name',
         lastName: 'Enter your last name',
         phone: 'Enter your phone number',
-        whatsapp: 'Enter your WhatsApp number',
         bio: 'Tell us about yourself',
         location: 'Enter your location',
         currentPassword: 'Enter current password',
@@ -251,14 +194,6 @@ const ProfilePage: React.FC = () => {
         passwordMismatch: 'Passwords do not match',
         passwordRequired: 'All password fields are required',
         passwordTooShort: 'Password must be at least 8 characters'
-      },
-      passwordHints: {
-        title: 'Password Requirements:',
-        minLength: 'At least 8 characters',
-        hasUppercase: 'At least one uppercase letter (A-Z)',
-        hasLowercase: 'At least one lowercase letter (a-z)',
-        hasNumber: 'At least one number (0-9)',
-        hasSpecial: 'At least one special character (!@#$%^&*)'
       },
       currency: 'SAR',
       sqm: 'sqm'
@@ -279,7 +214,6 @@ const ProfilePage: React.FC = () => {
       lastName: 'اسم العائلة',
       email: 'البريد الإلكتروني',
       phone: 'رقم الهاتف',
-      whatsapp: 'رقم الواتساب',
       bio: 'نبذة شخصية',
       location: 'الموقع',
       memberSince: 'عضو منذ',
@@ -295,7 +229,6 @@ const ProfilePage: React.FC = () => {
         firstName: 'أدخل اسمك الأول',
         lastName: 'أدخل اسم العائلة',
         phone: 'أدخل رقم هاتفك',
-        whatsapp: 'أدخل رقم الواتساب',
         bio: 'أخبرنا عن نفسك',
         location: 'أدخل موقعك',
         currentPassword: 'أدخل كلمة المرور الحالية',
@@ -310,14 +243,6 @@ const ProfilePage: React.FC = () => {
         passwordRequired: 'جميع حقول كلمة المرور مطلوبة',
         passwordTooShort: 'يجب أن تكون كلمة المرور 8 أحرف على الأقل'
       },
-      passwordHints: {
-        title: 'متطلبات كلمة المرور:',
-        minLength: '8 أحرف على الأقل',
-        hasUppercase: 'حرف كبير واحد على الأقل (A-Z)',
-        hasLowercase: 'حرف صغير واحد على الأقل (a-z)',
-        hasNumber: 'رقم واحد على الأقل (0-9)',
-        hasSpecial: 'رمز خاص واحد على الأقل (!@#$%^&*)'
-      },
       currency: 'ريال',
       sqm: 'م²'
     }
@@ -331,22 +256,11 @@ const ProfilePage: React.FC = () => {
 
   const handlePasswordChange = (field: string, value: string) => {
     setPasswordData(prev => ({ ...prev, [field]: value }));
-    
-    // Validate new password in real-time
-    if (field === 'newPassword') {
-      setPasswordValidation({
-        minLength: value.length >= 8,
-        hasUppercase: /[A-Z]/.test(value),
-        hasLowercase: /[a-z]/.test(value),
-        hasNumber: /[0-9]/.test(value),
-        hasSpecial: /[!@#$%^&*(),.?":{}|<>]/.test(value)
-      });
-    }
   };
 
   const handleSaveProfile = async () => {
     try {
-      // Update user profile with the edit data (API call)
+      // Update user profile with the edit data
       if (updateUser) {
         await updateUser({
           firstName: editData.firstName,
@@ -354,18 +268,6 @@ const ProfilePage: React.FC = () => {
           phoneNumber: editData.phone
         });
       }
-      
-      // Save all profile data to localStorage (including bio and location)
-      const profileData = {
-        firstName: editData.firstName,
-        lastName: editData.lastName,
-        email: editData.email,
-        phone: editData.phone,
-        bio: editData.bio,
-        location: editData.location
-      };
-      localStorage.setItem('userProfile', JSON.stringify(profileData));
-      
       setIsEditing(false);
       showToast('success', t.validation.profileUpdated);
     } catch {
@@ -405,17 +307,13 @@ const ProfilePage: React.FC = () => {
 
   const handleCancelEdit = () => {
     if (user) {
-      const savedProfile = localStorage.getItem('userProfile');
-      const savedData = savedProfile ? JSON.parse(savedProfile) : {};
-      
       setEditData({
-        firstName: user.firstName || savedData.firstName || '',
-        lastName: user.lastName || savedData.lastName || '',
-        email: user.email || savedData.email || '',
-        phone: user.phoneNumber || savedData.phone || '',
-        whatsapp: savedData.whatsapp || '',
-        bio: savedData.bio || '',
-        location: savedData.location || ''
+        firstName: user.firstName || '',
+        lastName: user.lastName || '',
+        email: user.email || '',
+        phone: user.phoneNumber || '',
+        bio: '',
+        location: ''
       });
     }
     setIsEditing(false);
@@ -527,21 +425,21 @@ const ProfilePage: React.FC = () => {
         {/* Navigation Tabs */}
         <div className={styles.profile__nav}>
           <button
-            onClick={() => handleTabChange('profile')}
+            onClick={() => setActiveTab('profile')}
             className={`${styles.profile__nav_btn} ${activeTab === 'profile' ? styles.active : ''}`}
           >
             <User size={16} />
             {t.profile}
           </button>
           <button
-            onClick={() => handleTabChange('favorites')}
+            onClick={() => setActiveTab('favorites')}
             className={`${styles.profile__nav_btn} ${activeTab === 'favorites' ? styles.active : ''}`}
           >
             <Heart size={16} />
             {t.favorites}
           </button>
           <button
-            onClick={() => handleTabChange('interests')}
+            onClick={() => setActiveTab('interests')}
             className={`${styles.profile__nav_btn} ${activeTab === 'interests' ? styles.active : ''}`}
           >
             <Eye size={16} />
@@ -549,7 +447,7 @@ const ProfilePage: React.FC = () => {
           </button>
           {user && !('isThirdPartyAuth' in user && user.isThirdPartyAuth) && (
             <button
-              onClick={() => handleTabChange('password')}
+              onClick={() => setActiveTab('password')}
               className={`${styles.profile__nav_btn} ${activeTab === 'password' ? styles.active : ''}`}
             >
               <Lock size={16} />
@@ -674,45 +572,6 @@ const ProfilePage: React.FC = () => {
                     className={styles.profile__input}
                   />
                 </div>
-
-                {/* Password Hints */}
-                {passwordData.newPassword && (
-                  <div className={styles.profile__password_hints}>
-                    <h4 className={styles.profile__hints_title}>{t.passwordHints.title}</h4>
-                    <div className={styles.profile__hints_grid}>
-                      <div className={`${styles.profile__hint} ${passwordValidation.minLength ? styles.profile__hint_valid : styles.profile__hint_invalid}`}>
-                        <span className={styles.profile__hint_icon}>
-                          {passwordValidation.minLength ? '✓' : '✗'}
-                        </span>
-                        <span>{t.passwordHints.minLength}</span>
-                      </div>
-                      <div className={`${styles.profile__hint} ${passwordValidation.hasUppercase ? styles.profile__hint_valid : styles.profile__hint_invalid}`}>
-                        <span className={styles.profile__hint_icon}>
-                          {passwordValidation.hasUppercase ? '✓' : '✗'}
-                        </span>
-                        <span>{t.passwordHints.hasUppercase}</span>
-                      </div>
-                      <div className={`${styles.profile__hint} ${passwordValidation.hasLowercase ? styles.profile__hint_valid : styles.profile__hint_invalid}`}>
-                        <span className={styles.profile__hint_icon}>
-                          {passwordValidation.hasLowercase ? '✓' : '✗'}
-                        </span>
-                        <span>{t.passwordHints.hasLowercase}</span>
-                      </div>
-                      <div className={`${styles.profile__hint} ${passwordValidation.hasNumber ? styles.profile__hint_valid : styles.profile__hint_invalid}`}>
-                        <span className={styles.profile__hint_icon}>
-                          {passwordValidation.hasNumber ? '✓' : '✗'}
-                        </span>
-                        <span>{t.passwordHints.hasNumber}</span>
-                      </div>
-                      <div className={`${styles.profile__hint} ${passwordValidation.hasSpecial ? styles.profile__hint_valid : styles.profile__hint_invalid}`}>
-                        <span className={styles.profile__hint_icon}>
-                          {passwordValidation.hasSpecial ? '✓' : '✗'}
-                        </span>
-                        <span>{t.passwordHints.hasSpecial}</span>
-                      </div>
-                    </div>
-                  </div>
-                )}
                 
                 <div className={styles.profile__form_group}>
                   <label className={styles.profile__label}>{t.confirmPassword}</label>
@@ -820,21 +679,6 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
           />
         ) : (
           <p className={styles.profile__value}>{user?.phoneNumber}</p>
-        )}
-      </div>
-
-      <div className={styles.profile__form_group}>
-        <label className={styles.profile__label}>{t.whatsapp}</label>
-        {isEditing ? (
-          <input
-            type="tel"
-            value={editData.whatsapp}
-            onChange={(e) => onInputChange('whatsapp', e.target.value)}
-            placeholder={t.placeholders.whatsapp}
-            className={styles.profile__input}
-          />
-        ) : (
-          <p className={styles.profile__value}>{editData.whatsapp || '-'}</p>
         )}
       </div>
 

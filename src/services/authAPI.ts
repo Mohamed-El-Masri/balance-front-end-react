@@ -9,7 +9,7 @@ import type {
   ApiError
 } from '../types';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.balance-realestate.com';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 class AuthAPI {
   private baseURL: string;
