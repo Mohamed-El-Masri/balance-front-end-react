@@ -1,12 +1,12 @@
-// Export all types from their individual files
-export type { Property } from './Property'
-export type { Project } from './Project'
-export type { User, AppUser } from './User'
-export type { Language } from './Language'
-export type { Theme } from './Theme'
-export type { ContactForm, InterestFormData } from './Forms'
-export type { GoogleMapsLocation } from './GoogleMaps'
-export type { 
+// Import all types explicitly
+import type { Property } from './Property'
+import type { Project } from './Project'
+import type { User, AppUser } from './User'
+import type { Language } from './Language'
+import type { Theme } from './Theme'
+import type { ContactForm, InterestFormData } from './Forms'
+import type { GoogleMapsLocation } from './GoogleMaps'
+import type { 
   AuthResponse, 
   LoginRequest, 
   RegisterRequest, 
@@ -17,6 +17,26 @@ export type {
   ApiError,
   AuthContextType 
 } from './Auth'
+
+// Re-export all types
+export type { Property }
+export type { Project }
+export type { User, AppUser }
+export type { Language }
+export type { Theme }
+export type { ContactForm, InterestFormData }
+export type { GoogleMapsLocation }
+export type { 
+  AuthResponse, 
+  LoginRequest, 
+  RegisterRequest, 
+  ChangePasswordRequest,
+  ForgotPasswordRequest,
+  ResetPasswordRequest,
+  GoogleLoginRequest,
+  ApiError,
+  AuthContextType 
+}
 
 // Re-export global declarations
 import './GoogleMaps'
