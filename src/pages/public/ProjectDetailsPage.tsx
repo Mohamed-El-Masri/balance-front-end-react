@@ -12,7 +12,7 @@ import ProjectLocationMap from '../../components/ui/project-details/ProjectLocat
 import ProjectProperties from '../../components/ui/project-details/ProjectProperties';
 import RegisterInterest from '../../components/ui/project-details/RegisterInterest';
 import { useLanguage } from '../../contexts/useLanguage';
-import type { Property } from '../../components/ui/project-details/index';
+import type { ProjectDetailProperty } from '../../components/ui/project-details/index';
 
 interface InterestFormData {
   fullName: string;
@@ -196,14 +196,11 @@ const ProjectDetailsPage: React.FC = () => {
     fetchProjectData();
   }, [id]);
 
-  const handleFavoriteToggle = () => {
-    setProjectData(prev => ({
-      ...prev,
-      isFavorited: !prev.isFavorited
-    }));
+    const handleProjectFavoriteToggle = () => {
+    console.log('Project favorite toggled');
   };
 
-  const handlePropertyFavoriteToggle = (propertyId: string) => {
+  const handleFavoriteToggle = (propertyId: string) => {
     let isAdded = false;
     
     setProjectData(prev => {
@@ -233,7 +230,7 @@ const ProjectDetailsPage: React.FC = () => {
     setToast(prev => ({ ...prev, show: false }));
   };
 
-  const handlePropertyClick = (property: Property) => {
+  const handlePropertyClick = (property: ProjectDetailProperty) => {
     console.log('Property clicked:', property);
     // يمكن إضافة navigation إلى صفحة تفاصيل العقار
   };
@@ -288,7 +285,7 @@ const ProjectDetailsPage: React.FC = () => {
           isFavorited: projectData.isFavorited,
           completionDate: projectData.completionDate
         }}
-        onFavoriteToggle={handleFavoriteToggle}
+        onFavoriteToggle={handleProjectFavoriteToggle}
       />
 
       {/* Project Description */}
@@ -316,7 +313,7 @@ const ProjectDetailsPage: React.FC = () => {
       <ProjectProperties 
         properties={projectData.properties}
         onPropertyClick={handlePropertyClick}
-        onFavoriteToggle={handlePropertyFavoriteToggle}
+        onFavoriteToggle={handleFavoriteToggle}
       />
 
       {/* Register Interest */}

@@ -5,7 +5,7 @@ import {
   ProjectCard, 
   Pagination,
   type ActiveFilters,
-  type Project 
+  type ProjectCardData
 } from '../../components/ui/projects';
 import PageBreadcrumb from '../../components/ui/shared/PageBreadcrumb';
 import Toast from '../../components/ui/common/Toast';
@@ -57,7 +57,7 @@ const ProjectsPage: React.FC = () => {
   const t = isArabic ? content.ar : content.en;
 
   // Mock projects data
-  const allProjects: Project[] = useMemo(() => [
+  const allProjects: ProjectCardData[] = useMemo(() => [
     {
       id: 1,
       title: 'Balance Residence',
