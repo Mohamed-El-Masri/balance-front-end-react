@@ -148,7 +148,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       // Store token
       localStorage.setItem('authToken', response.token);
       setToken(response.token);
-      setUser(response.user);
+      
+      // Fetch user data separately using the token
+      try {
+        const userData = await authAPI.getCurrentUser();
+        setUser(userData);
+      } catch (userError) {
+        console.error('Failed to fetch user data after Google login:', userError);
+      }
       
       showToast(
         'success', 

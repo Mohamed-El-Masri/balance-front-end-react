@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
 import { useLanguage, useAuth } from '../../contexts';
 import LoadingSpinner from '../../components/ui/LoadingSpinner';
+import googleAuthService from '../../services/googleAuth';
 import styles from '../../styles/components/auth/SignIn.module.css';
 
 interface SignInFormData {
@@ -22,9 +23,12 @@ const SignInPage: React.FC = () => {
   });
 
   const [showPassword, setShowPassword] = useState(false);
-  const { login, loading } = useAuth();
+  const { login, googleLogin, loading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Loading state for Google OAuth
+  const [googleLoading, setGoogleLoading] = useState(false);
 
   // Validation states for real-time feedback
   const [validationState, setValidationState] = useState({
@@ -45,7 +49,7 @@ const SignInPage: React.FC = () => {
       signUp: 'Sign Up',
       or: 'Or',
       signInWithGoogle: 'Sign in with Google',
-      signInWithFacebook: 'Sign in with Facebook',
+      signInWithGoogleLoading: 'Signing in with Google...',
       placeholders: {
         email: 'Enter your email address',
         password: 'Enter your password'
@@ -71,7 +75,7 @@ const SignInPage: React.FC = () => {
       signUp: 'إنشاء حساب',
       or: 'أو',
       signInWithGoogle: 'تسجيل الدخول بجوجل',
-      signInWithFacebook: 'تسجيل الدخول بفيسبوك',
+      signInWithGoogleLoading: 'جاري تسجيل الدخول بجوجل...',
       placeholders: {
         email: 'أدخل بريدك الإلكتروني',
         password: 'أدخل كلمة المرور'
@@ -139,9 +143,59 @@ const SignInPage: React.FC = () => {
     }
   };
 
-  const handleSocialLogin = (provider: 'google' | 'facebook') => {
-    console.log(`Logging in with ${provider}`);
-    // Implement social login logic here
+  const handleSocialLogin = async (provider: 'google' | 'facebook') => {
+    if (provider === 'google') {
+      try {
+        // Set loading state
+        setGoogleLoading(true);
+        
+        // Reset any previous state
+        googleAuthService.reset();
+        
+        // Use the actual Google OAuth service
+        const idToken = await googleAuthService.signInWithPopup();
+        
+        // Send the ID token to the backend
+        await googleLogin({ idToken });
+        
+        // Get redirect path from location state or default to profile
+        const from = location.state?.from || '/profile';
+        navigate(from, { replace: true });
+        
+      } catch (error) {
+        console.error('Google login error:', error);
+        
+        // Reset service state on error
+        googleAuthService.reset();
+        
+        // Show user-friendly error message
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        
+        if (errorMessage.includes('timeout') || errorMessage.includes('dismissed') || errorMessage.includes('cancelled')) {
+          // Don't show toast for user cancellations
+          return;
+        }
+        
+        if (errorMessage.includes('Client ID') || errorMessage.includes('invalid_client')) {
+          // Configuration error - show alert for developers
+          alert(isArabic 
+            ? 'خطأ في إعداد Google OAuth. يرجى التحقق من Google Client ID في ملف .env' 
+            : 'Google OAuth configuration error. Please check Google Client ID in .env file'
+          );
+          return;
+        }
+        
+        // AuthContext will handle the error toast for API errors
+        // For Google service errors, we handle them here
+        if (errorMessage.includes('Failed to')) {
+          // This is a Google service error, not an API error
+          // You could show a toast here if needed
+        }
+      } finally {
+        // Always clear loading state
+        setGoogleLoading(false);
+      }
+    }
   };
 
   return (
@@ -276,19 +330,17 @@ const SignInPage: React.FC = () => {
                 type="button"
                 className={`${styles.signin__social_btn} ${styles.signin__google_btn}`}
                 onClick={() => handleSocialLogin('google')}
-                disabled={loading}
+                disabled={loading || googleLoading}
               >
                 <img src="/images/google-icon.svg" alt="Google" />
-                {t.signInWithGoogle}
-              </button>
-              <button
-                type="button"
-                className={`${styles.signin__social_btn} ${styles.signin__facebook_btn}`}
-                onClick={() => handleSocialLogin('facebook')}
-                disabled={loading}
-              >
-                <img src="/images/facebook-icon.svg" alt="Facebook" />
-                {t.signInWithFacebook}
+                {googleLoading ? (
+                  <span className={styles.signin__loading_text}>
+                    {t.signInWithGoogleLoading}
+                  </span>
+                ) : (
+                  t.signInWithGoogle
+                )}
+                {googleLoading && <div className={styles.signin__spinner_small}></div>}
               </button>
             </div>
 

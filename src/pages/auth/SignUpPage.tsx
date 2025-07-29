@@ -6,6 +6,7 @@ import LoadingSpinner from '../../components/ui/LoadingSpinner';
 import Modal from '../../components/ui/Modal';
 import TermsOfServiceContent from '../../components/ui/TermsOfServiceContent';
 import PrivacyPolicyContent from '../../components/ui/PrivacyPolicyContent';
+import googleAuthService from '../../services/googleAuth';
 import styles from '../../styles/components/auth/SignUp.module.css';
 
 interface SignUpFormData {
@@ -38,8 +39,11 @@ const SignUpPage: React.FC = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [showTermsModal, setShowTermsModal] = useState(false);
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
-  const { register, loading } = useAuth();
+  const { register, googleLogin, loading } = useAuth();
   const navigate = useNavigate();
+  
+  // Loading state for Google OAuth
+  const [googleLoading, setGoogleLoading] = useState(false);
   
   // Validation states for real-time feedback
   const [validationState, setValidationState] = useState({
@@ -75,7 +79,7 @@ const SignUpPage: React.FC = () => {
       signIn: 'Sign In',
       or: 'Or',
       signUpWithGoogle: 'Sign up with Google',
-      signUpWithFacebook: 'Sign up with Facebook',
+      signUpWithGoogleLoading: 'Creating account with Google...',
       termsOfService: 'Terms of Service',
       privacyPolicy: 'Privacy Policy',
       placeholders: {
@@ -127,7 +131,7 @@ const SignUpPage: React.FC = () => {
       signIn: 'تسجيل الدخول',
       or: 'أو',
       signUpWithGoogle: 'إنشاء حساب بجوجل',
-      signUpWithFacebook: 'إنشاء حساب بفيسبوك',
+      signUpWithGoogleLoading: 'جاري فتح جوجل...',
       termsOfService: 'شروط الخدمة',
       privacyPolicy: 'سياسة الخصوصية',
       placeholders: {
@@ -313,9 +317,40 @@ const SignUpPage: React.FC = () => {
     }
   };
 
-  const handleSocialSignUp = (provider: 'google' | 'facebook') => {
-    console.log(`Signing up with ${provider}`);
-    // Implement social signup logic here
+  const handleSocialSignUp = async (provider: 'google' | 'facebook') => {
+    if (provider === 'google') {
+      setGoogleLoading(true);
+      try {
+        // Reset any previous state
+        googleAuthService.reset();
+        
+        // Use the actual Google OAuth service
+        const idToken = await googleAuthService.signInWithPopup();
+        
+        // Send the ID token to the backend (handles both login and registration)
+        await googleLogin({ idToken });
+        
+        // Redirect to profile page after successful registration/login
+        navigate('/profile');
+        
+      } catch (error) {
+        console.error('Google signup error:', error);
+        
+        // Reset service state on error
+        googleAuthService.reset();
+        
+        // Show user-friendly error message
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        if (errorMessage.includes('timeout') || errorMessage.includes('dismissed')) {
+          // Don't show toast for user cancellations
+          return;
+        }
+        
+        // AuthContext will handle API errors
+      } finally {
+        setGoogleLoading(false);
+      }
+    }
   };
 
   return (
@@ -660,19 +695,17 @@ const SignUpPage: React.FC = () => {
                 type="button"
                 className={`${styles.signup__social_btn} ${styles.signup__google_btn}`}
                 onClick={() => handleSocialSignUp('google')}
-                disabled={loading}
+                disabled={loading || googleLoading}
               >
                 <img src="/images/google-icon.svg" alt="Google" />
-                {t.signUpWithGoogle}
-              </button>
-              <button
-                type="button"
-                className={`${styles.signup__social_btn} ${styles.signup__facebook_btn}`}
-                onClick={() => handleSocialSignUp('facebook')}
-                disabled={loading}
-              >
-                <img src="/images/facebook-icon.svg" alt="Facebook" />
-                {t.signUpWithFacebook}
+                {googleLoading ? (
+                  <>
+                    <span className={styles.signin__spinner_small}></span>
+                    <span className={styles.signin__loading_text}>{t.signUpWithGoogleLoading}</span>
+                  </>
+                ) : (
+                  t.signUpWithGoogle
+                )}
               </button>
             </div>
 

@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { LanguageProvider, ThemeProvider, ToastProvider, AuthProvider } from './contexts'
 import ToastContainer from './components/ui/ToastContainer'
 import ProtectedRoute from './components/auth/ProtectedRoute'
+import GoogleAuthCallback from './components/auth/GoogleAuthCallback'
 
 
 // Public Routes
@@ -22,6 +23,9 @@ import ResetPasswordPage from './pages/auth/ResetPasswordPage'
 // Dashboard Routes
 import ProfilePage from './pages/dashboard/ProfilePage'
 
+// Test Routes
+import GoogleOAuthTest from './pages/test/GoogleOAuthTest'
+
 // Shared Layout
 import PublicLayout from './layouts/PublicLayout'
 
@@ -34,6 +38,12 @@ function App() {
             <Router>
               <div className="app">
                 <Routes>
+                  {/* Google OAuth Callback Route (no layout needed) */}
+                  <Route path="/auth/google/callback" element={<GoogleAuthCallback />} />
+                  
+                  {/* Test Routes (development only) */}
+                  <Route path="/test/google-oauth" element={<GoogleOAuthTest />} />
+                  
                   {/* Public Routes with Layout */}
                   <Route path="/" element={<PublicLayout />}>
                     <Route index element={<HomePage />} />

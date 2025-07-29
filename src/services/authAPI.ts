@@ -4,6 +4,7 @@ import type {
   ChangePasswordRequest,
   ResetPasswordRequest,
   GoogleLoginRequest,
+  GoogleLoginResponse,
   AuthResponse,
   User,
   ApiError
@@ -131,8 +132,8 @@ class AuthAPI {
     });
   }
 
-  async googleLogin(googleData: GoogleLoginRequest): Promise<AuthResponse> {
-    return this.request<AuthResponse>('/google-login', {
+  async googleLogin(googleData: GoogleLoginRequest): Promise<GoogleLoginResponse> {
+    return this.request<GoogleLoginResponse>('/google-login', {
       method: 'POST',
       body: JSON.stringify(googleData),
     });

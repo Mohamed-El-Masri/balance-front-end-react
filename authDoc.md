@@ -215,8 +215,32 @@ hint : The token is typically sent to the user's email after they request a pass
     "message": "Password reset successfully."
 }
 ```
+### 8. Logout User
+**Endpoint:** `/auth/logout`
+**Method:** `POST`
+**Authorization:** Bearer token required
+**Description:** Logs out the authenticated user by invalidating the JWT token.
+**Response:**
+```json
+{
+    "message": "Logged out successfully."
+}
+```
 
-
-
-
+### 9. login with Google
+**Endpoint:** `/auth/google-login
+**Method:** `POST`
+**Description:** Authenticates a user using Google OAuth and returns a JWT token.
+**Request Body:**
+```json
+{
+    "idToken": "string"
+}
+```
+**Response:**
+```json
+{
+    "token": "string"
+}
+```
 

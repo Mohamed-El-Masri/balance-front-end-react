@@ -41,7 +41,10 @@ export interface ResetPasswordRequest {
 
 export interface GoogleLoginRequest {
   idToken: string;
-  roleName: string;
+}
+
+export interface GoogleLoginResponse {
+  token: string;
 }
 
 export interface UpdateProfileRequest {
