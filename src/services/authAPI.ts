@@ -9,13 +9,18 @@ import type {
   ApiError
 } from '../types';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.balance-realestate.com';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://balancerealestate.runasp.net/api';
 
 class AuthAPI {
   private baseURL: string;
+  private token: string | null = null;
 
   constructor() {
-    this.baseURL = `${API_BASE_URL}/api/auth`;
+    this.baseURL = `${API_BASE_URL}/auth`;
+  }
+
+  setToken(token: string | null) {
+    this.token = token;
   }
 
   private async request<T>(
@@ -23,12 +28,11 @@ class AuthAPI {
     options: RequestInit = {}
   ): Promise<T> {
     const url = `${this.baseURL}${endpoint}`;
-    const token = localStorage.getItem('authToken');
 
     const config: RequestInit = {
       headers: {
         'Content-Type': 'application/json',
-        ...(token && { Authorization: `Bearer ${token}` }),
+        ...(this.token && { Authorization: `Bearer ${this.token}` }),
         ...options.headers,
       },
       ...options,
@@ -57,21 +61,21 @@ class AuthAPI {
   }
 
   async login(credentials: LoginRequest): Promise<AuthResponse> {
-    return this.request<AuthResponse>('/login', {
+    return this.request<AuthResponse>('/signin', {
       method: 'POST',
       body: JSON.stringify(credentials),
     });
   }
 
   async register(userData: RegisterRequest): Promise<AuthResponse> {
-    return this.request<AuthResponse>('/register', {
+    return this.request<AuthResponse>('/signup', {
       method: 'POST',
       body: JSON.stringify(userData),
     });
   }
 
   async getCurrentUser(): Promise<User> {
-    return this.request<User>('/me', {
+    return this.request<User>('/profile', {
       method: 'GET',
     });
   }
@@ -84,20 +88,44 @@ class AuthAPI {
   }
 
   async logout(): Promise<void> {
-    return this.request<void>('/logout', {
-      method: 'POST',
-    });
+    // Clear token - will be handled by AuthContext
+    this.token = null;
+    return Promise.resolve();
   }
 
-  async forgotPassword(email: string): Promise<void> {
-    return this.request<void>('/forgot-password', {
+  async forgotPassword(email: string): Promise<{ message: string }> {
+    const url = `${this.baseURL}/forgot-password`;
+    
+    const response = await fetch(url, {
       method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify({ email }),
     });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.detail || errorData.title || 'Failed to send reset email');
+    }
+
+    // Check if response has content
+    const contentType = response.headers.get('content-type');
+    if (contentType && contentType.includes('application/json')) {
+      try {
+        return await response.json();
+      } catch {
+        // JSON parsing failed, return default message
+        return { message: 'Password reset link sent to your email.' };
+      }
+    } else {
+      // No JSON content, return default message for successful request
+      return { message: 'Password reset link sent to your email.' };
+    }
   }
 
-  async resetPassword(resetData: ResetPasswordRequest): Promise<void> {
-    return this.request<void>('/reset-password', {
+  async resetPassword(resetData: ResetPasswordRequest): Promise<{ message: string }> {
+    return this.request<{ message: string }>('/reset-password', {
       method: 'POST',
       body: JSON.stringify(resetData),
     });
@@ -108,6 +136,25 @@ class AuthAPI {
       method: 'POST',
       body: JSON.stringify(googleData),
     });
+  }
+
+  async updateProfile(formData: FormData): Promise<User> {
+    const url = `${this.baseURL}/profile`;
+
+    const response = await fetch(url, {
+      method: 'PUT',
+      headers: {
+        ...(this.token && { Authorization: `Bearer ${this.token}` }),
+      },
+      body: formData, // Don't set Content-Type for FormData
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.detail || errorData.title || 'Failed to update profile');
+    }
+
+    return await response.json();
   }
 }
 

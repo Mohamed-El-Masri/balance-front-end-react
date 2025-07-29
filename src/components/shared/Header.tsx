@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { useLanguage, useAuth, useToast } from '../../contexts'
+import { useLanguage, useAuth } from '../../contexts'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { Menu, X, ChevronDown, User, UserCircle, Heart, Star, LogOut } from 'lucide-react'
 import styles from '../../styles/components/Header.module.css'
@@ -7,7 +7,6 @@ import styles from '../../styles/components/Header.module.css'
 const Header: React.FC = () => {
   const { changeLanguage, currentLanguage } = useLanguage()
   const { isAuthenticated, logout } = useAuth()
-  const { showToast } = useToast()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false)
@@ -73,10 +72,10 @@ const Header: React.FC = () => {
       onClick: async () => {
         try {
           await logout()
-          showToast('success', currentLanguage.code === 'ar' ? 'تم تسجيل الخروج بنجاح' : 'Logged out successfully')
           navigate('/')
         } catch {
-          showToast('error', currentLanguage.code === 'ar' ? 'حدث خطأ أثناء تسجيل الخروج' : 'Error during logout')
+          // Error toast is handled by AuthContext
+          console.error('Logout failed')
         }
         setIsUserDropdownOpen(false)
       }

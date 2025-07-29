@@ -100,35 +100,37 @@ const ForgotPasswordPage: React.FC = () => {
 
   if (emailSent) {
     return (
-      <div className={styles.forgot_password} dir={isArabic ? 'rtl' : 'ltr'}>
-        <div className={styles.forgot_password__container}>
-          <div className={styles.forgot_password__content}>
-            <div className={styles.forgot_password__success_icon}>
-              <CheckCircle size={64} />
+      <div className={styles.forgotPassword} dir={isArabic ? 'rtl' : 'ltr'}>
+        <div className={styles.forgotPassword__container}>
+          <div className={styles.forgotPassword__content}>
+            {/* Success Header */}
+            <div className={styles.forgotPassword__header}>
+              <div className={styles.forgotPassword__success_icon}>
+                <CheckCircle size={48} />
+              </div>
+              <h1 className={styles.forgotPassword__title}>
+                {t.emailSentTitle}
+              </h1>
+              <p className={styles.forgotPassword__subtitle}>
+                {t.emailSentMessage}
+              </p>
             </div>
             
-            <h1 className={styles.forgot_password__title}>
-              {t.emailSentTitle}
-            </h1>
-            
-            <p className={styles.forgot_password__subtitle}>
-              {t.emailSentMessage}
-            </p>
-            
-            <div className={styles.forgot_password__actions}>
+            {/* Actions */}
+            <div className={styles.forgotPassword__actions}>
               <button
                 onClick={handleResend}
-                className={styles.forgot_password__resend_btn}
+                className={styles.forgotPassword__resend_btn}
                 disabled={loading}
               >
-                {t.resendLink}
+                {loading ? <LoadingSpinner /> : t.resendLink}
               </button>
               
               <Link 
                 to="/signin" 
-                className={styles.forgot_password__back_link}
+                className={styles.forgotPassword__back_btn}
               >
-                <ArrowLeft size={16} />
+                <ArrowLeft size={18} />
                 {t.backToSignIn}
               </Link>
             </div>
@@ -139,61 +141,63 @@ const ForgotPasswordPage: React.FC = () => {
   }
 
   return (
-    <div className={styles.forgot_password} dir={isArabic ? 'rtl' : 'ltr'}>
-      <div className={styles.forgot_password__container}>
-        <div className={styles.forgot_password__content}>
-          <div className={styles.forgot_password__header}>
-            <h1 className={styles.forgot_password__title}>
+    <div className={styles.forgotPassword} dir={isArabic ? 'rtl' : 'ltr'}>
+      <div className={styles.forgotPassword__container}>
+        <div className={styles.forgotPassword__content}>
+          {/* Header */}
+          <div className={styles.forgotPassword__header}>
+            <div className={styles.forgotPassword__icon}>
+              <Mail size={32} />
+            </div>
+            <h1 className={styles.forgotPassword__title}>
               {t.title}
             </h1>
-            <p className={styles.forgot_password__subtitle}>
+            <p className={styles.forgotPassword__subtitle}>
               {t.subtitle}
             </p>
           </div>
 
-          <form className={styles.forgot_password__form} onSubmit={handleSubmit}>
-            <div className={styles.forgot_password__form_group}>
-              <label className={styles.forgot_password__label}>
+          {/* Form */}
+          <form onSubmit={handleSubmit} className={styles.forgotPassword__form}>
+            <div className={styles.forgotPassword__form_group}>
+              <label className={styles.forgotPassword__label}>
                 {t.email}
               </label>
-              <div className={styles.forgot_password__input_wrapper}>
-                <Mail className={styles.forgot_password__input_icon} size={20} />
+              <div className={styles.forgotPassword__input_wrapper}>
+                <Mail className={styles.forgotPassword__input_icon} size={20} />
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder={t.placeholders.email}
-                  className={styles.forgot_password__input}
+                  className={styles.forgotPassword__input}
                   disabled={loading}
+                  required
                 />
               </div>
             </div>
 
             <button
               type="submit"
-              className={styles.forgot_password__submit_btn}
-              disabled={loading || !email}
+              className={styles.forgotPassword__submit_btn}
+              disabled={loading || !validateEmail(email)}
             >
               {loading ? (
-                <LoadingSpinner size="small" />
+                <LoadingSpinner />
               ) : (
-                <>
-                  <Mail size={16} />
-                  {t.sendLink}
-                </>
+                t.sendLink
               )}
             </button>
-          </form>
 
-          <div className={styles.forgot_password__footer}>
+            {/* Back to Sign In */}
             <Link 
               to="/signin" 
-              className={styles.forgot_password__back_link}
+              className={styles.forgotPassword__back_btn}
             >
-              <ArrowLeft size={16} />
+              <ArrowLeft size={18} />
               {t.backToSignIn}
             </Link>
-          </div>
+          </form>
         </div>
       </div>
     </div>

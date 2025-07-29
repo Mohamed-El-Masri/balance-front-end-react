@@ -20,6 +20,7 @@ const ResetPasswordPage: React.FC = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [token, setToken] = useState<string | null>(null);
+  const [email, setEmail] = useState<string | null>(null);
   
   // Password validation state
   const [passwordValidation, setPasswordValidation] = useState({
@@ -35,11 +36,16 @@ const ResetPasswordPage: React.FC = () => {
 
   useEffect(() => {
     const tokenFromUrl = searchParams.get('token');
-    if (!tokenFromUrl) {
+    const emailFromUrl = searchParams.get('email');
+    
+    if (!tokenFromUrl || !emailFromUrl) {
       navigate('/signin');
       return;
     }
+    
     setToken(tokenFromUrl);
+    // فك تشفير البريد الإلكتروني من URL encoding
+    setEmail(decodeURIComponent(emailFromUrl));
   }, [searchParams, navigate]);
 
   const content = {
@@ -147,14 +153,14 @@ const ResetPasswordPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!validateForm() || !token) return;
+    if (!validateForm() || !token || !email) return;
 
     setLoading(true);
     try {
       await resetPassword({
+        email,
         token,
-        newPassword: formData.password,
-        confirmNewPassword: formData.confirmPassword
+        newPassword: formData.password
       });
       
       // Redirect to signin page after successful reset
@@ -169,7 +175,7 @@ const ResetPasswordPage: React.FC = () => {
     }
   };
 
-  if (!token) {
+  if (!token || !email) {
     return <LoadingSpinner />;
   }
 

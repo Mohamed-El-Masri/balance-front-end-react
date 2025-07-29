@@ -30,6 +30,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const clearError = () => setError(null);
 
+  // Update authAPI token whenever token changes
+  useEffect(() => {
+    authAPI.setToken(token);
+  }, [token]);
+
   // Check if user is authenticated on app load
   useEffect(() => {
     const initAuth = async () => {
@@ -188,20 +193,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const forgotPassword = async (email: string): Promise<void> => {
     try {
-      await authAPI.forgotPassword(email);
-      showToast(
-        'success', 
-        currentLanguage.code === 'ar' 
-          ? 'تم إرسال رابط إعادة تعيين كلمة المرور' 
-          : 'Password reset link sent'
-      );
+      const response = await authAPI.forgotPassword(email);
+      // Use API response message with fallback
+      const successMessage = response.message || 
+        (currentLanguage.code === 'ar' 
+          ? 'تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني' 
+          : 'Password reset link sent to your email');
+      
+      showToast('success', successMessage);
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Failed to send reset link';
       showToast(
         'error', 
         currentLanguage.code === 'ar' 
-          ? 'فشل في إرسال رابط إعادة التعيين' 
-          : message
+          ? 'فشل في إرسال رابط إعادة التعيين. تحقق من البريد الإلكتروني.' 
+          : 'Failed to send reset link. Please check your email address.'
       );
       throw error;
     }
@@ -209,20 +215,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const resetPassword = async (resetData: ResetPasswordRequest): Promise<void> => {
     try {
-      await authAPI.resetPassword(resetData);
-      showToast(
-        'success', 
-        currentLanguage.code === 'ar' 
+      const response = await authAPI.resetPassword(resetData);
+      // Use API response message with fallback
+      const successMessage = response.message || 
+        (currentLanguage.code === 'ar' 
           ? 'تم إعادة تعيين كلمة المرور بنجاح' 
-          : 'Password reset successfully'
-      );
+          : 'Password reset successfully');
+      
+      showToast('success', successMessage);
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Password reset failed';
       showToast(
         'error', 
         currentLanguage.code === 'ar' 
-          ? 'فشل في إعادة تعيين كلمة المرور' 
-          : message
+          ? 'فشل في إعادة تعيين كلمة المرور. تحقق من صحة البيانات.' 
+          : 'Password reset failed. Please check your information.'
       );
       throw error;
     }
@@ -241,12 +248,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const updateUser = async (userData: Partial<User>): Promise<void> => {
+  const updateUser = async (formData: FormData): Promise<void> => {
     if (!user) return;
     
     try {
-      // Update local user data
-      setUser({ ...user, ...userData });
+      const updatedUser = await authAPI.updateProfile(formData);
+      setUser(updatedUser);
       showToast(
         'success', 
         currentLanguage.code === 'ar' 

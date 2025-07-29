@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { User, Heart, Eye, Lock, Edit3, Save, X } from 'lucide-react';
 import { useLanguage, useAuth, useToast } from '../../contexts';
+import { authAPI } from '../../services/authAPI';
 import LoadingSpinner from '../../components/ui/LoadingSpinner';
 import styles from '../../styles/components/dashboard/Profile.module.css';
 
@@ -77,12 +78,16 @@ interface ContentType {
 
 const ProfilePage: React.FC = () => {
   const { currentLanguage } = useLanguage();
-  const { user, updateUser, changePassword, loading } = useAuth();
+  const { user, updateUser, changePassword, logout, refreshUserData, loading } = useAuth();
   const { showToast } = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
   const isArabic = currentLanguage.code === 'ar';
 
   const [isEditing, setIsEditing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
   // Initialize editData with user data and localStorage data
   const [editData, setEditData] = useState<EditUserData>(() => {
     try {
@@ -146,6 +151,16 @@ const ProfilePage: React.FC = () => {
     hasSpecial: false
   });
 
+  // Form validation state
+  const [formValidation, setFormValidation] = useState({
+    firstName: { isValid: true, message: '' },
+    lastName: { isValid: true, message: '' },
+    phone: { isValid: true, message: '' },
+    whatsapp: { isValid: true, message: '' },
+    bio: { isValid: true, message: '' },
+    location: { isValid: true, message: '' }
+  });
+
   // Mock favorites and interests
   const [favorites] = useState<ProfileProperty[]>([
     {
@@ -186,20 +201,17 @@ const ProfilePage: React.FC = () => {
     }
   ]);
 
-  // Sync edit data with user data and localStorage when user changes
+  // Sync edit data with user data when user changes
   useEffect(() => {
     if (user) {
-      const savedProfile = localStorage.getItem('userProfile');
-      const savedData = savedProfile ? JSON.parse(savedProfile) : {};
-      
       setEditData({
-        firstName: user.firstName || savedData.firstName || '',
-        lastName: user.lastName || savedData.lastName || '',
-        email: user.email || savedData.email || '',
-        phone: user.phoneNumber || savedData.phone || '',
-        whatsapp: savedData.whatsapp || '',
-        bio: savedData.bio || '',
-        location: savedData.location || ''
+        firstName: user.firstName || '',
+        lastName: user.lastName || '',
+        email: user.email || '',
+        phone: user.phoneNumber || '',
+        whatsapp: user.whatsAppNumber || '',
+        bio: user.bio || '',
+        location: user.location || ''
       });
     }
   }, [user]);
@@ -325,8 +337,48 @@ const ProfilePage: React.FC = () => {
 
   const t = isArabic ? content.ar : content.en;
 
+  // Field validation functions
+  const validateField = (field: keyof EditUserData, value: string) => {
+    let isValid = true;
+    let message = '';
+
+    switch (field) {
+      case 'firstName':
+      case 'lastName':
+        if (!value.trim()) {
+          isValid = false;
+          message = isArabic ? 'هذا الحقل مطلوب' : 'This field is required';
+        } else if (value.trim().length < 2) {
+          isValid = false;
+          message = isArabic ? 'يجب أن يكون حرفين على الأقل' : 'Must be at least 2 characters';
+        }
+        break;
+      case 'phone':
+      case 'whatsapp':
+        if (value && !/^[+]?[\d\s\-()]+$/.test(value)) {
+          isValid = false;
+          message = isArabic ? 'رقم هاتف غير صحيح' : 'Invalid phone number';
+        }
+        break;
+      case 'bio':
+        if (value && value.length > 500) {
+          isValid = false;
+          message = isArabic ? 'السيرة الذاتية طويلة جداً (500 حرف كحد أقصى)' : 'Bio is too long (500 characters max)';
+        }
+        break;
+    }
+
+    setFormValidation(prev => ({
+      ...prev,
+      [field]: { isValid, message }
+    }));
+
+    return isValid;
+  };
+
   const handleInputChange = (field: keyof EditUserData, value: string) => {
     setEditData(prev => ({ ...prev, [field]: value }));
+    validateField(field, value);
   };
 
   const handlePasswordChange = (field: string, value: string) => {
@@ -345,31 +397,46 @@ const ProfilePage: React.FC = () => {
   };
 
   const handleSaveProfile = async () => {
+    if (!user || !updateUser) return;
+    
+    setIsSaving(true);
     try {
-      // Update user profile with the edit data (API call)
-      if (updateUser) {
-        await updateUser({
-          firstName: editData.firstName,
-          lastName: editData.lastName,
-          phoneNumber: editData.phone
-        });
+      // Create FormData for multipart/form-data request
+      const formData = new FormData();
+      formData.append('FirstName', editData.firstName);
+      formData.append('LastName', editData.lastName);
+      formData.append('PhoneNumber', editData.phone);
+      formData.append('Bio', editData.bio);
+      formData.append('Location', editData.location);
+      formData.append('WhatsAppNumber', editData.whatsapp);
+      
+      // Get user's public IP
+      try {
+        const ipResponse = await fetch('https://api.ipify.org?format=json');
+        const ipData = await ipResponse.json();
+        formData.append('PublicIp', ipData.ip);
+      } catch {
+        // IP fetch failed, continue without it
+      }
+
+      await updateUser(formData);
+      
+      // Refresh user data from server
+      setIsRefreshing(true);
+      try {
+        await refreshUserData();
+      } catch (error) {
+        console.log('Failed to refresh user data:', error);
+      } finally {
+        setIsRefreshing(false);
       }
       
-      // Save all profile data to localStorage (including bio and location)
-      const profileData = {
-        firstName: editData.firstName,
-        lastName: editData.lastName,
-        email: editData.email,
-        phone: editData.phone,
-        bio: editData.bio,
-        location: editData.location
-      };
-      localStorage.setItem('userProfile', JSON.stringify(profileData));
-      
       setIsEditing(false);
-      showToast('success', t.validation.profileUpdated);
-    } catch {
-      showToast('error', t.validation.updateError);
+      // Toast is handled by AuthContext.updateUser
+    } catch (error) {
+      // Error toast is handled by AuthContext.updateUser
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -384,6 +451,7 @@ const ProfilePage: React.FC = () => {
       return;
     }
 
+    setIsChangingPassword(true);
     try {
       await changePassword({
         email: user?.email || '',
@@ -397,9 +465,24 @@ const ProfilePage: React.FC = () => {
         newPassword: '',
         confirmPassword: ''
       });
-      showToast('success', t.validation.passwordUpdated);
-    } catch {
+      
+      showToast(
+        'success', 
+        isArabic 
+          ? 'تم تغيير كلمة المرور بنجاح. سيتم تسجيل الخروج الآن' 
+          : 'Password changed successfully. You will be logged out now'
+      );
+      
+      // Wait a moment for the toast to show, then logout and redirect
+      setTimeout(async () => {
+        await logout();
+        navigate('/signin');
+      }, 2000);
+      
+    } catch (error) {
       showToast('error', t.validation.updateError);
+    } finally {
+      setIsChangingPassword(false);
     }
   };
 

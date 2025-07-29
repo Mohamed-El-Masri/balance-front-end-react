@@ -6,6 +6,9 @@ export interface User {
   phoneNumber: string;
   firstName?: string;
   lastName?: string;
+  bio?: string;
+  whatsAppNumber?: string;
+  location?: string;
   profilePictureUrl?: string;
   isActive: boolean;
   lastLoginAt?: string;

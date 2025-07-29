@@ -16,9 +16,10 @@ export interface RegisterRequest {
   email: string;
   password: string;
   confirmPassword: string;
-  firstName?: string;
-  lastName?: string;
-  phoneNumber?: string;
+  firstName: string;
+  lastName: string;
+  phoneNumber: string;
+  PublicIp?: string;
 }
 
 export interface ChangePasswordRequest {
@@ -33,14 +34,26 @@ export interface ForgotPasswordRequest {
 }
 
 export interface ResetPasswordRequest {
+  email: string;
   token: string;
   newPassword: string;
-  confirmNewPassword: string;
 }
 
 export interface GoogleLoginRequest {
   idToken: string;
   roleName: string;
+}
+
+export interface UpdateProfileRequest {
+  phoneNumber?: string;
+  firstName?: string;
+  lastName?: string;
+  bio?: string;
+  whatsAppNumber?: string;
+  publicIp?: string;
+  file?: File;
+  pictureAvatar?: string;
+  location?: string;
 }
 
 export interface ApiError {
@@ -64,6 +77,6 @@ export interface AuthContextType {
   forgotPassword: (email: string) => Promise<void>;
   resetPassword: (resetData: ResetPasswordRequest) => Promise<void>;
   refreshUserData: () => Promise<void>;
-  updateUser?: (userData: Partial<User>) => Promise<void>;
+  updateUser?: (formData: FormData) => Promise<void>;
   clearError: () => void;
 }

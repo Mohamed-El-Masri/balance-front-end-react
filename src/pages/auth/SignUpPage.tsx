@@ -282,14 +282,25 @@ const SignUpPage: React.FC = () => {
     if (!isFormValid) return;
 
     try {
+      // Get user's public IP (optional)
+      let publicIp = '';
+      try {
+        const ipResponse = await fetch('https://api.ipify.org?format=json');
+        const ipData = await ipResponse.json();
+        publicIp = ipData.ip;
+      } catch {
+        // IP fetch failed, continue without it
+      }
+
       await register({
-        userName: `${formData.firstName}${formData.lastName}`,
+        userName: formData.email, // Use email as userName as per API docs
         email: formData.email,
         password: formData.password,
         confirmPassword: formData.confirmPassword,
         firstName: formData.firstName,
         lastName: formData.lastName,
-        phoneNumber: formData.phone
+        phoneNumber: formData.phone,
+        PublicIp: publicIp
       });
       
       // Redirect to signin page after successful registration
