@@ -2,6 +2,7 @@ import React from 'react';
 import { MapPin, Calendar, Eye, ArrowRight, ArrowLeft, Heart } from 'lucide-react';
 import styles from '../../../styles/components/projects/ProjectCard.module.css';
 import { useLanguage } from '../../../contexts/useLanguage';
+import { useFavorites } from '../../../contexts/useFavorites';
 
 export interface ProjectCardData {
   id: number;
@@ -26,18 +27,20 @@ export interface ProjectCardData {
 interface ProjectCardProps {
   project: ProjectCardData;
   onViewDetails: (slug: string) => void;
-  onFavoriteToggle?: (projectId: number) => void;
-  isFavorited?: boolean;
 }
 
 const ProjectCard: React.FC<ProjectCardProps> = ({ 
   project, 
-  onViewDetails, 
-  onFavoriteToggle,
-  isFavorited = false 
+  onViewDetails
 }) => {
   const { currentLanguage } = useLanguage();
+  const { 
+    isProjectFavorited, 
+    addProjectToFavorites, 
+    removeProjectFromFavorites 
+  } = useFavorites();
   const isArabic = currentLanguage.code === 'ar';
+  const isFavorited = isProjectFavorited(project.id);
 
   const content = {
     en: {
@@ -78,10 +81,13 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
       : styles.project_card__status_coming;
   };
 
-  const handleFavoriteClick = (event: React.MouseEvent) => {
+  const handleFavoriteClick = async (event: React.MouseEvent) => {
     event.stopPropagation();
-    if (onFavoriteToggle) {
-      onFavoriteToggle(project.id);
+    
+    if (isFavorited) {
+      await removeProjectFromFavorites(project.id);
+    } else {
+      await addProjectToFavorites(project.id);
     }
   };
   return (
@@ -100,18 +106,16 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
         </div>
 
         {/* Favorite Button */}
-        {onFavoriteToggle && (
-          <button 
-            className={`${styles.project_card__favorite} ${isFavorited ? styles.project_card__favorite_active : ''}`}
-            onClick={handleFavoriteClick}
-            title={isFavorited ? t.removeFromFavorites : t.addToFavorites}
-          >
-            <Heart 
-              size={20} 
-              fill={isFavorited ? '#FBBF24' : 'none'} 
-            />
-          </button>
-        )}
+        <button 
+          className={`${styles.project_card__favorite} ${isFavorited ? styles.project_card__favorite_active : ''}`}
+          onClick={handleFavoriteClick}
+          title={isFavorited ? t.removeFromFavorites : t.addToFavorites}
+        >
+          <Heart 
+            size={20} 
+            fill={isFavorited ? '#FBBF24' : 'none'} 
+          />
+        </button>
 
         {/* View Overlay */}
         <div className={styles.project_card__overlay}>

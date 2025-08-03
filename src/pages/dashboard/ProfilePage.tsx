@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { User, Heart, Eye, Lock, Edit3, Save, X } from 'lucide-react';
 import { useLanguage, useAuth, useToast } from '../../contexts';
+import { useFavorites } from '../../contexts/useFavorites';
 import { authAPI } from '../../services/authAPI';
 import LoadingSpinner from '../../components/ui/LoadingSpinner';
+import PropertyCard from '../../components/ui/dashboard/PropertyCard';
 import styles from '../../styles/components/dashboard/Profile.module.css';
 
 interface EditUserData {
@@ -79,6 +81,16 @@ interface ContentType {
 const ProfilePage: React.FC = () => {
   const { currentLanguage } = useLanguage();
   const { user, updateUser, changePassword, logout, refreshUserData, loading } = useAuth();
+  const { 
+    favoriteProjects, 
+    favoriteUnits,
+    totalFavoriteProjects,
+    totalFavoriteUnits,
+    isLoading: favoritesLoading,
+    removeProjectFromFavorites,
+    removeUnitFromFavorites,
+    refreshFavorites
+  } = useFavorites();
   const { showToast } = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -161,31 +173,12 @@ const ProfilePage: React.FC = () => {
     location: { isValid: true, message: '' }
   });
 
-  // Mock favorites and interests
-  const [favorites] = useState<ProfileProperty[]>([
-    {
-      id: '1',
-      title: 'Luxury Villa in Riyadh',
-      titleAr: 'فيلا فاخرة في الرياض',
-      price: 2500000,
-      location: 'Al Malqa, Riyadh',
-      locationAr: 'الملقا، الرياض',
-      image: '/images/properties/villa-1.jpg',
-      type: 'villa',
-      area: 500
-    },
-    {
-      id: '2',
-      title: 'Modern Apartment Downtown',
-      titleAr: 'شقة حديثة وسط المدينة',
-      price: 850000,
-      location: 'Downtown, Riyadh',
-      locationAr: 'وسط المدينة، الرياض',
-      image: '/images/properties/apartment-1.jpg',
-      type: 'apartment',
-      area: 120
+  // Load favorites when component mounts
+  useEffect(() => {
+    if (user?.id) {
+      refreshFavorites();
     }
-  ]);
+  }, [user?.id, refreshFavorites]);
 
   const [interests] = useState<ProfileProperty[]>([
     {
@@ -622,6 +615,11 @@ const ProfilePage: React.FC = () => {
           >
             <Heart size={16} />
             {t.favorites}
+            {(totalFavoriteProjects + totalFavoriteUnits) > 0 && (
+              <span className={styles.profile__badge}>
+                {totalFavoriteProjects + totalFavoriteUnits}
+              </span>
+            )}
           </button>
           <button
             onClick={() => handleTabChange('interests')}
@@ -658,37 +656,71 @@ const ProfilePage: React.FC = () => {
             <div className={styles.profile__tab_content}>
               <h2 className={styles.profile__section_title}>{t.myFavorites}</h2>
               
-              {/* Filter Tabs */}
-              <div className={styles.profile__filter_tabs}>
-                <button
-                  className={`${styles.profile__filter_tab} ${favoritesFilter === 'all' ? styles.active : ''}`}
-                  onClick={() => setFavoritesFilter('all')}
-                >
-                  {t.all}
-                </button>
-                <button
-                  className={`${styles.profile__filter_tab} ${favoritesFilter === 'projects' ? styles.active : ''}`}
-                  onClick={() => setFavoritesFilter('projects')}
-                >
-                  {t.projects}
-                </button>
-                <button
-                  className={`${styles.profile__filter_tab} ${favoritesFilter === 'properties' ? styles.active : ''}`}
-                  onClick={() => setFavoritesFilter('properties')}
-                >
-                  {t.properties}
-                </button>
-              </div>
-              
-              {getFilteredItems(favorites, favoritesFilter).length > 0 ? (
-                <div className={styles.profile__properties_grid}>
-                  {getFilteredItems(favorites, favoritesFilter).map(renderPropertyCard)}
-                </div>
+              {favoritesLoading ? (
+                <LoadingSpinner />
               ) : (
-                <div className={styles.profile__empty_state}>
-                  <Heart size={48} />
-                  <p>{t.noFavorites}</p>
-                </div>
+                <>
+                  {/* Favorite Projects Section */}
+                  <div className={styles.profile__favorites_section}>
+                    <h3 className={styles.profile__section_subtitle}>
+                      {t.projects} ({totalFavoriteProjects})
+                    </h3>
+                    {favoriteProjects.length > 0 ? (
+                      <div className={styles.profile__properties_grid}>
+                        {favoriteProjects.map((project) => (
+                          <PropertyCard
+                            key={project.id}
+                            id={project.id}
+                            title={isArabic ? project.titleAr : project.title}
+                            location={isArabic ? project.locationAr : project.location}
+                            price={isArabic ? project.priceAr : project.price}
+                            image={project.image}
+                            type="project"
+                            onRemove={removeProjectFromFavorites}
+                            viewUrl={`/projects/${project.slug || project.id}`}
+                            isArabic={isArabic}
+                          />
+                        ))}
+                      </div>
+                    ) : (
+                      <div className={styles.profile__empty_state}>
+                        <Heart size={48} />
+                        <p>{isArabic ? 'لا توجد مشاريع مفضلة' : 'No favorite projects'}</p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Favorite Units Section */}
+                  <div className={styles.profile__favorites_section}>
+                    <h3 className={styles.profile__section_subtitle}>
+                      {t.properties} ({totalFavoriteUnits})
+                    </h3>
+                    {favoriteUnits.length > 0 ? (
+                      <div className={styles.profile__properties_grid}>
+                        {favoriteUnits.map((unit) => (
+                          <PropertyCard
+                            key={unit.id}
+                            id={unit.id}
+                            title={isArabic ? unit.nameAr : unit.name}
+                            location={isArabic ? unit.locationAr : unit.location}
+                            price={unit.price}
+                            area={unit.area}
+                            image={unit.image}
+                            type="unit"
+                            onRemove={removeUnitFromFavorites}
+                            viewUrl={`/properties/${unit.id}`}
+                            isArabic={isArabic}
+                          />
+                        ))}
+                      </div>
+                    ) : (
+                      <div className={styles.profile__empty_state}>
+                        <Heart size={48} />
+                        <p>{isArabic ? 'لا توجد عقارات مفضلة' : 'No favorite properties'}</p>
+                      </div>
+                    )}
+                  </div>
+                </>
               )}
             </div>
           )}

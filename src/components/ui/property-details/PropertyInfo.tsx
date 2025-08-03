@@ -48,7 +48,8 @@ interface PropertyInfoProps {
   amenities: string[];
   amenitiesAr: string[];
   isFavorite: boolean;
-  onFavoriteToggle: (propertyId: string) => void;
+  onFavoriteToggle: () => void;
+  isTogglingFavorite?: boolean;
 }
 
 const PropertyInfo: React.FC<PropertyInfoProps> = ({
@@ -71,7 +72,8 @@ const PropertyInfo: React.FC<PropertyInfoProps> = ({
   amenities,
   amenitiesAr,
   isFavorite,
-  onFavoriteToggle
+  onFavoriteToggle,
+  isTogglingFavorite = false
 }) => {
   const { currentLanguage } = useLanguage();
   const isArabic = currentLanguage.code === 'ar';
@@ -190,10 +192,8 @@ const PropertyInfo: React.FC<PropertyInfoProps> = ({
 
   // Handle favorite toggle
   const handleFavoriteToggle = () => {
-    onFavoriteToggle(propertyId);
-    setToastMessage(isFavorite ? t.favoriteRemoved : t.favoriteAdded);
-    setToastType('success');
-    setShowToast(true);
+    if (isTogglingFavorite) return;
+    onFavoriteToggle();
   };
 
   // Handle share
@@ -268,6 +268,7 @@ const PropertyInfo: React.FC<PropertyInfoProps> = ({
               isFavorite ? styles.property_info__action_btn_active : ''
             }`}
             onClick={handleFavoriteToggle}
+            disabled={isTogglingFavorite}
             title={t.favorite}
           >
             <Heart size={20} fill={isFavorite ? 'currentColor' : 'none'} />

@@ -3,13 +3,18 @@ import { useNavigate } from 'react-router-dom';
 import { MapPin, Building, Calendar, Heart } from 'lucide-react';
 import styles from '../../../styles/components/home/FeaturedProjects.module.css';
 import { useLanguage } from '../../../contexts/useLanguage';
+import { useFavorites } from '../../../contexts/useFavorites';
 import Toast from '../common/Toast';
 
 const FeaturedProjects: React.FC = () => {
   const { currentLanguage } = useLanguage();
+  const { 
+    isProjectFavorited, 
+    addProjectToFavorites, 
+    removeProjectFromFavorites 
+  } = useFavorites();
   const isArabic = currentLanguage.code === 'ar';
   const navigate = useNavigate();
-  const [favoriteProjects, setFavoriteProjects] = React.useState<Set<number>>(new Set());
   const [toast, setToast] = React.useState<{
     show: boolean;
     message: string;
@@ -113,25 +118,20 @@ const FeaturedProjects: React.FC = () => {
     navigate('/projects');
   };
 
-  const handleFavoriteToggle = (projectId: number, event: React.MouseEvent) => {
+  const handleFavoriteToggle = async (projectId: number, event: React.MouseEvent) => {
     event.stopPropagation();
-    const newFavorites = new Set(favoriteProjects);
-    const isCurrentlyFavorited = favoriteProjects.has(projectId);
+    const isCurrentlyFavorited = isProjectFavorited(projectId);
     
-    if (isCurrentlyFavorited) {
-      newFavorites.delete(projectId);
-    } else {
-      newFavorites.add(projectId);
+    try {
+      if (isCurrentlyFavorited) {
+        await removeProjectFromFavorites(projectId);
+      } else {
+        await addProjectToFavorites(projectId);
+      }
+    } catch (error) {
+      // Error is already handled by the context and toast is shown
+      console.error('Error toggling favorite:', error);
     }
-    
-    setFavoriteProjects(newFavorites);
-    
-    // Show toast notification
-    setToast({
-      show: true,
-      message: isCurrentlyFavorited ? t.favoriteRemoved : t.favoriteAdded,
-      type: 'success'
-    });
   };
 
   const closeToast = () => {
@@ -184,13 +184,13 @@ const FeaturedProjects: React.FC = () => {
                 
                 {/* Favorite Button */}
                 <button 
-                  className={`${styles["featured__card-favorite"]} ${favoriteProjects.has(project.id) ? styles["featured__card-favorite_active"] : ''}`}
+                  className={`${styles["featured__card-favorite"]} ${isProjectFavorited(project.id) ? styles["featured__card-favorite_active"] : ''}`}
                   onClick={(e) => handleFavoriteToggle(project.id, e)}
-                  title={favoriteProjects.has(project.id) ? t.favoriteRemoved : t.favoriteAdded}
+                  title={isProjectFavorited(project.id) ? t.favoriteRemoved : t.favoriteAdded}
                 >
                   <Heart 
                     size={20} 
-                    fill={favoriteProjects.has(project.id) ? '#FBBF24' : 'none'} 
+                    fill={isProjectFavorited(project.id) ? '#FBBF24' : 'none'} 
                   />
                 </button>
               </div>

@@ -11,6 +11,8 @@ import PropertyVideo from '../../components/ui/property-details/PropertyVideo';
 import PropertyLocationMap from '../../components/ui/property-details/PropertyLocationMap';
 import PropertyContact from '../../components/ui/property-details/PropertyContact';
 import { useLanguage } from '../../contexts/useLanguage';
+import { useFavorites } from '../../contexts/useFavorites';
+import { useToast } from '../../contexts/useToast';
 import styles from '../../styles/components/property-details/PropertyDetailsPage.module.css';
 
 // Mock data - في التطبيق الحقيقي سيأتي من API
@@ -153,28 +155,28 @@ const mockPropertyData = {
 const PropertyDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { currentLanguage } = useLanguage();
+  const { isUnitFavorited, addUnitToFavorites, removeUnitFromFavorites } = useFavorites();
+  const { showToast } = useToast();
   const isArabic = currentLanguage.code === 'ar';
   
   const [propertyData, setPropertyData] = useState(mockPropertyData);
   const [loading, setLoading] = useState(true);
-  const [toast, setToast] = useState<{
-    show: boolean;
-    message: string;
-    type: 'success' | 'error' | 'info';
-  }>({ show: false, message: '', type: 'success' });
+  const [isTogglingFavorite, setIsTogglingFavorite] = useState(false);
 
   const content = {
     en: {
       loadingProperty: 'Loading Property Details...',
-      favoriteAdded: '❤️ Property added to favorites!',
-      favoriteRemoved: '💔 Property removed from favorites!',
-      contactSent: '✅ Contact request sent successfully!'
+      favoriteAdded: 'Property added to favorites!',
+      favoriteRemoved: 'Property removed from favorites!',
+      favoriteError: 'Error updating favorites',
+      contactSent: 'Contact request sent successfully!'
     },
     ar: {
       loadingProperty: 'جاري تحميل تفاصيل العقار...',
-      favoriteAdded: '❤️ تم إضافة العقار للمفضلة!',
-      favoriteRemoved: '💔 تم إزالة العقار من المفضلة!',
-      contactSent: '✅ تم إرسال طلب التواصل بنجاح!'
+      favoriteAdded: 'تم إضافة العقار للمفضلة!',
+      favoriteRemoved: 'تم إزالة العقار من المفضلة!',
+      favoriteError: 'خطأ في تحديث المفضلة',
+      contactSent: 'تم إرسال طلب التواصل بنجاح!'
     }
   };
 
@@ -209,29 +211,32 @@ const PropertyDetailsPage: React.FC = () => {
     fetchPropertyData();
   }, [id]);
 
-  const handleFavoriteToggle = () => {
-    const wasFavorited = propertyData.isFavorited;
+  const handleFavoriteToggle = async () => {
+    if (isTogglingFavorite) return;
     
-    setPropertyData(prev => ({
-      ...prev,
-      isFavorited: !prev.isFavorited
-    }));
+    setIsTogglingFavorite(true);
+    const propertyId = parseInt(id || '1');
     
-    // Show toast notification with correct message
-    setToast({
-      show: true,
-      message: wasFavorited ? t.favoriteRemoved : t.favoriteAdded,
-      type: 'success'
-    });
-    
-    // Auto close toast after 4 seconds
-    setTimeout(() => {
-      setToast(prev => ({ ...prev, show: false }));
-    }, 4000);
+    try {
+      const propertyIsFavorite = isUnitFavorited(propertyId);
+      
+      if (propertyIsFavorite) {
+        await removeUnitFromFavorites(propertyId);
+        showToast('success', t.favoriteRemoved);
+      } else {
+        await addUnitToFavorites(propertyId);
+        showToast('success', t.favoriteAdded);
+      }
+    } catch (error) {
+      console.error('Error toggling favorite:', error);
+      showToast('error', t.favoriteError);
+    } finally {
+      setIsTogglingFavorite(false);
+    }
   };
 
   const closeToast = () => {
-    setToast(prev => ({ ...prev, show: false }));
+    // Not needed anymore as we use ToastContext
   };
 
   if (loading) {
@@ -250,14 +255,6 @@ const PropertyDetailsPage: React.FC = () => {
 
   return (
     <div className={styles['property-details-page']}>
-      {/* Toast Notification */}
-      <Toast 
-        message={toast.message}
-        type={toast.type}
-        isVisible={toast.show}
-        onClose={closeToast}
-      />
-
       {/* Breadcrumb with Hero Background */}
       <PageBreadcrumb 
         title={propertyData.name}
@@ -299,8 +296,9 @@ const PropertyDetailsPage: React.FC = () => {
         featuresAr={propertyData.featuresAr}
         amenities={propertyData.amenities || []}
         amenitiesAr={propertyData.amenitiesAr || []}
-        isFavorite={propertyData.isFavorited}
+        isFavorite={isUnitFavorited(parseInt(id || '1'))}
         onFavoriteToggle={handleFavoriteToggle}
+        isTogglingFavorite={isTogglingFavorite}
       />
 
       {/* Property Description */}

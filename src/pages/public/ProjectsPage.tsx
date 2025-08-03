@@ -25,7 +25,6 @@ const ProjectsPage: React.FC = () => {
     city: '',
     area: ''
   });
-  const [favoriteProjects, setFavoriteProjects] = useState<Set<number>>(new Set());
   
   const itemsPerPage = 6;
 
@@ -35,18 +34,14 @@ const ProjectsPage: React.FC = () => {
       pageDescription: 'Discover our exceptional real estate developments across Saudi Arabia',
       sectionTitle: 'Featured Projects',
       sectionDescription: 'Explore our diverse portfolio of residential and commercial developments designed to meet your lifestyle and investment needs.',
-      location: 'Saudi Arabia',
-      favoriteAdded: 'Project added to favorites!',
-      favoriteRemoved: 'Project removed from favorites!'
+      location: 'Saudi Arabia'
     },
     ar: {
       pageTitle: 'مشاريعنا',
       pageDescription: 'اكتشف مشاريعنا العقارية الاستثنائية في جميع أنحاء المملكة العربية السعودية',
       sectionTitle: 'المشاريع المميزة',
       sectionDescription: 'استكشف محفظتنا المتنوعة من التطويرات السكنية والتجارية المصممة لتلبية احتياجات نمط حياتك الاستثمارية.',
-      location: 'المملكة العربية السعودية',
-      favoriteAdded: 'تم إضافة المشروع للمفضلة!',
-      favoriteRemoved: 'تم إزالة المشروع من المفضلة!'
+      location: 'المملكة العربية السعودية'
     }
   };
 
@@ -318,21 +313,6 @@ const ProjectsPage: React.FC = () => {
     navigate(`/projects/${slug}`);
   };
 
-  const handleFavoriteToggle = (projectId: number) => {
-    const newFavorites = new Set(favoriteProjects);
-    const isCurrentlyFavorited = favoriteProjects.has(projectId);
-    
-    if (isCurrentlyFavorited) {
-      newFavorites.delete(projectId);
-    } else {
-      newFavorites.add(projectId);
-    }
-    
-    setFavoriteProjects(newFavorites);
-    
-    // Show toast notification using global toast
-    showToast('success', isCurrentlyFavorited ? t.favoriteRemoved : t.favoriteAdded);
-  };
   return (
     <>
       {/* Breadcrumb */}
@@ -375,8 +355,6 @@ const ProjectsPage: React.FC = () => {
                   key={project.id}
                   project={project}
                   onViewDetails={handleViewDetails}
-                  onFavoriteToggle={handleFavoriteToggle}
-                  isFavorited={favoriteProjects.has(project.id)}
                 />
               ))}
             </div>
