@@ -212,27 +212,10 @@ const PropertyDetailsPage: React.FC = () => {
   }, [id]);
 
   const handleFavoriteToggle = async () => {
-    if (isTogglingFavorite) return;
-    
-    setIsTogglingFavorite(true);
-    const propertyId = parseInt(id || '1');
-    
-    try {
-      const propertyIsFavorite = isUnitFavorited(propertyId);
-      
-      if (propertyIsFavorite) {
-        await removeUnitFromFavorites(propertyId);
-        showToast('success', t.favoriteRemoved);
-      } else {
-        await addUnitToFavorites(propertyId);
-        showToast('success', t.favoriteAdded);
-      }
-    } catch (error) {
-      console.error('Error toggling favorite:', error);
-      showToast('error', t.favoriteError);
-    } finally {
-      setIsTogglingFavorite(false);
-    }
+    // This function is now optional and mainly for any additional logic
+    // The actual favorite toggling is handled by PropertyInfo component
+    // to avoid duplicate toast notifications
+    console.log('Favorite toggled for property:', id);
   };
 
   const closeToast = () => {

@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Heart, Calendar, MapPin, Tag } from 'lucide-react';
 import styles from '../../../styles/components/project-details/ProjectInfo.module.css';
 import { useLanguage } from '../../../contexts/useLanguage';
+import { useFavorites } from '../../../contexts/useFavorites';
+import { useAuth } from '../../../contexts/useAuth';
 
 interface ProjectInfoProps {
   project: {
@@ -15,13 +17,24 @@ interface ProjectInfoProps {
     isFavorited: boolean;
     completionDate: string;
   };
-  onFavoriteToggle: () => void;
+  onFavoriteToggle?: () => void; // Make optional since we'll handle internally
 }
 
 const ProjectInfo: React.FC<ProjectInfoProps> = ({ project, onFavoriteToggle }) => {
   const { currentLanguage } = useLanguage();
+  const { isAuthenticated } = useAuth();
+  const { 
+    isProjectFavorited,
+    addProjectToFavorites,
+    removeProjectFromFavorites
+  } = useFavorites();
+  
   const isArabic = currentLanguage.code === 'ar';
   const [showToast, setShowToast] = useState(false);
+  const [isTogglingFavorite, setIsTogglingFavorite] = useState(false);
+  
+  // Check if project is actually favorited from favorites context
+  const isFavorited = isProjectFavorited(parseInt(project.id));
 
   const content = {
     en: {
@@ -48,10 +61,35 @@ const ProjectInfo: React.FC<ProjectInfoProps> = ({ project, onFavoriteToggle }) 
 
   const t = isArabic ? content.ar : content.en;
 
-  const handleFavoriteClick = () => {
-    onFavoriteToggle();
-    setShowToast(true);
-    setTimeout(() => setShowToast(false), 3000);
+  const handleFavoriteClick = async () => {
+    if (!isAuthenticated) {
+      // You could show a login prompt here or redirect to login
+      return;
+    }
+
+    if (isTogglingFavorite) return;
+    
+    setIsTogglingFavorite(true);
+    
+    try {
+      const projectId = parseInt(project.id);
+      
+      if (isFavorited) {
+        await removeProjectFromFavorites(projectId);
+      } else {
+        await addProjectToFavorites(projectId);
+      }
+      
+      // Call the optional external handler if provided
+      if (onFavoriteToggle) {
+        onFavoriteToggle();
+      }
+      
+    } catch (error) {
+      console.error('Error toggling project favorite:', error);
+    } finally {
+      setIsTogglingFavorite(false);
+    }
   };
 
   const formatDate = (dateString: string) => {
@@ -73,14 +111,15 @@ const ProjectInfo: React.FC<ProjectInfoProps> = ({ project, onFavoriteToggle }) 
           </div>
           
           <button 
-            className={`${styles.info__favorite_btn} ${project.isFavorited ? styles.info__favorite_btn_active : ''}`}
+            className={`${styles.info__favorite_btn} ${isFavorited ? styles.info__favorite_btn_active : ''}`}
             onClick={handleFavoriteClick}
-            title={project.isFavorited ? t.removeFromFavorites : t.addToFavorites}
+            disabled={isTogglingFavorite || !isAuthenticated}
+            title={isFavorited ? t.removeFromFavorites : t.addToFavorites}
           >
             <Heart 
               size={24} 
-              fill={project.isFavorited ? '#ef4444' : 'none'} 
-              color={project.isFavorited ? '#ef4444' : '#64748b'}
+              fill={isFavorited ? '#ef4444' : 'none'} 
+              color={isFavorited ? '#ef4444' : '#64748b'}
             />
           </button>
         </div>

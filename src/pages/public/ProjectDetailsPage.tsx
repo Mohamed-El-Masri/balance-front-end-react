@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import LoadingSpinner from '../../components/ui/common/LoadingSpinner';
-import Toast from '../../components/ui/common/Toast';
 import PageBreadcrumb from '../../components/ui/shared/PageBreadcrumb';
 import ProjectGallery from '../../components/ui/project-details/ProjectGallery';
 import ProjectInfo from '../../components/ui/project-details/ProjectInfo';
@@ -143,22 +142,13 @@ const ProjectDetailsPage: React.FC = () => {
   
   const [projectData, setProjectData] = useState(mockProjectData);
   const [loading, setLoading] = useState(true);
-  const [toast, setToast] = useState<{
-    show: boolean;
-    message: string;
-    type: 'success' | 'error' | 'info';
-  }>({ show: false, message: '', type: 'success' });
 
   const content = {
     en: {
-      loadingProject: 'Loading Project Details...',
-      favoriteAdded: 'Property added to favorites!',
-      favoriteRemoved: 'Property removed from favorites!'
+      loadingProject: 'Loading Project Details...'
     },
     ar: {
-      loadingProject: 'جاري تحميل تفاصيل المشروع...',
-      favoriteAdded: 'تم إضافة العقار للمفضلة!',
-      favoriteRemoved: 'تم إزالة العقار من المفضلة!'
+      loadingProject: 'جاري تحميل تفاصيل المشروع...'
     }
   };
 
@@ -197,40 +187,15 @@ const ProjectDetailsPage: React.FC = () => {
   }, [id]);
 
   const handleFavoriteToggle = () => {
-    setProjectData(prev => ({
-      ...prev,
-      isFavorited: !prev.isFavorited
-    }));
+    // Optional: Update local state if needed for any UI sync
+    // The actual favorites are handled by the components themselves
+    console.log('Project favorite toggled');
   };
 
   const handlePropertyFavoriteToggle = (propertyId: string) => {
-    let isAdded = false;
-    
-    setProjectData(prev => {
-      const updatedProperties = prev.properties.map(property => {
-        if (property.id === propertyId) {
-          isAdded = !property.isFavorited;
-          return { ...property, isFavorited: !property.isFavorited };
-        }
-        return property;
-      });
-      
-      return {
-        ...prev,
-        properties: updatedProperties
-      };
-    });
-    
-    // Show toast notification
-    setToast({
-      show: true,
-      message: isAdded ? t.favoriteAdded : t.favoriteRemoved,
-      type: 'success'
-    });
-  };
-
-  const closeToast = () => {
-    setToast(prev => ({ ...prev, show: false }));
+    // Optional: Update local state if needed for any UI sync  
+    // The actual favorites are handled by the components themselves
+    console.log('Property favorite toggled:', propertyId);
   };
 
   const handlePropertyClick = (property: ProjectDetailProperty) => {
@@ -255,14 +220,6 @@ const ProjectDetailsPage: React.FC = () => {
 
   return (
     <div className="project-details-page">
-      {/* Toast Notification */}
-      <Toast 
-        message={toast.message}
-        type={toast.type}
-        isVisible={toast.show}
-        onClose={closeToast}
-      />
-
       {/* Breadcrumb with Hero Background */}
       <PageBreadcrumb 
         title={projectData.name}

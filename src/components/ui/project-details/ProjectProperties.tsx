@@ -16,6 +16,8 @@ import {
 } from 'lucide-react';
 import styles from '../../../styles/components/project-details/ProjectProperties.module.css';
 import { useLanguage } from '../../../contexts/useLanguage';
+import { useFavorites } from '../../../contexts/useFavorites';
+import { useAuth } from '../../../contexts/useAuth';
 import Toast from '../common/Toast';
 
 interface ProjectProperty {
@@ -52,7 +54,7 @@ interface PropertyFilters {
 interface ProjectPropertiesProps {
   properties: ProjectProperty[];
   onPropertyClick: (property: ProjectProperty) => void;
-  onFavoriteToggle: (propertyId: string) => void;
+  onFavoriteToggle?: (propertyId: string) => void; // Make optional since we'll handle internally
 }
 
 const ProjectProperties: React.FC<ProjectPropertiesProps> = ({
@@ -60,6 +62,13 @@ const ProjectProperties: React.FC<ProjectPropertiesProps> = ({
   onFavoriteToggle
 }) => {
   const { currentLanguage } = useLanguage();
+  const { isAuthenticated } = useAuth();
+  const { 
+    isUnitFavorited,
+    addUnitToFavorites,
+    removeUnitFromFavorites
+  } = useFavorites();
+  
   const isArabic = currentLanguage.code === 'ar';
   
   const [filters, setFilters] = useState<PropertyFilters>({
@@ -227,19 +236,32 @@ const ProjectProperties: React.FC<ProjectPropertiesProps> = ({
     setCurrentPage(1);
   };
 
-  const handleFavoriteToggle = (property: ProjectProperty, event: React.MouseEvent) => {
+  const handleFavoriteToggle = async (property: ProjectProperty, event: React.MouseEvent) => {
     event.stopPropagation();
-    const isCurrentlyFavorited = property.isFavorited;
     
-    // Call the parent handler
-    onFavoriteToggle(property.id);
+    if (!isAuthenticated) {
+      // You could show a login prompt here or redirect to login
+      return;
+    }
     
-    // Show toast notification
-    setToast({
-      show: true,
-      message: isCurrentlyFavorited ? t.favoriteRemoved : t.favoriteAdded,
-      type: 'success'
-    });
+    try {
+      const unitId = parseInt(property.id);
+      const isCurrentlyFavorited = isUnitFavorited(unitId);
+      
+      if (isCurrentlyFavorited) {
+        await removeUnitFromFavorites(unitId);
+      } else {
+        await addUnitToFavorites(unitId);
+      }
+      
+      // Call the optional external handler if provided
+      if (onFavoriteToggle) {
+        onFavoriteToggle(property.id);
+      }
+      
+    } catch (error) {
+      console.error('Error toggling unit favorite:', error);
+    }
   };
 
   const closeToast = () => {
@@ -421,11 +443,12 @@ const ProjectProperties: React.FC<ProjectPropertiesProps> = ({
                     {t[property.status as keyof typeof t]}
                   </div>
                   <button 
-                    className={`${styles.properties__card_favorite} ${property.isFavorited ? styles.properties__card_favorite_active : ''}`}
+                    className={`${styles.properties__card_favorite} ${isUnitFavorited(parseInt(property.id)) ? styles.properties__card_favorite_active : ''}`}
                     onClick={(e) => handleFavoriteToggle(property, e)}
-                    title={property.isFavorited ? t.removeFromFavorites : t.addToFavorites}
+                    disabled={!isAuthenticated}
+                    title={isUnitFavorited(parseInt(property.id)) ? t.removeFromFavorites : t.addToFavorites}
                   >
-                    <Heart size={20} fill={property.isFavorited ? '#FBBF24' : 'none'} />
+                    <Heart size={20} fill={isUnitFavorited(parseInt(property.id)) ? '#FBBF24' : 'none'} />
                   </button>
                 </div>
                 

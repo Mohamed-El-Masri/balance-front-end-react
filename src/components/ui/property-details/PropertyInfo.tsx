@@ -18,6 +18,8 @@ import {
 } from 'lucide-react';
 import styles from '../../../styles/components/property-details/PropertyInfo.module.css';
 import { useLanguage } from '../../../contexts/useLanguage';
+import { useFavorites } from '../../../contexts/useFavorites';
+import { useAuth } from '../../../contexts/useAuth';
 import Toast from '../Toast';
 
 interface PropertyFeature {
@@ -48,7 +50,7 @@ interface PropertyInfoProps {
   amenities: string[];
   amenitiesAr: string[];
   isFavorite: boolean;
-  onFavoriteToggle: () => void;
+  onFavoriteToggle?: () => void; // Make optional since we'll handle internally
   isTogglingFavorite?: boolean;
 }
 
@@ -76,11 +78,22 @@ const PropertyInfo: React.FC<PropertyInfoProps> = ({
   isTogglingFavorite = false
 }) => {
   const { currentLanguage } = useLanguage();
+  const { isAuthenticated } = useAuth();
+  const { 
+    isUnitFavorited,
+    addUnitToFavorites,
+    removeUnitFromFavorites
+  } = useFavorites();
+  
   const isArabic = currentLanguage.code === 'ar';
   
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [toastType, setToastType] = useState<'success' | 'error' | 'info'>('success');
+  const [isInternalToggling, setIsInternalToggling] = useState(false);
+
+  // Use favorites context to get the actual favorite status
+  const actualIsFavorite = isUnitFavorited(parseInt(propertyId));
 
   const content = {
     en: {
@@ -191,9 +204,35 @@ const PropertyInfo: React.FC<PropertyInfoProps> = ({
   }
 
   // Handle favorite toggle
-  const handleFavoriteToggle = () => {
-    if (isTogglingFavorite) return;
-    onFavoriteToggle();
+  const handleFavoriteToggle = async () => {
+    if (!isAuthenticated) {
+      // Could show a login prompt here
+      return;
+    }
+
+    if (isInternalToggling || isTogglingFavorite) return;
+    
+    setIsInternalToggling(true);
+    
+    try {
+      const unitId = parseInt(propertyId);
+      
+      if (actualIsFavorite) {
+        await removeUnitFromFavorites(unitId);
+      } else {
+        await addUnitToFavorites(unitId);
+      }
+      
+      // Call the optional external handler if provided (without showing extra toast)
+      if (onFavoriteToggle) {
+        onFavoriteToggle();
+      }
+      
+    } catch (error) {
+      console.error('Error toggling unit favorite:', error);
+    } finally {
+      setIsInternalToggling(false);
+    }
   };
 
   // Handle share
@@ -265,13 +304,13 @@ const PropertyInfo: React.FC<PropertyInfoProps> = ({
         <div className={styles.property_info__actions}>
           <button
             className={`${styles.property_info__action_btn} ${
-              isFavorite ? styles.property_info__action_btn_active : ''
+              actualIsFavorite ? styles.property_info__action_btn_active : ''
             }`}
             onClick={handleFavoriteToggle}
-            disabled={isTogglingFavorite}
+            disabled={isInternalToggling || isTogglingFavorite || !isAuthenticated}
             title={t.favorite}
           >
-            <Heart size={20} fill={isFavorite ? 'currentColor' : 'none'} />
+            <Heart size={20} fill={actualIsFavorite ? 'currentColor' : 'none'} />
           </button>
           <button
             className={styles.property_info__action_btn}
