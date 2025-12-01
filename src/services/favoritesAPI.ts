@@ -7,7 +7,7 @@ export interface FavoriteUnit {
   price: number,
   location: string,
   mainImageUrl: string,
-  projectId: number
+  unitId: number
 }
 
 export interface FavoriteProject {

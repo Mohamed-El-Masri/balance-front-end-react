@@ -257,7 +257,7 @@ export const FavoritesProvider: React.FC<FavoritesProviderProps> = ({ children }
   };
 
   const isUnitFavorited = (unitId: number): boolean => {
-    return favoriteUnits.some(unit => unit.projectId === unitId);
+    return favoriteUnits.some(unit => unit.unitId === unitId);
   };
 
   const value: FavoritesContextType = {

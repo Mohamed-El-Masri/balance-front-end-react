@@ -6,6 +6,10 @@ import ApiConfigInterceptor from "../../config/config.api"
 export interface AssignedEmployee {
   id: string;
   fullName: string;
+  email: string,
+  imageUrl: string,
+  phone: string,
+  whatsApp: string
 }
 
 export interface UnitFeature {

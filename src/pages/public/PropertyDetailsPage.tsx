@@ -12,12 +12,11 @@ import PropertyLocationMap from '../../components/ui/property-details/PropertyLo
 import PropertyContact from '../../components/ui/property-details/PropertyContact';
 import { useLanguage } from '../../contexts/useLanguage';
 import { useFavorites } from '../../contexts/useFavorites';
-import { useToast } from '../../contexts/useToast';
 import styles from '../../styles/components/property-details/PropertyDetailsPage.module.css';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../store';
 import { getUnitById } from '../../store/slices/UnitSlice';
-import { getStatusUnitText, getTypeText, returnUnitTypeText } from '../../helpers/helpers';
+import { getTypeText, returnUnitTypeText } from '../../helpers/helpers';
 
 // Mock data - في التطبيق الحقيقي سيأتي من API
 const mockPropertyData = {
@@ -161,11 +160,9 @@ const PropertyDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { currentLanguage } = useLanguage();
   const { isUnitFavorited, addUnitToFavorites, removeUnitFromFavorites } = useFavorites();
-  const { showToast } = useToast();
   const isArabic = currentLanguage.code === 'ar';
 
   const [propertyData, setPropertyData] = useState(mockPropertyData);
-  const [loading, setLoading] = useState(true);
   const [isTogglingFavorite, setIsTogglingFavorite] = useState(false);
 
   const content = {
@@ -186,35 +183,6 @@ const PropertyDetailsPage: React.FC = () => {
   };
 
   const t = isArabic ? content.ar : content.en;
-
-  // useEffect(() => {
-  //   // محاكاة تحميل البيانات من API باستخدام slug/id
-  //   const fetchPropertyData = async () => {
-  //     setLoading(true);
-
-  //     try {
-  //       // في التطبيق الحقيقي:
-  //       // const response = await api.getPropertyBySlug(id);
-  //       // setPropertyData(response.data);
-
-  //       // محاكاة وقت التحميل
-  //       await new Promise(resolve => setTimeout(resolve, 1500));
-
-  //       // في الوقت الحالي نستخدم نفس البيانات، لكن يمكن تخصيصها حسب الـ slug
-  //       setPropertyData({
-  //         ...mockPropertyData,
-  //         id: id || '1', // استخدام id من URL
-  //       });
-
-  //     } catch (error) {
-  //       console.error('Error fetching property data:', error);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-
-  //   fetchPropertyData();
-  // }, [id]);
 
   const handleFavoriteToggle = async () => {
     // This function is now optional and mainly for any additional logic
@@ -385,11 +353,7 @@ const PropertyDetailsPage: React.FC = () => {
       <PropertyContact
         propertyTitle={unitData?.titleEn || ""}
         propertyTitleAr={unitData?.titleAr || ""}
-        agentName={unitData?.assignedEmployees?.[0]?.fullName || ""}
-        agentNameAr={unitData?.assignedEmployees?.[0]?.fullName || ""}
-        agentPhone={propertyData.agent.phone}
-        agentEmail={propertyData.agent.email}
-        agentPhoto={propertyData.agent.image}
+        assignTo={unitData?.assignedEmployees || []}
         propertyId={parseInt(id)}
       />
     </div>

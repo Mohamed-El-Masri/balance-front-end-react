@@ -185,96 +185,102 @@ const FeaturedProjects: React.FC = () => {
     // if the user is auth , if the fave apis loading is false , then dispatch project , 
     // if user is not auth , dispatch project direct 
     if (isAuthenticated) {
-      !favoriteProjectsLoading && dispatch(getProjectsAPi({}));
+      !favoriteProjectsLoading && dispatch(getProjectsAPi({
+        IsActive: true,
+        IsFeatured: true
+      }));
     } else {
-      dispatch(getProjectsAPi({}));
-    }
+      dispatch(getProjectsAPi({
+          IsActive: true,
+          IsFeatured: true
+      }));
   }
+}
 
 
-  useEffect(() => {
-    AuthAndFetchData()
-  }, [isAuthenticated]);
-
-
-
-  useEffect(() => {
-    !loading && data?.items?.length !== 0 && console.log("Fetch Data ", data);
-    console.log(error);
-
-  }, [data]);
+useEffect(() => {
+  AuthAndFetchData()
+}, [isAuthenticated]);
 
 
 
+useEffect(() => {
+  !loading && data?.items?.length !== 0 && console.log("Fetch Data ", data);
+  console.log(error);
+
+}, [data]);
 
 
-  // #endregion Api Fetch Data 
 
 
-  return (
-    <section className={styles.featured} dir={isArabic ? 'rtl' : 'ltr'}>
-      {/* Toast Notification */}
-      <Toast
-        message={toast.message}
-        type={toast.type}
-        isVisible={toast.show}
-        onClose={closeToast}
-      />
 
-      <div className={styles.featured__container}>
-        {/* Section Header */}
-        <div className={styles.featured__header}>
-          <div className={styles.featured__subtitle}>
-            {t.subtitle}
-          </div>
-          <h2 className={styles.featured__title}>
-            {t.title}
-          </h2>
-          <p className={styles.featured__description}>
-            {t.description}
-          </p>
+// #endregion Api Fetch Data 
+
+
+return (
+  <section className={styles.featured} dir={isArabic ? 'rtl' : 'ltr'}>
+    {/* Toast Notification */}
+    <Toast
+      message={toast.message}
+      type={toast.type}
+      isVisible={toast.show}
+      onClose={closeToast}
+    />
+
+    <div className={styles.featured__container}>
+      {/* Section Header */}
+      <div className={styles.featured__header}>
+        <div className={styles.featured__subtitle}>
+          {t.subtitle}
         </div>
-
-        {loading ? <>
-          <div className={styles.featured__grid}>
-            <ProjectCardSkeleton />
-            <ProjectCardSkeleton />
-            <ProjectCardSkeleton />
-          </div>
-        </> : error !== null ? <>
-          <p style={{ textAlign: "center", fontSize: "2rem" }}>{t.errorFetch} </p>
-        </> :
-          data && data?.items && data?.items?.length !== 0 ?
-            <>
-              <div className={styles.featured__grid}>
-                {data.items.map((project: Project) => (
-                  <HomeProjectCard
-                    handleFavoriteToggle={handleFavoriteToggle}
-                    handleProjectClick={handleProjectClick}
-                    isProjectFavorited={isProjectFavorited}
-                    project={project}
-                    key={project.id}
-                    t={t}
-                    language={isArabic ? "AR" : "EN"}
-                  />
-                ))}
-              </div>
-              < div className={styles.featured__cta}>
-                <button
-                  className={styles.featured__explore_btn}
-                  onClick={handleExploreClick}
-                >
-                  {t.exploreProjects}
-                </button>
-              </div>
-            </>
-            : <>
-              <p style={{ textAlign: "center", fontSize: "2rem" }}>{t.noProjects} </p>
-            </>
-        }
+        <h2 className={styles.featured__title}>
+          {t.title}
+        </h2>
+        <p className={styles.featured__description}>
+          {t.description}
+        </p>
       </div>
-    </section >
-  );
+
+      {loading ? <>
+        <div className={styles.featured__grid}>
+          <ProjectCardSkeleton />
+          <ProjectCardSkeleton />
+          <ProjectCardSkeleton />
+        </div>
+      </> : error !== null ? <>
+        <p style={{ textAlign: "center", fontSize: "2rem" }}>{t.errorFetch} </p>
+      </> :
+        data && data?.items && data?.items?.length !== 0 ?
+          <>
+            <div className={styles.featured__grid}>
+              {data.items.map((project: Project) => (
+                <HomeProjectCard
+                  handleFavoriteToggle={handleFavoriteToggle}
+                  handleProjectClick={handleProjectClick}
+                  isProjectFavorited={isProjectFavorited}
+                  project={project}
+                  key={project.id}
+                  t={t}
+                  language={isArabic ? "AR" : "EN"}
+                />
+              ))}
+            </div>
+            < div className={styles.featured__cta}>
+              <button
+                className={styles.featured__explore_btn}
+                onClick={handleExploreClick}
+              >
+                {t.exploreProjects}
+              </button>
+            </div>
+          </>
+          : <>
+            <p style={{ textAlign: "center", fontSize: "2rem" }}>{t.noProjects} </p>
+          </>
+      }
+    </div>
+  </section >
+);
 };
 
 

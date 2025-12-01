@@ -2,6 +2,7 @@ import React from 'react';
 import { Building, Square, Car, ArrowUp, CheckCircle } from 'lucide-react';
 import styles from '../../../styles/components/project-details/ProjectOverview.module.css';
 import { useLanguage } from '../../../contexts/useLanguage';
+import { ProjectFeature } from '../../../store/slices/ProjectSlice';
 
 interface ProjectOverviewProps {
   overview?: {
@@ -9,8 +10,7 @@ interface ProjectOverviewProps {
     totalArea?: string;
     parkingSpaces?: number;
     elevators?: number;
-    features?: string[];
-    featuresAr?: string[];
+    features?: ProjectFeature[] | null;
   } | null;
 }
 
@@ -42,9 +42,7 @@ const ProjectOverview: React.FC<ProjectOverviewProps> = ({ overview }) => {
   const t = isArabic ? content.ar : content.en;
 
   // ✅ استخدم optional chaining + fallback للfeatures
-  const currentFeatures = isArabic
-    ? overview?.featuresAr ?? []
-    : overview?.features ?? [];
+  const currentFeatures = overview?.features ?? []
 
   // ✅ قيم افتراضية لو overview مش موجود
   const stats = [
@@ -114,7 +112,7 @@ const ProjectOverview: React.FC<ProjectOverviewProps> = ({ overview }) => {
               {currentFeatures.map((feature, index) => (
                 <div key={index} className={styles.overview__feature_item}>
                   <CheckCircle size={20} className={styles.overview__feature_icon} />
-                  <span className={styles.overview__feature_text}>{feature}</span>
+                  <span className={styles.overview__feature_text}>{isArabic ? feature.nameAr : feature.nameEn}</span>
                 </div>
               ))}
             </div>

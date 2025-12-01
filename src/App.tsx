@@ -1,12 +1,12 @@
-import React, { Suspense } from 'react'
+import React, { Suspense, useEffect } from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { LanguageProvider, ThemeProvider, ToastProvider, AuthProvider, FavoritesProvider } from './contexts'
 import ToastContainer from './components/ui/ToastContainer'
 import ProtectedRoute from './components/auth/ProtectedRoute'
 import GoogleAuthCallback from './components/auth/GoogleAuthCallback'
 import LoadingSpinner from './components/ui/LoadingSpinner'
-import { store } from "./store/index";
-import { Provider as StoreProvider } from "react-redux";
+import { AppDispatch, RootState, store } from "./store/index";
+import { Provider as StoreProvider, useDispatch, useSelector } from "react-redux";
 // Lazy load pages for better performance
 const HomePage = React.lazy(() => import('./pages/public/HomePage'))
 const ProjectsPage = React.lazy(() => import('./pages/public/ProjectsPage'))
@@ -29,13 +29,39 @@ const ProfilePage = React.lazy(() => import('./pages/dashboard/ProfilePage'))
 
 // Shared Layout
 import PublicLayout from './layouts/PublicLayout'
+import { getCMSData, reset } from './store/slices/CMSSlice'
 
 function App() {
+
+
+  const { data, error, loading } = useSelector((state: RootState) => state.Information);
+  const dispatch = useDispatch<AppDispatch>();
+
+  // useEffect(() => {
+  //   // reset Company Information
+  //   dispatch(reset());
+  //   // get Company Information
+  //   dispatch(getCMSData());
+  // }, [])
+
+  // useEffect(() => {
+
+  //   loading && console.log("CMS Loading ", loading);
+  //   data && console.log("CMS Data ", data);
+  //   error && console.log("CMS Error ", error);
+
+  // }, [data, loading, error])
+
+
+
+
+
+
   return (
     <ThemeProvider>
       <LanguageProvider>
         <ToastProvider>
-          <StoreProvider store={store}>
+
             <AuthProvider>
               <FavoritesProvider>
                 <Router>
@@ -86,7 +112,6 @@ function App() {
                 </Router>
               </FavoritesProvider>
             </AuthProvider>
-          </StoreProvider>
 
         </ToastProvider>
       </LanguageProvider>

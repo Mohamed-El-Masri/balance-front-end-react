@@ -6,6 +6,24 @@ import ApiConfigInterceptor from "../../config/config.api"
 export interface AssignedEmployee {
   id: string;
   fullName: string;
+  email: string;
+  phone: string;
+  whatsApp: string | null;
+  imageUrl: string;
+}
+
+export interface ProjectFeature {
+  id: number;
+  nameAr: string;
+  nameEn: string;
+  iconUrl: string | null;
+}
+
+export interface ProjectImage {
+  imageUrl: string;
+  publicId: string;
+  caption: string;
+  order: number;
 }
 
 export interface Project {
@@ -16,15 +34,15 @@ export interface Project {
   descriptionEn: string;
   locationAr: string;
   locationEn: string;
-  regionId: number | null;
-  regionName: string | null;
-  regionNameEn: string | null;
-  cityId: number | null;
-  cityName: string | null;
-  cityNameEn: string | null;
-  districtId: number | null;
-  districtName: string | null;
-  districtNameEn: string | null;
+  regionId: number;
+  regionName: string;
+  regionNameEn: string;
+  cityId: number;
+  cityName: string;
+  cityNameEn: string;
+  districtId: number;
+  districtName: string;
+  districtNameEn: string;
   latitude: number;
   longitude: number;
   statusId: number;
@@ -40,18 +58,19 @@ export interface Project {
   areaUnitEn: string;
   mainImageUrl: string;
   publicIp: string;
-  parkingSpots: number | null;
-  elevatorsCount: number | null;
-  estimatedCompletionDate: string | null;
+  parkingSpots: number;
+  elevatorsCount: number;
+  estimatedCompletionDate: string; // or Date if you parse it
   countOfUnits: number;
   isFeatured: boolean;
   isActive: boolean;
-  youtubeVideoUrl: string | null;
+  youtubeVideoUrl: string;
   assignedEmployees: AssignedEmployee[];
   projectsFeaturesIds: number[];
-  features: any[];
-  images: any[];
+  features: ProjectFeature[];
+  images: ProjectImage[];
 }
+
 
 export interface ProjectsDataResponse {
   items: Project[],
@@ -129,8 +148,6 @@ export const getProjectsAPi = createAsyncThunk("project/getAll", async (filters:
 export const getProjectById = createAsyncThunk("project/getById", async (id: number, thunkApi) => {
   try {
     const response = await ApiConfigInterceptor.get(`/project/${id}`);
-    console.log("Response Data Single Project ", response);
-
     return response;
   } catch (error) {
     return thunkApi.rejectWithValue(error);
@@ -161,7 +178,6 @@ const ProjectSlice = createSlice({
       state.single.error = null;
     }).addCase(getProjectById.fulfilled, (state, action) => {
       state.single.loading = false;
-      console.log("single Data", action.payload);
       state.single.details = action.payload.data;
     }).addCase(getProjectById.rejected, (state, action) => {
       state.single.loading = false;

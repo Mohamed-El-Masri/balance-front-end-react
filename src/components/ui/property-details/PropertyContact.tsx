@@ -7,16 +7,14 @@ import { ContactFormData, InterestsInUnit, reset } from '../../../store/slices/I
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../../store';
 import { useAuth } from '../../../contexts';
+import { AssignedEmployee } from '../../../store/slices/UnitSlice';
+
 
 interface PropertyContactProps {
   propertyId: number;
   propertyTitle: string;
   propertyTitleAr: string;
-  agentName?: string;
-  agentNameAr?: string;
-  agentPhone?: string;
-  agentEmail?: string;
-  agentPhoto?: string;
+  assignTo: AssignedEmployee[]
 }
 
 
@@ -24,11 +22,7 @@ interface PropertyContactProps {
 const PropertyContact: React.FC<PropertyContactProps> = ({
   propertyTitle,
   propertyTitleAr,
-  agentName,
-  agentNameAr,
-  agentPhone,
-  agentEmail,
-  agentPhoto,
+  assignTo,
   propertyId
 }) => {
   const { currentLanguage } = useLanguage();
@@ -112,7 +106,7 @@ const PropertyContact: React.FC<PropertyContactProps> = ({
 
   const t = isArabic ? content.ar : content.en;
   const currentPropertyTitle = isArabic ? propertyTitleAr : propertyTitle;
-  const currentAgentName = isArabic ? agentNameAr : agentName;
+  // const currentAgentName = isArabic ? agentNameAr : agentName;
 
 
   const {
@@ -184,31 +178,27 @@ const PropertyContact: React.FC<PropertyContactProps> = ({
     if (isAuthenticated && user?.id) {
       payload.userId = user.id;
     }
-    dispatch(InterestsInUnit(payload))
+    dispatch(InterestsInUnit(payload)).then(res => {
+      if (res.payload.data === true) {
+        setToastMessage(t.messageSent);
+        setToastType('success');
+        setShowToast(true);
+        setFormData({
+          name: '',
+          email: '',
+          phone: '',
+          message: '',
+          contactPreference: 0,
+          unitId: propertyId
+        });
+      } else {
+        setToastMessage(t.messageError);
+        setToastType('error');
+        setShowToast(true);
+      }
+    })
   };
 
-
-
-  useEffect(() => {
-    console.log("this is data ", data);
-    if (data === true) {
-      setToastMessage(t.messageSent);
-      setToastType('success');
-      setShowToast(true);
-      setFormData({
-        name: '',
-        email: '',
-        phone: '',
-        message: '',
-        contactPreference: 0,
-        unitId: propertyId
-      });
-    } else {
-      setToastMessage(t.messageError);
-      setToastType('error');
-      setShowToast(true);
-    }
-  }, [data])
 
   // Handle input changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -220,9 +210,9 @@ const PropertyContact: React.FC<PropertyContactProps> = ({
   };
 
   // Generate contact URLs
-  const whatsappUrl = agentPhone ? `https://wa.me/${agentPhone.replace(/\D/g, '')}?text=${encodeURIComponent(`مرحباً، أنا مهتم بالعقار: ${currentPropertyTitle}`)}` : '#';
-  const emailUrl = agentEmail ? `mailto:${agentEmail}?subject=${encodeURIComponent(`استفسار عن العقار: ${currentPropertyTitle}`)}` : '#';
-  const phoneUrl = agentPhone ? `tel:${agentPhone}` : '#';
+  // const whatsappUrl = agentPhone ? `https://wa.me/${agentPhone.replace(/\D/g, '')}?text=${encodeURIComponent(`مرحباً، أنا مهتم بالعقار: ${currentPropertyTitle}`)}` : '#';
+  // const emailUrl = agentEmail ? `mailto:${agentEmail}?subject=${encodeURIComponent(`استفسار عن العقار: ${currentPropertyTitle}`)}` : '#';
+  // const phoneUrl = agentPhone ? `tel:${agentPhone}` : '#';
 
   return (
     <div className={styles.contact} dir={isArabic ? 'rtl' : 'ltr'}
@@ -230,9 +220,55 @@ const PropertyContact: React.FC<PropertyContactProps> = ({
       <h2 className={styles.contact__title}>{t.title}</h2>
 
       <div className={styles.contact__content}>
-        {/* Agent Information */}
-        {(currentAgentName || agentPhone || agentEmail) && (
-          <div className={styles.contact__agent}>            <h3 className={styles.contact__agent_title}>{t.agentInfo}</h3>
+        <div>
+          {/* Agent Information */}
+          {assignTo.length != 0 && assignTo.map((data) => {
+            return <>
+              <div className={styles.contact__agent} key={data.id}>
+                <h3 className={styles.contact__agent_title}>{t.agentInfo}</h3>
+
+                <div className={styles.contact__agent_card}>
+                  {data.imageUrl && (
+                    <div className={styles.contact__agent_photo}>
+                      <img src={data.imageUrl} alt={data.fullName} />
+                    </div>
+                  )}
+
+                  <div className={styles.contact__agent_info}>
+                    {data.fullName && (
+                      <h4 className={styles.contact__agent_name}>{data.fullName}</h4>
+                    )}
+
+                    <div className={styles.contact__agent_actions}>
+                      {data.phone && (
+                        <a href={`tel:${data.phone}`} className={styles.contact__agent_action}>
+                          <Phone size={16} />
+                          {t.callAgent}
+                        </a>
+                      )}
+                      {data.email && (
+                        <a href={`mailto:${data.email}?subject=${encodeURIComponent(`استفسار عن العقار: ${currentPropertyTitle}`)}`} className={styles.contact__agent_action}>
+                          <Mail size={16} />
+                          {t.emailAgent}
+                        </a>
+                      )}
+                      {data.whatsApp && (
+                        <a href={`https://wa.me/${data.whatsApp.replace(/\D/g, '')}?text=${encodeURIComponent(`مرحباً، أنا مهتم بالعقار: ${currentPropertyTitle}`)}`} className={`${styles.contact__agent_action} ${styles.contact__agent_action_whatsapp}`}>
+                          <MessageCircle size={16} />
+                          {t.whatsappAgent}
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </>
+          })}
+        </div>
+
+        {/* {(currentAgentName || agentPhone || agentEmail) && (
+          <div className={styles.contact__agent}>
+            <h3 className={styles.contact__agent_title}>{t.agentInfo}</h3>
 
             <div className={styles.contact__agent_card}>
               {agentPhoto && (
@@ -269,7 +305,9 @@ const PropertyContact: React.FC<PropertyContactProps> = ({
               </div>
             </div>
           </div>
-        )}
+        )} */}
+
+
 
         {/* Contact Form */}
         <div className={styles.contact__form_section}>

@@ -45,6 +45,7 @@
 
 /* Agent Information */
 .contact__agent {
+  margin-top: 1rem ;
   background: linear-gradient(135deg, #fefbf3, #fef7e7);
   border-radius: 12px;
   padding: 24px;

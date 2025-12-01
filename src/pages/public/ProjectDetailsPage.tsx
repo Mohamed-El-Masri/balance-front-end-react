@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import * as React from 'react';
+import { useState, useEffect } from "react"
 import { useNavigate, useParams } from 'react-router-dom';
 import LoadingSpinner from '../../components/ui/common/LoadingSpinner';
 import PageBreadcrumb from '../../components/ui/shared/PageBreadcrumb';
@@ -53,7 +54,7 @@ const ProjectDetailsPage: React.FC = () => {
     console.log('Property favorite toggled:', propertyId);
   };
 
- 
+
   //#endregion Code 
 
 
@@ -111,61 +112,60 @@ const ProjectDetailsPage: React.FC = () => {
     {details && <div className="project-details-page">
       {/* Breadcrumb with Hero Background */}
       <PageBreadcrumb
-        title={details.nameEn}
-        titleAr={details.nameAr}
-        location={details.locationEn}
-        locationAr={details.locationAr}
-        backgroundImage={details.mainImageUrl}
+        title={details?.nameEn}
+        titleAr={details?.nameAr}
+        location={details?.locationEn}
+        locationAr={details?.locationAr}
+        backgroundImage={details?.mainImageUrl}
       />
 
       {/* Project Gallery */}
-      <ProjectGallery images={details.images} />
+      <ProjectGallery images={details?.images} />
 
       {/* Project Info */}
       <ProjectInfo
         project={{
-          id: details.id,
-          name: details.nameEn,
-          nameAr: details.nameAr,
-          location: details.locationEn,
-          locationAr: details.locationAr,
-          category: details.typeNameEn,
-          categoryAr: details.typeName,
-          isFavorited: details.isFeatured,
-          completionDate: details.estimatedCompletionDate
+          id: details?.id,
+          name: details?.nameEn,
+          nameAr: details?.nameAr,
+          location: details?.locationEn,
+          locationAr: details?.locationAr,
+          category: details?.typeNameEn,
+          categoryAr: details?.typeName,
+          isFavorited: details?.isFeatured,
+          completionDate: details?.estimatedCompletionDate
         }}
         onFavoriteToggle={handleFavoriteToggle}
       />
 
       {/* Project Description */}
       <ProjectDescription
-        description={details.descriptionEn}
-        descriptionAr={details.descriptionAr}
+        description={details?.descriptionEn}
+        descriptionAr={details?.descriptionAr}
       />
 
       {/* Project Overview */}
       <ProjectOverview overview={{
-        elevators: details.elevatorsCount,
-        features: details.features,
-        featuresAr: details.features,
-        parkingSpaces: details.parkingSpots,
-        totalArea: details.area + `${isArabic ? details.areaUnitAr : details.areaUnitEn}`,
-        totalUnits: details.countOfUnits
+        elevators: details?.elevatorsCount,
+        features: details?.features,
+        parkingSpaces: details?.parkingSpots,
+        totalArea: details?.area + `${isArabic ? details?.areaUnitAr : details?.areaUnitEn}`,
+        totalUnits: details?.countOfUnits
       }} />
 
       {/* Project Video */}
-      <ProjectVideo videoUrl={details.youtubeVideoUrl} />
+      <ProjectVideo videoUrl={details?.youtubeVideoUrl} />
 
       {/* Project Location Map */}
       <ProjectLocationMap
         coordinates={{
-          lat: details.latitude,
-          lng: details.longitude
+          lat: details?.latitude,
+          lng: details?.longitude
         }}
-        address={details.locationEn}
-        addressAr={details.locationAr}
-        projectName={details.nameEn}
-        projectNameAr={details.nameAr}
+        address={`${details?.locationEn}`}
+        addressAr={`${details?.locationAr}`}
+        projectName={details?.nameEn}
+        projectNameAr={details?.nameAr}
       />
 
       {/* Available Properties */}
@@ -179,8 +179,8 @@ const ProjectDetailsPage: React.FC = () => {
 
       {/* Register Interest */}
       <RegisterInterest
-        projectName={details.nameEn}
-        projectNameAr={details.nameAr}
+        projectName={details?.nameEn}
+        projectNameAr={details?.nameAr}
         // onSubmit={handleInterestSubmit}
         projectId={id}
       />

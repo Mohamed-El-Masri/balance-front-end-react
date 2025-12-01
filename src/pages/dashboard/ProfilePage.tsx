@@ -698,8 +698,8 @@ const ProfilePage: React.FC = () => {
                       <div className={styles.profile__properties_grid}>
                         {favoriteUnits.map((unit) => (
                           <PropertyCard
-                            key={unit.projectId}
-                            id={unit.projectId}
+                            key={unit.unitId}
+                            id={unit.unitId}
                             title={isArabic ? unit.nameAr : unit.nameEn}
                             location={isArabic ? unit.location : unit.location}
                             price={unit.price}
@@ -707,7 +707,7 @@ const ProfilePage: React.FC = () => {
                             image={unit.mainImageUrl}
                             type="unit"
                             onRemove={removeUnitFromFavorites}
-                            viewUrl={`/properties/${unit.projectId}`}
+                            viewUrl={`/properties/${unit.unitId}`}
                             isArabic={isArabic}
                           />
                         ))}

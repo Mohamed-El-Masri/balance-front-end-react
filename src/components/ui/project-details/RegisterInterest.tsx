@@ -18,10 +18,10 @@ interface InterestFormData {
   fullName: string;
   email: string;
   phone: string;
-  interestedIn: string;
+  // interestedIn: string;
+  // visitDate: string;
+  // numberOfPeople: number;
   preferredContact: string;
-  visitDate: string;
-  numberOfPeople: number;
   message: string;
 }
 
@@ -41,10 +41,7 @@ const RegisterInterest: React.FC<RegisterInterestProps> = ({
     fullName: '',
     email: '',
     phone: '',
-    interestedIn: '',
     preferredContact: 'email',
-    visitDate: '',
-    numberOfPeople: 1,
     message: ''
   });
 
@@ -153,6 +150,20 @@ const RegisterInterest: React.FC<RegisterInterestProps> = ({
 
   const { user, isAuthenticated } = useAuth();
 
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    if (user) {
+      setFormData({
+        fullName: user.firstName + " " + user.lastName,
+        email: user.email,
+        phone: user.phoneNumber,
+        preferredContact: 'email',
+        message: ''
+      })
+    }
+
+  }, [isAuthenticated])
 
   const {
     data, loading, error
@@ -179,9 +190,9 @@ const RegisterInterest: React.FC<RegisterInterestProps> = ({
     //   newErrors.phone = t.invalidPhone;
     // }
 
-    if (!formData.interestedIn) {
-      newErrors.interestedIn = t.required;
-    }
+    // if (!formData.interestedIn) {
+    //   newErrors.interestedIn = t.required;
+    // }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -198,10 +209,10 @@ const RegisterInterest: React.FC<RegisterInterestProps> = ({
       fullName: formData.fullName,
       email: formData.email,
       phone: formData.phone,
-      interestedIn: formData.interestedIn,
       preferredContact: formData.preferredContact,
-      visitDate: formData.visitDate,
-      numberOfPeople: formData.numberOfPeople,
+      // interestedIn: formData.interestedIn,
+      // visitDate: formData.visitDate,
+      // numberOfPeople: formData.numberOfPeople,
       message: formData.message,
       projectId: Number(projectId),
     };
@@ -227,10 +238,10 @@ const RegisterInterest: React.FC<RegisterInterestProps> = ({
       fullName: '',
       email: '',
       phone: '',
-      interestedIn: '',
       preferredContact: 'email',
-      visitDate: '',
-      numberOfPeople: 1,
+      // interestedIn: '',
+      // visitDate: '',
+      // numberOfPeople: 1,
       message: ''
     });
     setErrors({});
@@ -342,7 +353,7 @@ const RegisterInterest: React.FC<RegisterInterestProps> = ({
               </div>
 
               {/* Interest Type */}
-              <div className={styles.interest__form_group}>
+              {/* <div className={styles.interest__form_group}>
                 <label className={styles.interest__label}>{t.interestedIn}</label>
                 <div className={styles.interest__radio_group}>
                   {[
@@ -367,7 +378,7 @@ const RegisterInterest: React.FC<RegisterInterestProps> = ({
                 {errors.interestedIn && (
                   <span className={styles.interest__error}>{errors.interestedIn}</span>
                 )}
-              </div>
+              </div> */}
 
               {/* Contact Preferences */}
               <div className={styles.interest__form_group}>
@@ -387,7 +398,7 @@ const RegisterInterest: React.FC<RegisterInterestProps> = ({
               </div>
 
               {/* Visit Details */}
-              <div className={styles.interest__form_row}>
+              {/* <div className={styles.interest__form_row}>
                 <div className={styles.interest__form_group}>
                   <label className={styles.interest__label}>
                     <Calendar size={20} />
@@ -416,7 +427,7 @@ const RegisterInterest: React.FC<RegisterInterestProps> = ({
                     max="10"
                   />
                 </div>
-              </div>
+              </div> */}
 
               {/* Message */}
               <div className={styles.interest__form_group}>

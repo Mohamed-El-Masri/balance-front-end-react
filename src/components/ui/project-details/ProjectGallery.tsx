@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { ChevronLeft, ChevronRight, X, ZoomIn, ImageOff } from 'lucide-react';
 import styles from '../../../styles/components/project-details/ProjectGallery.module.css';
 import { useLanguage } from '../../../contexts/useLanguage';
+import { ProjectImage } from '../../../store/slices/ProjectSlice';
 
 interface ProjectGalleryProps {
-  images?: string[] | null;
+  images?: ProjectImage[] | null;
 }
 
 const ProjectGallery: React.FC<ProjectGalleryProps> = ({ images }) => {
@@ -87,7 +88,7 @@ const ProjectGallery: React.FC<ProjectGalleryProps> = ({ images }) => {
             <div className={styles.gallery__main}>
               <div className={styles.gallery__main_image}>
                 <img
-                  src={safeImages[currentImageIndex]}
+                  src={safeImages[currentImageIndex].imageUrl}
                   alt={`Project image ${currentImageIndex + 1}`}
                   className={styles.gallery__image}
                   onClick={() => openLightbox(currentImageIndex)}
@@ -139,7 +140,7 @@ const ProjectGallery: React.FC<ProjectGalleryProps> = ({ images }) => {
                     onClick={() => setCurrentImageIndex(index)}
                   >
                     <img
-                      src={image}
+                      src={image.imageUrl}
                       alt={`Thumbnail ${index + 1}`}
                       className={styles.gallery__thumbnail_image}
                     />
@@ -172,7 +173,7 @@ const ProjectGallery: React.FC<ProjectGalleryProps> = ({ images }) => {
             </button>
 
             <img
-              src={safeImages[lightboxImageIndex]}
+              src={safeImages[lightboxImageIndex].imageUrl}
               alt={`Project image ${lightboxImageIndex + 1}`}
               className={styles.gallery__lightbox_image}
             />
