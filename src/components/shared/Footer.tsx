@@ -4,15 +4,19 @@ import { Facebook, Instagram, Linkedin, Phone, Mail, MapPin } from 'lucide-react
 import { X } from 'lucide-react'
 import styles from '../../styles/components/Footer.module.css'
 import { useLanguage } from '../../contexts/useLanguage'
+import { CompanyInfo } from '../../store/slices/CMSSlice'
 
-const Footer: React.FC = () => {
+interface CompanyInfoProps {
+  companyInfo: CompanyInfo
+}
+const Footer: React.FC<CompanyInfoProps> = ({ companyInfo }) => {
   const { currentLanguage } = useLanguage();
   const isArabic = currentLanguage.code === 'ar';
 
   const content = {
     en: {
-      companyName: 'Balance Real Estate',
-      about: 'Your trusted partner in real estate development. We create exceptional properties that balance luxury, comfort, and investment value.',
+      companyName: companyInfo?.aboutTitleEn ? companyInfo?.aboutTitleEn : 'Balance Real Estate',
+      about: companyInfo?.aboutDescriptionEn ? companyInfo?.aboutDescriptionEn : 'Your trusted partner in real estate development. We create exceptional properties that balance luxury, comfort, and investment value.',
       quickLinks: 'Quick Links',
       services: 'Services',
       contactInfo: 'Contact Info',
@@ -29,15 +33,15 @@ const Footer: React.FC = () => {
         management: 'Property Management'
       },
       contactData: {
-        address: 'King Fahd Road, Riyadh, Saudi Arabia, 12345',
-        phone: '+966 50 123 4567',
-        email: 'info@balance-re.com'
+        address: companyInfo?.addressEn ? companyInfo?.addressEn : 'King Fahd Road, Riyadh, Saudi Arabia, 12345',
+        phone: companyInfo?.phone ? companyInfo?.phone : '+966 50 123 4567',
+        email: companyInfo?.email ? companyInfo?.email : 'info@balance-re.com'
       },
-      copyright: '© 2025 Balance Real Estate Co. All rights reserved.'
+      copyright: companyInfo?.copyrightTextEn ? companyInfo?.copyrightTextEn : '© 2025 Balance Real Estate Co. All rights reserved.'
     },
     ar: {
-      companyName: 'بالانس العقارية',
-      about: 'شريكك الموثوق في التطوير العقاري. نقوم بإنشاء عقارات استثنائية تجمع بين الفخامة والراحة والقيمة الاستثمارية.',
+      companyName: companyInfo?.aboutTitleAr ? companyInfo?.aboutTitleAr : 'بالانس العقارية',
+      about: companyInfo?.aboutDescriptionAr ? companyInfo?.aboutDescriptionAr : 'شريكك الموثوق في التطوير العقاري. نقوم بإنشاء عقارات استثنائية تجمع بين الفخامة والراحة والقيمة الاستثمارية.',
       quickLinks: 'روابط سريعة',
       services: 'خدماتنا',
       contactInfo: 'معلومات التواصل',
@@ -54,11 +58,11 @@ const Footer: React.FC = () => {
         management: 'إدارة العقارات'
       },
       contactData: {
-        address: 'طريق الملك فهد، الرياض، المملكة العربية السعودية، 12345',
-        phone: '+966 50 123 4567',
-        email: 'info@balance-re.com'
+        address: companyInfo?.addressAr ? companyInfo?.addressAr : 'طريق الملك فهد، الرياض، المملكة العربية السعودية، 12345',
+        phone: companyInfo?.phone ? companyInfo?.phone : '+966 50 123 4567',
+        email: companyInfo?.email ? companyInfo?.email : 'info@balance-re.com'
       },
-      copyright: '© 2025 شركة بالانس العقارية. جميع الحقوق محفوظة.'
+      copyright: companyInfo?.copyrightTextAr ? companyInfo?.copyrightTextAr : '© 2025 شركة بالانس العقارية. جميع الحقوق محفوظة.'
     }
   };
 
@@ -77,18 +81,33 @@ const Footer: React.FC = () => {
               {t.about}
             </p>
             <div className={styles.footer__social}>
-              <a href="#" className={styles["footer__social-link"]}>
-                <Facebook size={18} />
-              </a>
-              <a href="#" className={styles["footer__social-link"]}>
-                <X size={18} />
-              </a>
-              <a href="#" className={styles["footer__social-link"]}>
-                <Instagram size={18} />
-              </a>
-              <a href="#" className={styles["footer__social-link"]}>
-                <Linkedin size={18} />
-              </a>
+              {companyInfo && companyInfo?.socialLinks.map((item, index) => {
+                if (item.isVisible === true) {
+                  if (item.key === "Facebook") {
+                    return <>
+                      <a key={index} href={item.value} className={styles["footer__social-link"]}>
+                        <Facebook size={18} />
+                      </a>
+                    </>
+                  } else if (item.key === "Instagram") {
+                    return <>   <a key={index} href={item.value} className={styles["footer__social-link"]}>
+                      <Instagram size={18} />
+                    </a></>
+                  } else if (item.key === "LinkedIn") {
+                    return <> <a key={index} href={item.value} className={styles["footer__social-link"]}>
+                      <Linkedin size={18} />
+                    </a></>
+                  } else if (item.key === "X") {
+                    return <> <a key={index} href={item.value} className={styles["footer__social-link"]}>
+                      <X size={18} />
+                    </a></>
+
+                  } else {
+                    return;
+                  }
+                }
+              })}
+
             </div>
           </div>
 
@@ -175,7 +194,7 @@ const Footer: React.FC = () => {
           </p>
         </div>
       </div>
-    </footer>
+    </footer >
   )
 }
 

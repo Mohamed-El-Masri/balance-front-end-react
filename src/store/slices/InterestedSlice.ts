@@ -75,7 +75,7 @@ export const InterestsInUnit = createAsyncThunk("units/interests", async (formDa
       payload.userId = formData.userId
     }
 
-    const response = await ApiConfigInterceptor.post('/interests/unit', payload);
+    const response = await ApiConfigInterceptor.post('/interests/unit', payload) as any ;
     return response;
   } catch (error) {
     return thunkApi.rejectWithValue(error);

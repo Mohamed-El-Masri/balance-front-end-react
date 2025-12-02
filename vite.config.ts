@@ -29,9 +29,9 @@ export default defineConfig({
         entryFileNames: 'assets/js/[name]-[hash].js',
         manualChunks: (id) => {
           // React core libraries
-          if (id.includes('react') && !id.includes('react-router') && !id.includes('react-i18next')) {
-            return 'react-vendor';
-          }
+          // if (id.includes('react') && !id.includes('react-router') && !id.includes('react-i18next')) {
+          //   return 'react-vendor';
+          // }
           
           // Router
           if (id.includes('react-router')) {

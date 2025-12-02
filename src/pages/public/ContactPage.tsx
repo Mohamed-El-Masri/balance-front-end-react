@@ -7,6 +7,7 @@ import styles from '../../styles/components/public/Contact.module.css';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../store';
 import { contactFormApi, ContactFromData } from '../../store/slices/ContactFormSlice';
+import { CompanyInfo } from '../../store/slices/CMSSlice';
 
 interface ContactFormData {
   name: string;
@@ -17,7 +18,10 @@ interface ContactFormData {
   inquiryType: 'general' | 'property' | 'investment' | 'support';
 }
 
-const ContactPage: React.FC = () => {
+interface CompanyInfoProps {
+  companyInfo: CompanyInfo
+}
+const ContactPage: React.FC<CompanyInfoProps> = ({ companyInfo }) => {
 
   //#region Code
   const { currentLanguage } = useLanguage();
@@ -66,12 +70,12 @@ const ContactPage: React.FC = () => {
         message: 'Write your message here...'
       },
       contactDetails: {
-        address: 'King Fahd Road, Al Olaya District, Riyadh 12211, Saudi Arabia',
-        addressAr: 'طريق الملك فهد، حي العليا، الرياض 12211، المملكة العربية السعودية',
-        phone: '+966 11 123 4567',
-        email: 'info@balancerealestate.com',
-        hours: 'Sunday - Thursday: 9:00 AM - 6:00 PM',
-        hoursAr: 'الأحد - الخميس: 9:00 ص - 6:00 م'
+        address: companyInfo?.addressEn ? companyInfo?.addressEn : 'King Fahd Road, Al Olaya District, Riyadh 12211, Saudi Arabia',
+        addressAr: companyInfo?.addressAr ? companyInfo?.addressAr : 'طريق الملك فهد، حي العليا، الرياض 12211، المملكة العربية السعودية',
+        phone: companyInfo?.phone ? companyInfo?.phone : '+966 11 123 4567',
+        email: companyInfo?.email ? companyInfo?.email : 'info@balancerealestate.com',
+        hours: companyInfo?.workingHoursEn ? companyInfo?.workingHoursEn : 'Sunday - Thursday: 9:00 AM - 6:00 PM',
+        hoursAr: companyInfo?.workingHoursAr ? companyInfo?.workingHoursAr : 'الأحد - الخميس: 9:00 ص - 6:00 م'
       },
       validation: {
         nameRequired: 'Full name is required',
@@ -117,12 +121,12 @@ const ContactPage: React.FC = () => {
         message: 'اكتب رسالتك هنا...'
       },
       contactDetails: {
-        address: 'طريق الملك فهد، حي العليا، الرياض 12211، المملكة العربية السعودية',
-        addressAr: 'طريق الملك فهد، حي العليا، الرياض 12211، المملكة العربية السعودية',
-        phone: '+966 11 123 4567',
-        email: 'info@balancerealestate.com',
-        hours: 'الأحد - الخميس: 9:00 ص - 6:00 م',
-        hoursAr: 'الأحد - الخميس: 9:00 ص - 6:00 م'
+        address: companyInfo?.addressEn ? companyInfo?.addressEn : 'طريق الملك فهد، حي العليا، الرياض 12211، المملكة العربية السعودية',
+        addressAr: companyInfo?.addressAr ? companyInfo?.addressAr : 'طريق الملك فهد، حي العليا، الرياض 12211، المملكة العربية السعودية',
+        phone: companyInfo?.phone ? companyInfo?.phone : '+966 11 123 4567',
+        email: companyInfo?.email ? companyInfo?.email : 'info@balancerealestate.com',
+        hours: companyInfo?.workingHoursEn ? companyInfo?.workingHoursEn : 'الأحد - الخميس: 9:00 ص - 6:00 م',
+        hoursAr: companyInfo?.workingHoursAr ? companyInfo?.workingHoursAr : 'الأحد - الخميس: 9:00 ص - 6:00 م'
       },
       validation: {
         nameRequired: 'الاسم الكامل مطلوب',
@@ -144,6 +148,11 @@ const ContactPage: React.FC = () => {
   const t = isArabic ? content.ar : content.en;
   const { data, error, loading } = useSelector((state: RootState) => state.Contact)
   const dispatch = useDispatch<AppDispatch>()
+
+
+  const lat = companyInfo?.latitude ? companyInfo?.latitude : companyInfo?.latitude;
+  const lon = companyInfo?.longitude ? companyInfo?.latitude : companyInfo?.latitude;
+  const mapUrl = `https://www.google.com/maps?q=${lat},${lon}&z=15&output=embed`;
 
 
   //#endregion Code
@@ -451,7 +460,7 @@ const ContactPage: React.FC = () => {
         <div className={styles.contact__map_section}>
           <div className={styles.contact__map}>
             <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3624.4!2d46.6753!3d24.7136!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3e2f0c8c8c8c8c8c%3A0x8c8c8c8c8c8c8c8c!2sKing%20Fahd%20Rd%2C%20Al%20Olaya%2C%20Riyadh%2012211%2C%20Saudi%20Arabia!5e0!3m2!1sen!2s!4v1234567890"
+              src={mapUrl ? mapUrl : "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3624.4!2d46.6753!3d24.7136!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3e2f0c8c8c8c8c8c%3A0x8c8c8c8c8c8c8c8c!2sKing%20Fahd%20Rd%2C%20Al%20Olaya%2C%20Riyadh%2012211%2C%20Saudi%20Arabia!5e0!3m2!1sen!2s!4v1234567890"}
               width="100%"
               height="450"
               style={{ border: 0 }}

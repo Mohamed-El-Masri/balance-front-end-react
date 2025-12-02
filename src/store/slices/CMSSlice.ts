@@ -2,7 +2,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { buildCreateApi } from "@reduxjs/toolkit/query";
 import ApiConfigInterceptor from "../../config/config.api"
 
-export const getCMSData =createAsyncThunk("getCMS", async (_, thunkApi) => {
+export const getCMSData = createAsyncThunk("getCMS", async (_, thunkApi) => {
     try {
         const response = await ApiConfigInterceptor.get("/admin/Settings");
         return response
@@ -21,17 +21,24 @@ export interface SocialLink {
 }
 
 export interface CompanyInfo {
-    aboutTitle: string;
-    aboutDescription: string;
-    address: string;
+    aboutTitleAr: string;
+    aboutTitleEn: string;
+    aboutDescriptionAr: string;
+    aboutDescriptionEn: string;
+    addressAr: string;
+    addressEn: string;
+    workingHoursAr: string;
+    workingHoursEn: string;
+    copyrightTextAr: string;
+    copyrightTextEn: string;
     phone: string;
     email: string;
-    copyrightText: string;
-    workingHours: string;
+    mapUrl: string | null;
     latitude: number;
     longitude: number;
     socialLinks: SocialLink[];
 }
+
 
 interface CMSSliceDate {
     loading: boolean,
