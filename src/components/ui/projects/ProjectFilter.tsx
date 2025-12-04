@@ -235,16 +235,24 @@ const ProjectFilter: React.FC<ProjectFilterProps> = ({
   const t = isArabic ? content.ar : content.en;
 
   const handleFilterChange = (filterType: string, value: string) => {
-    const newFilters = {
+    let newFilters = {
       ...filters,
       [filterType]: value
     };
-    setFilters(newFilters);
+
     if (filterType === "RegionId") {
       dispatch(getCitiesByRegionId(value))
+      dispatch(resetCitiesAndDistrict())
+      delete newFilters.CityId;
+      delete newFilters.DistrictId;
+
     } else if (filterType === "CityId") {
       dispatch(getDistrictsByCityId(value))
+      delete newFilters.DistrictId;
+
     }
+
+    setFilters(newFilters);
     onFilterChange(newFilters);
   };
 
