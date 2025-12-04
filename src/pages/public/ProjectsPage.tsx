@@ -297,13 +297,13 @@ const ProjectsPage: React.FC = () => {
     });
   }, [filters, allProjects]);
 
-  // Paginate filtered projects
-  const paginatedProjects = useMemo(() => {
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    return filteredProjects.slice(startIndex, startIndex + itemsPerPage);
-  }, [filteredProjects, currentPage]);
+  // // Paginate filtered projects
+  // const paginatedProjects = useMemo(() => {
+  //   const startIndex = (currentPage - 1) * itemsPerPage;
+  //   return filteredProjects.slice(startIndex, startIndex + itemsPerPage);
+  // }, [filteredProjects, currentPage]);
 
-  const totalPages = Math.ceil(filteredProjects.length / itemsPerPage);
+  // const totalPages = Math.ceil(filteredProjects.length / itemsPerPage);
 
   const handleFilterChange = (newFilters: ActiveFilters) => {
     setFilters(newFilters);

@@ -143,24 +143,24 @@ const Footer: React.FC<CompanyInfoProps> = ({ companyInfo }) => {
             <h4 className={styles.footer__heading}>{t.services}</h4>
             <ul className={styles.footer__links}>
               <li>
-                <Link to="/services/residential" className={styles.footer__link}>
+                <span className={styles.footer__link}>
                   {t.servicesList.residential}
-                </Link>
+                </span>
               </li>
               <li>
-                <Link to="/services/commercial" className={styles.footer__link}>
+                <span className={styles.footer__link}>
                   {t.servicesList.commercial}
-                </Link>
+                </span>
               </li>
               <li>
-                <Link to="/services/investment" className={styles.footer__link}>
+                <span className={styles.footer__link}>
                   {t.servicesList.investment}
-                </Link>
+                </span>
               </li>
               <li>
-                <Link to="/services/property-management" className={styles.footer__link}>
+                <span className={styles.footer__link}>
                   {t.servicesList.management}
-                </Link>
+                </span>
               </li>
             </ul>
           </div>

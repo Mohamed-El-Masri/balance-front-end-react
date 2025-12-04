@@ -47,17 +47,36 @@ export interface filterDataResponse {
 interface initialStateData {
     data: filterDataResponse | null,
     loading: boolean,
-    error: string | null
+    error: string | null,
+    cities: City[] | null,
+    district: District[] | null,
 }
 
 const initialState: initialStateData = {
     data: null,
     loading: false,
-    error: null
+    error: null,
+    cities: null,
+    district: null,
 };
 
 
-
+export const getCitiesByRegionId = createAsyncThunk("filter/cities", async (regionId: string, thunkApi) => {
+    try {
+        const response = await ApiConfigInterceptor.get(`/project/cities?regionId=${regionId}`);
+        return response;
+    } catch (error) {
+        return thunkApi.rejectWithValue(error);
+    }
+});
+export const getDistrictsByCityId = createAsyncThunk("filter/districts", async (cityId: string, thunkApi) => {
+    try {
+        const response = await ApiConfigInterceptor.get(`/project/districts?cityId=${cityId}`);
+        return response;
+    } catch (error) {
+        return thunkApi.rejectWithValue(error);
+    }
+});
 
 export const getFilterAPi = createAsyncThunk("filter/getFilter", async (filter: string, thunkApi) => {
     try {
@@ -68,11 +87,23 @@ export const getFilterAPi = createAsyncThunk("filter/getFilter", async (filter: 
     }
 });
 
-
 const FilterSlice = createSlice({
     name: "filter",
     initialState,
-    reducers: {},
+    reducers: {
+        reset: (state) => {
+            state.loading = false;
+            state.error = null;
+            state.data = null;
+            state.cities = null;
+            state.district = null;
+
+        },
+        resetCitiesAndDistrict: (state) => {
+            state.cities = null
+            state.district = null
+        },
+    },
     extraReducers: (builder) => {
 
         // Get All Projects 
@@ -85,10 +116,18 @@ const FilterSlice = createSlice({
         }).addCase(getFilterAPi.rejected, (state, action) => {
             state.loading = false;
             state.error = action.payload as string;
-        });
+        })
+            // City 
+            .addCase(getCitiesByRegionId.fulfilled, (state, action) => {
+                state.cities = action.payload.data
+            })
+            // District
+            .addCase(getDistrictsByCityId.fulfilled, (state, action) => {
+                state.district = action.payload.data
+            })
 
     }
 })
 
-
+export const { reset, resetCitiesAndDistrict } = FilterSlice.actions
 export default FilterSlice.reducer

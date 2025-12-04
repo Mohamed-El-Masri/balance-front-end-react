@@ -4,7 +4,7 @@ import styles from '../../../styles/components/projects/ProjectFilter.module.css
 import { useLanguage } from '../../../contexts/useLanguage';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../../store';
-import { City, District, getFilterAPi, ProjectType, Region, Status } from '../../../store/slices/FiltersSlice';
+import { City, District, getCitiesByRegionId, getDistrictsByCityId, getFilterAPi, ProjectType, Region, reset, resetCitiesAndDistrict, Status } from '../../../store/slices/FiltersSlice';
 
 export interface FilterOptions {
   status: string[];
@@ -68,13 +68,27 @@ interface FilterDropdownListProps2 {
   filterChangeObject: string,
   isArabic: boolean,
   filterData: District[] | City[] | Region[]
+  isDisabled: boolean
 }
 
-const FilterDropdownList2: React.FC<FilterDropdownListProps2> = ({ t, label, FilterValue, handleFilterChange, filterChangeObject, isArabic, filterData }) => {
+const FilterDropdownList2: React.FC<FilterDropdownListProps2> = (
+  {
+    t,
+    label,
+    FilterValue,
+    handleFilterChange,
+    filterChangeObject,
+    isArabic,
+    filterData,
+    isDisabled
+  }) => {
+  console.log(`FilterValue disable = ${filterChangeObject}`, isDisabled);
+
   return <>
     <div className={styles.filter__group}>
       <label className={styles.filter__label}>{label}</label>
       <select
+        disabled={isDisabled}
         className={styles.filter__select}
         value={FilterValue}
         onChange={(e) => handleFilterChange(`${filterChangeObject}`, e.target.value)}
@@ -105,19 +119,36 @@ const ProjectFilter: React.FC<ProjectFilterProps> = ({
   const isArabic = currentLanguage.code === 'ar';
 
   const {
-    data, loading, error
+    data, loading, error, cities, district
   } = useSelector((state: RootState) => state.Filter);
   const dispatch = useDispatch<AppDispatch>();
 
-
-
   useEffect(() => {
+    dispatch(reset())
     dispatch(getFilterAPi("project"));
   }, [])
 
+
+
   useEffect(() => {
-    data && data.statuses && console.log("fetch Data", data.statuses);
-  }, [data])
+    console.log("data", {
+      cities,
+      district
+    });
+
+  }, [])
+  // useEffect(() => {
+  //   dispatch(getCitiesByRegionId("1"))
+  //   dispatch(getDistrictsByCityId("1"))
+  // }, [])
+
+  // useEffect(() => {
+  //   cities && console.log("data City", cities);
+  //   district && console.log("data dis", district);
+
+  // }, [cities, district])
+
+
 
   const [filters, setFilters] = useState({
     RegionId: "",
@@ -209,6 +240,11 @@ const ProjectFilter: React.FC<ProjectFilterProps> = ({
       [filterType]: value
     };
     setFilters(newFilters);
+    if (filterType === "RegionId") {
+      dispatch(getCitiesByRegionId(value))
+    } else if (filterType === "CityId") {
+      dispatch(getDistrictsByCityId(value))
+    }
     onFilterChange(newFilters);
   };
 
@@ -220,6 +256,7 @@ const ProjectFilter: React.FC<ProjectFilterProps> = ({
       StatusId: ""
     };
     setFilters(clearedFilters);
+    dispatch(resetCitiesAndDistrict())
     onFilterChange(clearedFilters);
   };
 
@@ -259,12 +296,14 @@ const ProjectFilter: React.FC<ProjectFilterProps> = ({
 
             <FilterDropdownList2
               t={t}
-              label={t.district}
-              FilterValue={filters.DistrictId}
+              label={t.area}
+              FilterValue={filters.RegionId}
               handleFilterChange={handleFilterChange}
-              filterChangeObject={"DistrictId"}
+              filterChangeObject={"RegionId"}
               isArabic={isArabic}
-              filterData={data?.districts ? data.districts : []} />
+              filterData={data?.regions ? data.regions : []}
+              isDisabled={false}
+            />
 
             <FilterDropdownList2
               t={t}
@@ -273,16 +312,24 @@ const ProjectFilter: React.FC<ProjectFilterProps> = ({
               handleFilterChange={handleFilterChange}
               filterChangeObject={"CityId"}
               isArabic={isArabic}
-              filterData={data?.cities ? data.cities : []} />
+              filterData={cities ? cities : []}
+              isDisabled={cities === null}
+            />
 
             <FilterDropdownList2
               t={t}
-              label={t.area}
+              label={t.district}
               FilterValue={filters.DistrictId}
               handleFilterChange={handleFilterChange}
               filterChangeObject={"DistrictId"}
               isArabic={isArabic}
-              filterData={data?.regions ? data.regions : []} />
+              filterData={district ? district : []}
+              isDisabled={district === null}
+
+            />
+
+
+
 
             {/* Status Filter */}
             {/* <div className={styles.filter__group}>
