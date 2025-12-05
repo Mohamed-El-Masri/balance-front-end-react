@@ -1,162 +1,23 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import styles from '../../../styles/components/home/OurLocations.module.css';
 import { useLanguage } from '../../../contexts/useLanguage';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '../../../store';
+import { getAllProjectLocation, Project, ProjectLocation } from '../../../store/slices/ProjectSlice';
 
 // Global flag to track if Google Maps script has been loaded
 let googleMapsScriptLoaded = false;
-
-// بيانات المواقع مع إحداثيات جغرافية حقيقية
-const projectLocations = [
-  {
-    id: 1,
-    name: {
-      ar: 'مجمع الياسمين السكني',
-      en: 'Yasmin Residential Complex'
-    },
-    address: {
-      ar: 'شمال الرياض، المملكة العربية السعودية',
-      en: 'North Riyadh, Saudi Arabia'
-    },
-    coordinates: {
-      lat: 24.8607,
-      lng: 46.7219
-    },
-    phone: '+966 11 123 4567',
-    status: {
-      ar: 'قيد الإنشاء',
-      en: 'Under Construction'
-    },
-    type: {
-      ar: 'سكني',
-      en: 'Residential'
-    }
-  },
-  {
-    id: 2,
-    name: {
-      ar: 'برج النخيل التجاري',
-      en: 'Palm Tower Commercial'
-    },
-    address: {
-      ar: 'وسط جدة، المملكة العربية السعودية',
-      en: 'Central Jeddah, Saudi Arabia'
-    },
-    coordinates: {
-      lat: 21.5433,
-      lng: 39.1728
-    },
-    phone: '+966 12 123 4567',
-    status: {
-      ar: 'مكتمل',
-      en: 'Completed'
-    },
-    type: {
-      ar: 'تجاري',
-      en: 'Commercial'
-    }
-  },
-  {
-    id: 3,
-    name: {
-      ar: 'مدينة الأعمال الذكية',
-      en: 'Smart Business City'
-    },
-    address: {
-      ar: 'شرق الدمام، المملكة العربية السعودية',
-      en: 'East Dammam, Saudi Arabia'
-    },
-    coordinates: {
-      lat: 26.4207,
-      lng: 50.0888
-    },
-    phone: '+966 13 123 4567',
-    status: {
-      ar: 'قيد التخطيط',
-      en: 'Planning Phase'
-    },
-    type: {
-      ar: 'مختلط',
-      en: 'Mixed Use'
-    }
-  },
-  {
-    id: 4,
-    name: {
-      ar: 'قرية الورود العائلية',
-      en: 'Rose Family Village'
-    },
-    address: {
-      ar: 'غرب الرياض، المملكة العربية السعودية',
-      en: 'West Riyadh, Saudi Arabia'
-    },
-    coordinates: {
-      lat: 24.7136,
-      lng: 46.6753
-    },
-    phone: '+966 11 123 4568',
-    status: {
-      ar: 'قيد الإنشاء',
-      en: 'Under Construction'
-    },
-    type: {
-      ar: 'سكني',
-      en: 'Residential'
-    }
-  },
-  {
-    id: 5,
-    name: {
-      ar: 'مركز الماس التجاري',
-      en: 'Diamond Commercial Center'
-    },
-    address: {
-      ar: 'شمال جدة، المملكة العربية السعودية',
-      en: 'North Jeddah, Saudi Arabia'
-    },
-    coordinates: {
-      lat: 21.6042,
-      lng: 39.1467
-    },
-    phone: '+966 12 123 4568',
-    status: {
-      ar: 'متاح للبيع',
-      en: 'Available for Sale'
-    },
-    type: {
-      ar: 'تجاري',
-      en: 'Commercial'
-    }
-  },
-  {
-    id: 6,
-    name: {
-      ar: 'مجمع الأندلس الفاخر',
-      en: 'Andalus Luxury Complex'
-    },
-    address: {
-      ar: 'جنوب الرياض، المملكة العربية السعودية',
-      en: 'South Riyadh, Saudi Arabia'
-    },
-    coordinates: {
-      lat: 24.6408,
-      lng: 46.7728
-    },
-    phone: '+966 11 123 4569',
-    status: {
-      ar: 'قيد الإنشاء',
-      en: 'Under Construction'
-    },
-    type: {
-      ar: 'فاخر',
-      en: 'Luxury'
-    }
-  }
-];
 
 const OurLocations: React.FC = () => {
   const { currentLanguage } = useLanguage();
   const isArabic = currentLanguage.code === 'ar';
   const [mapLoaded, setMapLoaded] = useState(false);
+
+  const { location: {
+    all, loading, error
+  } } = useSelector((state: RootState) => state.projects);
+
+  const dispatch = useDispatch<AppDispatch>();
 
   const content = {
     en: {
@@ -189,9 +50,11 @@ const OurLocations: React.FC = () => {
 
   // إنشاء دالة لتهيئة الخريطة
   const initializeMap = useCallback(() => {
+    if (!all || all.length === 0) return;
+
     const mapElement = document.getElementById('google-map');
     if (!mapElement || !window.google || !window.google.maps) return;
-    
+
     // منع إنشاء خرائط متعددة
     if (mapElement.dataset.mapInitialized === 'true') return;
     mapElement.dataset.mapInitialized = 'true';
@@ -217,12 +80,16 @@ const OurLocations: React.FC = () => {
     });
 
     // إضافة markers لكل موقع
-    projectLocations.forEach((location) => {
+    all.forEach((item: ProjectLocation) => {
       // إنشاء ماركر بشكل GPS تقليدي
       const marker = new window.google.maps.Marker({
-        position: location.coordinates,
+        position: {
+          lat: item?.coordinates?.lat,
+          lng: item?.coordinates?.lng
+
+        },
         map: map,
-        title: isArabic ? location.name.ar : location.name.en,
+        title: isArabic ? item?.name?.ar : item?.name?.en,
         icon: {
           url: 'data:image/svg+xml;base64,' + btoa(`
             <svg width="32" height="40" viewBox="0 0 32 40" xmlns="http://www.w3.org/2000/svg">
@@ -242,10 +109,10 @@ const OurLocations: React.FC = () => {
         content: `
           <div style="padding: 1.5rem; max-width: 300px; font-family: 'Cairo', sans-serif; direction: ${isArabic ? 'rtl' : 'ltr'};">
             <h3 style="margin: 0 0 1rem 0; color: #291C0E; font-size: 1.2rem; font-weight: 700;">
-              ${isArabic ? location.name.ar : location.name.en}
+              ${isArabic ? item?.name?.ar : item?.name?.en}
             </h3>
             <p style="margin: 0 0 1rem 0; color: #666; font-size: 0.95rem; line-height: 1.4;">
-              ${isArabic ? location.address.ar : location.address.en}
+              ${isArabic ? item?.address?.ar : item?.address?.en}
             </p>
             
             <div style="display: flex; justify-content: space-between; margin-bottom: 1rem; padding: 0.75rem; background: #f8f9fa; border-radius: 8px;">
@@ -254,7 +121,7 @@ const OurLocations: React.FC = () => {
                   ${isArabic ? 'الحالة' : 'Status'}
                 </div>
                 <div style="color: #291C0E; font-size: 0.9rem;">
-                  ${isArabic ? location.status.ar : location.status.en}
+                  ${isArabic ? item?.status?.ar : item?.status?.en}
                 </div>
               </div>
               <div style="text-align: center;">
@@ -262,14 +129,14 @@ const OurLocations: React.FC = () => {
                   ${isArabic ? 'النوع' : 'Type'}
                 </div>
                 <div style="color: #291C0E; font-size: 0.9rem;">
-                  ${isArabic ? location.type.ar : location.type.en}
+                  ${isArabic ? item?.type?.ar : item?.type?.en}
                 </div>
               </div>
             </div>
             
             <div style="display: flex; gap: 0.75rem; margin-top: 1rem;">
               <button 
-                onclick="window.open('/project/${location.id}', '_blank')"
+                onclick="window.open('/project/${item?.id}', '_blank')"
                 style="flex: 1; background: #B58863; color: white; border: none; padding: 0.75rem 1rem; border-radius: 8px; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease;"
                 onmouseover="this.style.background='#A0785A'"
                 onmouseout="this.style.background='#B58863'"
@@ -277,7 +144,7 @@ const OurLocations: React.FC = () => {
                 ${isArabic ? 'عرض المشروع' : 'View Project'}
               </button>
               <button 
-                onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${location.coordinates.lat},${location.coordinates.lng}', '_blank')"
+                onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${item?.coordinates?.lat},${item?.coordinates?.lng}', '_blank')"
                 style="flex: 1; background: transparent; color: #B58863; border: 2px solid #B58863; padding: 0.75rem 1rem; border-radius: 8px; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease;"
                 onmouseover="this.style.background='#B58863'; this.style.color='white'"
                 onmouseout="this.style.background='transparent'; this.style.color='#B58863'"
@@ -287,7 +154,7 @@ const OurLocations: React.FC = () => {
             </div>
             
             <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #eee; font-size: 0.85rem; color: #666;">
-              ${isArabic ? 'الهاتف:' : 'Phone:'} <strong style="color: #291C0E;">${location.phone}</strong>
+              ${isArabic ? 'الهاتف:' : 'Phone:'} <strong style="color: #291C0E;">${item?.phone}</strong>
             </div>
           </div>
         `
@@ -297,7 +164,7 @@ const OurLocations: React.FC = () => {
         infoWindow.open(map, marker);
       });
     });
-  }, [isArabic]);
+  }, [isArabic, all]);
 
   // تحميل Google Maps API
   useEffect(() => {
@@ -316,7 +183,7 @@ const OurLocations: React.FC = () => {
       script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&callback=initMap&libraries=marker`;
       script.async = true;
       script.defer = true;
-      
+
       // Only define initMap if it doesn't already exist
       if (!window.initMap) {
         window.initMap = () => {
@@ -330,6 +197,7 @@ const OurLocations: React.FC = () => {
     };
 
     loadGoogleMaps();
+    dispatch(getAllProjectLocation());
   }, []);
 
   // تهيئة الخريطة عند تحميلها أو تغيير اللغة

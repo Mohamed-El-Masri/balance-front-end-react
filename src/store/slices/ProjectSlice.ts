@@ -95,9 +95,41 @@ interface ProjectDetailsState {
   error: string | null;
 }
 
+export interface ProjectLocation {
+  id: number;
+  name: {
+    ar: string;
+    en: string;
+  };
+  address: {
+    ar: string;
+    en: string;
+  };
+  coordinates: {
+    lat: number;
+    lng: number;
+  };
+  phone: string;
+  status: {
+    ar: string;
+    en: string;
+  };
+  type: {
+    ar: string;
+    en: string;
+  };
+}
+
+interface ProjectsLocationState {
+  all: ProjectLocation[] | null,
+  loading: boolean;
+  error: string | null;
+}
+
 interface SliceProjectState {
   projects: ProjectsState
   single: ProjectDetailsState
+  location: ProjectsLocationState
 }
 
 
@@ -111,9 +143,13 @@ const initialState: SliceProjectState = {
     details: null,
     loading: false,
     error: null
-
-
+  },
+  location: {
+    all: null,
+    loading: false,
+    error: null,
   }
+
 };
 
 
@@ -154,6 +190,18 @@ export const getProjectById = createAsyncThunk("project/getById", async (id: num
   }
 })
 
+export const getAllProjectLocation = createAsyncThunk("project/locations", async (_, thunkApi) => {
+  try {
+    const response = await ApiConfigInterceptor.get(`/project/locations`);
+    return response;
+  } catch (error) {
+    return thunkApi.rejectWithValue(error);
+  }
+})
+
+
+
+
 
 
 const ProjectSlice = createSlice({
@@ -182,6 +230,16 @@ const ProjectSlice = createSlice({
     }).addCase(getProjectById.rejected, (state, action) => {
       state.single.loading = false;
       state.single.error = action.payload as string;
+    });
+    builder.addCase(getAllProjectLocation.pending, (state) => {
+      state.location.loading = true;
+      state.location.error = null;
+    }).addCase(getAllProjectLocation.fulfilled, (state, action) => {
+      state.location.loading = false;
+      state.location.all = action.payload.data;
+    }).addCase(getAllProjectLocation.rejected, (state, action) => {
+      state.location.loading = false;
+      state.location.error = action.payload as string;
     });
 
 
