@@ -400,9 +400,9 @@
   }
   
   .about__image {
-    order: -1;
+    /* order: 1; */
     height: auto;
-    min-height: 400px;
+    min-height: 1300px;
   }
   
   .about__image_container {
