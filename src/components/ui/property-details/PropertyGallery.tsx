@@ -2,9 +2,10 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { ChevronLeft, ChevronRight, Play, X, ZoomIn, Download } from 'lucide-react';
 import styles from '../../../styles/components/property-details/PropertyGallery.module.css';
 import { useLanguage } from '../../../contexts/useLanguage';
+import { UnitImage } from '../../../store/slices/UnitSlice';
 
 interface PropertyGalleryProps {
-  images: string[];
+  images: UnitImage[];
   videos?: string[];
   virtualTour?: string;
   propertyName: string;
@@ -20,7 +21,7 @@ const PropertyGallery: React.FC<PropertyGalleryProps> = ({
 }) => {
   const { currentLanguage } = useLanguage();
   const isArabic = currentLanguage.code === 'ar';
-  
+
   const [activeIndex, setActiveIndex] = useState(0);
   const [activeMediaType, setActiveMediaType] = useState<'images' | 'videos' | 'tour'>('images');
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
@@ -55,18 +56,18 @@ const PropertyGallery: React.FC<PropertyGalleryProps> = ({
   const propertyTitle = isArabic ? propertyNameAr : propertyName;
 
   // Get current media array based on active type
-  const getCurrentMedia = () => {
+  const getCurrentMedia = ():  | UnitImage[]| string[]  => {
     switch (activeMediaType) {
       case 'videos':
-        return videos;
+        return videos ;
       case 'tour':
         return virtualTour ? [virtualTour] : [];
       default:
-        return images;
+        return images as UnitImage[];
     }
   };
 
-  const currentMedia = getCurrentMedia();
+  const currentMedia:UnitImage[] | string[] = getCurrentMedia();
 
   // Navigation functions
   const goToNext = () => {
@@ -177,7 +178,7 @@ const PropertyGallery: React.FC<PropertyGalleryProps> = ({
           {activeMediaType === 'images' ? (
             <div className={styles.gallery__image_container}>
               <img
-                src={currentMedia[activeIndex]}
+                src={currentMedia[activeIndex]?.imageUrl}
                 alt={`${propertyTitle} - Image ${activeIndex + 1}`}
                 className={styles.gallery__primary_image}
                 onClick={() => openLightbox(activeIndex)}
@@ -193,7 +194,7 @@ const PropertyGallery: React.FC<PropertyGalleryProps> = ({
           ) : activeMediaType === 'videos' ? (
             <div className={styles.gallery__video_container}>
               <video
-                src={currentMedia[activeIndex]}
+                src={currentMedia[activeIndex] + ""}
                 controls
                 className={styles.gallery__primary_video}
               />
@@ -241,9 +242,8 @@ const PropertyGallery: React.FC<PropertyGalleryProps> = ({
             {currentMedia.slice(0, 6).map((media, index) => (
               <div
                 key={index}
-                className={`${styles.gallery__thumbnail} ${
-                  index === activeIndex ? styles.gallery__thumbnail_active : ''
-                }`}
+                className={`${styles.gallery__thumbnail} ${index === activeIndex ? styles.gallery__thumbnail_active : ''
+                  }`}
                 onClick={() => setActiveIndex(index)}
               >
                 {activeMediaType === 'images' ? (
@@ -266,7 +266,7 @@ const PropertyGallery: React.FC<PropertyGalleryProps> = ({
                 )}
               </div>
             ))}
-            
+
             {currentMedia.length > 6 && (
               <button
                 className={styles.gallery__view_all}
@@ -294,7 +294,7 @@ const PropertyGallery: React.FC<PropertyGalleryProps> = ({
             </button>
 
             <img
-              src={currentMedia[lightboxIndex]}
+              src={currentMedia[lightboxIndex]?.imageUrl}
               alt={`${propertyTitle} - Image ${lightboxIndex + 1}`}
               className={styles.lightbox__image}
             />
@@ -326,7 +326,7 @@ const PropertyGallery: React.FC<PropertyGalleryProps> = ({
                 className={styles.lightbox__download}
                 onClick={() => {
                   const link = document.createElement('a');
-                  link.href = currentMedia[lightboxIndex];
+                  link.href = currentMedia[lightboxIndex]?.imageUrl;
                   link.download = `${propertyTitle}-image-${lightboxIndex + 1}.jpg`;
                   link.click();
                 }}

@@ -18,6 +18,12 @@ export interface UnitFeature {
   nameEn: string;
   iconUrl: string | null;
 }
+export interface UnitImage {
+  imageUrl: string,
+  caption: string,
+  order: number,
+  publicId: string
+}
 
 export interface Unit {
   id: number;
@@ -53,7 +59,7 @@ export interface Unit {
   mainImageUrl: string;
 
   assignedEmployees: AssignedEmployee[];
-  images: string[];
+  images: UnitImage[];
 
   features: UnitFeature[];
 
