@@ -56,10 +56,10 @@ const PropertyGallery: React.FC<PropertyGalleryProps> = ({
   const propertyTitle = isArabic ? propertyNameAr : propertyName;
 
   // Get current media array based on active type
-  const getCurrentMedia = ():  | UnitImage[]| string[]  => {
+  const getCurrentMedia = (): | UnitImage[] | string[] => {
     switch (activeMediaType) {
       case 'videos':
-        return videos ;
+        return videos;
       case 'tour':
         return virtualTour ? [virtualTour] : [];
       default:
@@ -67,7 +67,7 @@ const PropertyGallery: React.FC<PropertyGalleryProps> = ({
     }
   };
 
-  const currentMedia:UnitImage[] | string[] = getCurrentMedia();
+  const currentMedia: UnitImage[] | string[] = getCurrentMedia();
 
   // Navigation functions
   const goToNext = () => {
@@ -178,7 +178,7 @@ const PropertyGallery: React.FC<PropertyGalleryProps> = ({
           {activeMediaType === 'images' ? (
             <div className={styles.gallery__image_container}>
               <img
-                src={currentMedia[activeIndex]?.imageUrl}
+                src={typeof currentMedia[activeIndex] === "object" ? currentMedia[activeIndex]?.imageUrl : currentMedia[activeIndex]}
                 alt={`${propertyTitle} - Image ${activeIndex + 1}`}
                 className={styles.gallery__primary_image}
                 onClick={() => openLightbox(activeIndex)}
@@ -248,7 +248,7 @@ const PropertyGallery: React.FC<PropertyGalleryProps> = ({
               >
                 {activeMediaType === 'images' ? (
                   <img
-                    src={media}
+                    src={typeof media === "object" ? media?.imageUrl : media}
                     alt={`Thumbnail ${index + 1}`}
                     className={styles.gallery__thumbnail_image}
                   />
@@ -294,7 +294,7 @@ const PropertyGallery: React.FC<PropertyGalleryProps> = ({
             </button>
 
             <img
-              src={currentMedia[lightboxIndex]?.imageUrl}
+              src={typeof currentMedia[lightboxIndex] === "object" ? currentMedia[lightboxIndex]?.imageUrl : currentMedia[lightboxIndex]}
               alt={`${propertyTitle} - Image ${lightboxIndex + 1}`}
               className={styles.lightbox__image}
             />
@@ -326,7 +326,7 @@ const PropertyGallery: React.FC<PropertyGalleryProps> = ({
                 className={styles.lightbox__download}
                 onClick={() => {
                   const link = document.createElement('a');
-                  link.href = currentMedia[lightboxIndex]?.imageUrl;
+                  link.href = typeof currentMedia[lightboxIndex] === "object" ? currentMedia[lightboxIndex]?.imageUrl : currentMedia[lightboxIndex];
                   link.download = `${propertyTitle}-image-${lightboxIndex + 1}.jpg`;
                   link.click();
                 }}

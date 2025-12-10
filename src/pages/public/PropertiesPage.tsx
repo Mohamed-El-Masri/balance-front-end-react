@@ -9,7 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../store';
 import { getUnitsAPi } from '../../store/slices/UnitSlice';
 import { Pagination } from '../../components/ui/projects';
-
+import { useDebounce } from "use-debounce"
 // Mock data for properties
 const mockProperties = [
   {
@@ -134,12 +134,11 @@ const PropertiesPage: React.FC = () => {
   const { currentLanguage } = useLanguage();
   const isArabic = currentLanguage.code === 'ar';
 
-  const [properties, setProperties] = useState(mockProperties);
-  const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [searchTerm, setSearchTerm] = useState('');
-  const [filters, setFilters] = useState({
+  const [debouncedSearch] = useDebounce(searchTerm, 500);
 
+  const [filters, setFilters] = useState({
     Type: '',
     MinPrice: '',
     MaxPrice: '',
@@ -209,19 +208,6 @@ const PropertiesPage: React.FC = () => {
 
   const t = isArabic ? content.ar : content.en;
 
-  useEffect(() => {
-    // Simulate API call
-    const fetchProperties = async () => {
-      setLoading(true);
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      setProperties(mockProperties);
-      setLoading(false);
-    };
-
-    fetchProperties();
-  }, []);
-
-
 
   const clearFilters = () => {
     setFilters({
@@ -248,6 +234,7 @@ const PropertiesPage: React.FC = () => {
     // Type=2&NumberOfRooms=1&MinPrice=5000&MaxPrice=10000000
     dispatch(getUnitsAPi({
       ...filters,
+      SearchTerm: debouncedSearch,
       Page: 1
     }))
   };
@@ -260,6 +247,7 @@ const PropertiesPage: React.FC = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
     dispatch(getUnitsAPi({
       ...filters,
+      SearchTerm: debouncedSearch,
       Page: page
     }));
   };
@@ -279,6 +267,13 @@ const PropertiesPage: React.FC = () => {
     dispatch(getUnitsAPi({}));
   }, [])
 
+  useEffect(() => {
+    dispatch(getUnitsAPi({
+      ...filters,
+      SearchTerm: debouncedSearch,
+      Page: currentPage
+    }));
+  }, [debouncedSearch]);
 
   useEffect(() => {
     if (!unitLoading && data !== null) {

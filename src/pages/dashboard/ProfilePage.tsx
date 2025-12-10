@@ -700,8 +700,8 @@ const ProfilePage: React.FC = () => {
                           <PropertyCard
                             key={unit.unitId}
                             id={unit.unitId}
-                            title={isArabic ? unit.nameAr : unit.nameEn}
-                            location={isArabic ? unit.location : unit.location}
+                            title={isArabic ? unit.titleAr : unit.titleEn}
+                            location={isArabic ? unit.locationAr : unit.locationEn}
                             price={unit.price}
                             area={0}
                             image={unit.mainImageUrl}

@@ -2,10 +2,11 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://balancereales
 
 export interface FavoriteUnit {
   userId: string,
-  nameAr: string,
-  nameEn: string,
+  titleAr: string,
+  titleEn: string,
   price: number,
-  location: string,
+  locationAr: string,
+  locationEn: string,
   mainImageUrl: string,
   unitId: number
 }

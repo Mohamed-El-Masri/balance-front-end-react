@@ -74,12 +74,12 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
             </div>
           )}
           
-          {area && (
+          {/* {area && (
             <div className={styles.property_card__meta_item}>
               <Square size={16} />
               <span>{area} {t.sqm}</span>
             </div>
-          )}
+          )} */}
         </div>
 
         <div className={styles.property_card__actions}>

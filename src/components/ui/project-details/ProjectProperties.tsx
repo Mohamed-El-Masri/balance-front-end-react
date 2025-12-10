@@ -435,7 +435,7 @@ const ProjectProperties: React.FC<ProjectPropertiesProps> = ({
               <div key={property.id} className={styles.properties__card}>
                 <div className={styles.properties__card_image}>
                   <img
-                    src={property.images[0]}
+                    src={property?.images?.[0] + ""}
                     alt={isArabic ? property.titleAr : property.titleEn}
                     className={styles.properties__card_img}
                   />
